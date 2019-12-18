@@ -32,7 +32,7 @@ OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 #############################
 
 #### regra principal, gera o executavel
-tsp: $(OBJS) 
+tsp: $(OBJS)
 	@echo  "\033[31m \nLinking all objects files: \033[0m"
 	$(CPPC) $(CCOPT) $(OBJS) -o $(OBJDIR)/$@
 ############################
@@ -43,6 +43,7 @@ tsp: $(OBJS)
 #regra para cada arquivo objeto: compila e gera o arquivo de dependencias do arquivo objeto
 #cada arquivo objeto depende do .c e dos headers (informacao dos header esta no arquivo de dependencias gerado pelo compiler)
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(OBJDIR)
 	@echo  "\033[31m \nCompiling $<: \033[0m"
 	$(CPPC) $(CCOPT) -c $< -o $@
 	@echo  "\033[32m \ncreating $< dependency file: \033[0m"
