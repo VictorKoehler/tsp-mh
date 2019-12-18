@@ -44,6 +44,19 @@ void simple_best_twoopt_test() {
     a.printSolution();
 }
 
+void simple_best_reinserion_test(size_t len) {
+    auto a = solutionConstructor(dimension, matrizAdj);
+    a.printSolution();
+    ReinsertionMove::reinsertion_best(&a, len, true);
+    a.printSolution();
+    ReinsertionMove::reinsertion_best(&a, len, true);
+    a.printSolution();
+    a.pop_NeighborhoodMove();
+    a.printSolution();
+    a.pop_NeighborhoodMove();
+    a.printSolution();
+}
+
 void simple_copy_test() {
     auto a = solutionConstructor(dimension, matrizAdj);
     auto b = a;

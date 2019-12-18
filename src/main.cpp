@@ -13,21 +13,13 @@ void printData();
 void realignData();
 
 int main(int argc, char** argv) {
-    // std::vector<int> elems = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    // // elems.insert(elems.end() - 2, elems.begin() + 1, elems.begin() + 4);
-    // // elems.erase(elems.begin() + 1, elems.begin() + 4);
-    // elems.insert(elems.begin() + 2, elems.end() - 5, elems.end() - 2);
-    // elems.erase(elems.end() - 5, elems.end() - 2);
-    // for (auto e : elems) std::cout << e << " ";
-    // std::cout << std::endl;
-
     srand(time(NULL));
 
     int dim;
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
     realignData();
-    simple_best_swap_test();
+    simple_best_reinserion_test(1);
     return 0;
 }
 

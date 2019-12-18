@@ -130,3 +130,77 @@ double TwoOptMove::twoopt_best(TSPSolution *sol, bool auto_push) {
     }
     return delta;
 }
+
+
+
+
+
+
+
+
+
+
+
+inline void reinsertion_apply(TSPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
+    sol->cost += delta;
+    //std::cout << "Reinserting [" << opos << "..(" << len << ")] to " << npos << " with delta=" << delta << std::endl;
+    std::vector<int> cpy(sol->it(opos), sol->it(opos + len));
+    sol->erase(sol->it(opos), sol->it(opos + len));
+    size_t dlen = opos < npos ? len : 0;
+    sol->insert(sol->it(npos - dlen), cpy.begin(), cpy.end());
+}
+
+inline double reinsertion_cost(TSPSolution *sol, const vecit &o, size_t len, const vecit &n) {
+    const int preo = *(o - 1), poso = *(o + len), pren = *(n - 1), posn = *n,
+              bego = *o, endo = *(o + (len - 1));
+    return mat[preo][poso] + mat[pren][bego] + mat[endo][posn]
+        - (mat[preo][bego] + mat[endo][poso] + mat[pren][posn]);
+}
+
+inline double reinsertion_cost(TSPSolution *sol, size_t opos, size_t len, size_t npos) {
+    auto o = sol->it(opos), n = sol->it(npos);
+    return reinsertion_cost(sol, o, len, n);
+}
+
+
+void ReinsertionMove::apply(TSPSolution *sol) {
+    reinsertion_apply(sol, opos, len, npos, reinsertion_cost(sol, opos, len, npos));
+}
+
+void ReinsertionMove::undo(TSPSolution *sol) {
+    int t = opos;
+    opos = npos;
+    npos = t;
+    if (npos > opos) npos += len;
+    else opos -= len;
+    //std::cout << "U:npos=" << npos << ", opos=" << opos << " ";
+    apply(sol);
+}
+
+double ReinsertionMove::reinsertion_best(TSPSolution *sol, size_t len, bool auto_push) {
+    double delta = INFINITYLF;
+    vecit bi, bn;
+    auto end_max = sol->end() - len;
+    for (auto i = sol->begin() + 1; i != end_max; i++) {
+        auto maxi = i + len;
+        for (auto n = sol->begin() + 1; n != sol->end() - 1; n++) {
+            if (i <= n && n <= maxi) continue;
+            double d = reinsertion_cost(sol, i, len, n);
+            if (d < delta) {
+                bi = i;
+                bn = n;
+                delta = d;
+            }
+        }
+    }
+
+    if (delta < 0) {
+        int o = std::distance(sol->begin(), bi);
+        int n = std::distance(sol->begin(), bn);
+        if (!auto_push) reinsertion_apply(sol, o, len, n, delta);
+        else {
+            sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new ReinsertionMove(o, len, n)));
+        }
+    }
+    return delta;
+}

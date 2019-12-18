@@ -31,4 +31,19 @@ class TwoOptMove : public NeighborhoodMove {
     static double twoopt_best(TSPSolution *sol, bool auto_push);
 };
 
+
+class ReinsertionMove : public NeighborhoodMove {
+    public:
+    int opos, len, npos;
+    
+    ReinsertionMove(const int opos, const int len, const int npos) : opos(opos), len(len), npos(npos) { }
+
+    void apply(TSPSolution *sol) override;
+    void undo(TSPSolution *sol) override;
+
+    ~ReinsertionMove() override {}
+
+    static double reinsertion_best(TSPSolution *sol, size_t len, bool auto_push);
+};
+
 #endif
