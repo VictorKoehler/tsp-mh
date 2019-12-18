@@ -1,13 +1,18 @@
+#ifndef __TSPSOLUTION_CLASS__
+#define __TSPSOLUTION_CLASS__
+
 #include <vector>
+#include <stack>
 #include <cstdlib>
 #include <limits>
 #include <iostream>
+#include <memory>
 
-using namespace std;
+#include "tspneigh.h"
 
-typedef vector<int>::iterator vecit;
+typedef std::vector<int>::iterator vecit;
 
-class TSPSolution : public vector<int> {
+class TSPSolution : public std::vector<int> {
    public:
     TSPSolution(uint d, double **m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m)
     {
@@ -16,22 +21,9 @@ class TSPSolution : public vector<int> {
 
     uint dimension;
     double cost, **matrizAdj;
+    std::stack< std::unique_ptr<NeighborhoodMove> > neighmoves;
 
-    double update_cost() {
-        double ncost = 0;
-        for (auto it = begin(); it != end() - 1; it++) {
-            ncost += matrizAdj[*it][*(it+1)];
-        }
-        cost = ncost;
-        return ncost;
-    }
 
-    /**
-     * If this represents a valid solution.
-     */
-    inline bool completed() {
-        return dimension + 1 == uint(size());
-    }
 
     inline void insert_candidate(int c, const vecit& pos) {
         cost += insertion_cost(c, pos);
@@ -60,12 +52,48 @@ class TSPSolution : public vector<int> {
         return remotion_cost(i) + insertion_cost(*i, p);
     }
 
-    void printSolution() {
-        cout << "Solution:";
-        for (auto e : *this) {
-            cout << " " << e;
+
+
+    double update_cost() {
+        double ncost = 0;
+        for (auto it = begin(); it != end() - 1; it++) {
+            ncost += matrizAdj[*it][*(it+1)];
         }
-        cout << endl;
+        cost = ncost;
+        return ncost;
+    }
+
+    /**
+     * If this represents a valid solution.
+     */
+    inline bool completed() {
+        return dimension + 1 == uint(size());
+    }
+
+
+
+    inline double push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove> n) {
+        n->apply(this);
+        neighmoves.push(move(n));
+        return cost;
+    }
+
+    inline double pop_NeighborhoodMove() {
+        neighmoves.top()->undo(this);
+        neighmoves.pop();
+        return cost;
+    }
+
+
+    void printSolution() {
+        double d = cost;
+        std::cout << "Solution (" << d << "/" << update_cost() << "):";
+        // cout << "Solution:";
+        for (auto e : *this) {
+            std::cout << " " << e;
+        }
+        std::cout << std::endl;
     }
 };
 
+#endif
