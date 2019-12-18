@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include "readData.h"
+#include "tspheur.h"
 
 using namespace std;
 
@@ -11,10 +12,13 @@ void printData();
 void realignData();
 
 int main(int argc, char** argv) {
+    srand(time(NULL));
+
     int dim;
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
     realignData();
+    solutionConstructor(dimension, matrizAdj).printSolution();
     return 0;
 }
 
