@@ -7,6 +7,7 @@
 #include <limits>
 #include <iostream>
 #include <memory>
+#include <assert.h>
 
 #include "tspneigh.h"
 
@@ -64,6 +65,7 @@ class TSPSolution : public std::vector<int> {
     double update_cost() {
         double ncost = 0;
         for (auto it = begin(); it != end() - 1; it++) {
+            assert(matrizAdj[*it][*(it+1)] == matrizAdj[*(it+1)][*it]);
             ncost += matrizAdj[*it][*(it+1)];
         }
         cost = ncost;

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include "readData.h"
-#include "tspheur.h"
+#include "tests.h"
 
 using namespace std;
 
@@ -12,42 +12,15 @@ template<bool guides>
 void printData();
 void realignData();
 
-
-void simple_swap_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
-    a.printSolution();
-    a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
-    a.printSolution();
-    a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(4, 5)));
-    a.printSolution();
-    a.pop_NeighborhoodMove();
-    a.printSolution();
-    a.pop_NeighborhoodMove();
-    a.printSolution();
-}
-
-void simple_best_swap_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
-    a.printSolution();
-    SwapMove::swap_best(&a, false);
-    a.printSolution();
-    SwapMove::swap_best(&a, false);
-    a.printSolution();
-}
-
-void simple_copy_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
-    auto b = a;
-    cout << "a "; a.printSolution();
-    a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
-    cout << "a "; a.printSolution();
-    cout << "b "; b.printSolution();
-    a.pop_NeighborhoodMove();
-    cout << "a "; a.printSolution();
-    cout << "b "; b.printSolution();
-}
-
 int main(int argc, char** argv) {
+    // std::vector<int> elems = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    // // elems.insert(elems.end() - 2, elems.begin() + 1, elems.begin() + 4);
+    // // elems.erase(elems.begin() + 1, elems.begin() + 4);
+    // elems.insert(elems.begin() + 2, elems.end() - 5, elems.end() - 2);
+    // elems.erase(elems.end() - 5, elems.end() - 2);
+    // for (auto e : elems) std::cout << e << " ";
+    // std::cout << std::endl;
+
     srand(time(NULL));
 
     int dim;
