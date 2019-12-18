@@ -1,13 +1,13 @@
 #ifndef __TSPSOLUTION_CLASS__
 #define __TSPSOLUTION_CLASS__
 
-#include <vector>
-#include <stack>
-#include <cstdlib>
-#include <limits>
-#include <iostream>
-#include <memory>
 #include <assert.h>
+#include <cstdlib>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <stack>
+#include <vector>
 
 #include "tspneigh.h"
 
@@ -15,21 +15,28 @@ typedef std::vector<int>::iterator vecit;
 
 class TSPSolution : public std::vector<int> {
    public:
-    TSPSolution(const TSPSolution &obj) : vector<int>(obj)
-    {
+    static const uint route_start = 0;
+    uint dimension;
+    double cost, **matrizAdj;
+    std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+
+    TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
         dimension = obj.dimension;
         cost = obj.cost;
         matrizAdj = obj.matrizAdj;
     }
 
-    TSPSolution(uint d, double **m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m)
-    {
-        this->at(0) = this->at(1) = 0;
+    TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
+        this->at(route_start) = this->at(route_start) = 0;
     }
 
-    uint dimension;
-    double cost, **matrizAdj;
-    std::stack< std::unique_ptr<NeighborhoodMove> > neighmoves;
+    TSPSolution& operator=(const TSPSolution& t) {
+        std::vector<int>::operator=(t);
+        dimension = t.dimension;
+        cost = t.cost;
+        matrizAdj = t.matrizAdj;
+        return *this;
+    }
 
 
 
@@ -42,31 +49,28 @@ class TSPSolution : public std::vector<int> {
         insert_candidate(c, begin() + pos);
     }
 
-
-
     inline double insertion_cost(uint n, uint i, uint j) const {
         return matrizAdj[i][n] + matrizAdj[n][j] - matrizAdj[i][j];
     }
 
     inline double insertion_cost(uint n, const vecit& p) const {
-        return insertion_cost(n, *(p-1), *p);
+        return insertion_cost(n, *(p - 1), *p);
     }
 
     inline double remotion_cost(const vecit& i) const {
-        return matrizAdj[*(i-1)][*(i+1)] - matrizAdj[*(i-1)][*i] - matrizAdj[*i][*(i-1)];
+        return matrizAdj[*(i - 1)][*(i + 1)] - matrizAdj[*(i - 1)][*i] -
+               matrizAdj[*i][*(i - 1)];
     }
 
     inline double reinsertion_cost(const vecit& i, const vecit& p) const {
         return remotion_cost(i) + insertion_cost(*i, p);
     }
 
-
-
     double update_cost() {
         double ncost = 0;
         for (auto it = begin(); it != end() - 1; it++) {
-            assert(matrizAdj[*it][*(it+1)] == matrizAdj[*(it+1)][*it]);
-            ncost += matrizAdj[*it][*(it+1)];
+            assert(matrizAdj[*it][*(it + 1)] == matrizAdj[*(it + 1)][*it]);
+            ncost += matrizAdj[*it][*(it + 1)];
         }
         cost = ncost;
         return ncost;
@@ -75,9 +79,7 @@ class TSPSolution : public std::vector<int> {
     /**
      * If this represents a valid solution.
      */
-    inline bool completed() {
-        return dimension + 1 == uint(size());
-    }
+    inline bool completed() { return dimension + 1 == uint(size()); }
 
 
 
@@ -98,9 +100,8 @@ class TSPSolution : public std::vector<int> {
     }
 
     inline void reset_NeighborhoodMove() {
-        while (!neighmoves.empty()) neighmoves.pop();        
+        while (!neighmoves.empty()) neighmoves.pop();
     }
-
 
     void printSolution() {
         double d = cost;

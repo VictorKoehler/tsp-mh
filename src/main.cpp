@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
     realignData();
-    simple_best_reinserion_test(1);
+    cout << gils_rvnd(dimension, matrizAdj).cost << endl;
     return 0;
 }
 
