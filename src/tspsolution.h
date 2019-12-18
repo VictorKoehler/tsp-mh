@@ -14,6 +14,13 @@ typedef std::vector<int>::iterator vecit;
 
 class TSPSolution : public std::vector<int> {
    public:
+    TSPSolution(const TSPSolution &obj) : vector<int>(obj)
+    {
+        dimension = obj.dimension;
+        cost = obj.cost;
+        matrizAdj = obj.matrizAdj;
+    }
+
     TSPSolution(uint d, double **m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m)
     {
         this->at(0) = this->at(1) = 0;
@@ -82,6 +89,14 @@ class TSPSolution : public std::vector<int> {
         neighmoves.top()->undo(this);
         neighmoves.pop();
         return cost;
+    }
+
+    inline void popall_NeighborhoodMove() {
+        while (!neighmoves.empty()) pop_NeighborhoodMove();
+    }
+
+    inline void reset_NeighborhoodMove() {
+        while (!neighmoves.empty()) neighmoves.pop();        
     }
 
 

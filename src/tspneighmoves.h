@@ -1,15 +1,19 @@
+#ifndef __TSPNEIGHMOVES__
+#define __TSPNEIGHMOVES__
 #include "tspsolution.h"
 
 class SwapMove : public NeighborhoodMove {
     public:
     int a, b;
     
-    SwapMove(const int i, const int j) : a(i), b(j) { }
+    SwapMove(const int i, const int j) : a(i < j ? i : j), b(i < j ? j : i) { }
 
     void apply(TSPSolution *sol) override;
     void undo(TSPSolution *sol) override;
 
     ~SwapMove() override {}
 
-    inline static double swap_cost(TSPSolution *sol, int o, int p);
+    static double swap_best(TSPSolution *sol, bool auto_push);
 };
+
+#endif

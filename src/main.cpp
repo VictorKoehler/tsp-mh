@@ -12,13 +12,8 @@ template<bool guides>
 void printData();
 void realignData();
 
-int main(int argc, char** argv) {
-    srand(time(NULL));
 
-    int dim;
-    readData(argc, argv, &dim, &matrizAdj);
-    dimension = uint(dim);
-    realignData();
+void simple_swap_test() {
     auto a = solutionConstructor(dimension, matrizAdj);
     a.printSolution();
     a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
@@ -29,6 +24,37 @@ int main(int argc, char** argv) {
     a.printSolution();
     a.pop_NeighborhoodMove();
     a.printSolution();
+}
+
+void simple_best_swap_test() {
+    auto a = solutionConstructor(dimension, matrizAdj);
+    a.printSolution();
+    SwapMove::swap_best(&a, false);
+    a.printSolution();
+    SwapMove::swap_best(&a, false);
+    a.printSolution();
+}
+
+void simple_copy_test() {
+    auto a = solutionConstructor(dimension, matrizAdj);
+    auto b = a;
+    cout << "a "; a.printSolution();
+    a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
+    cout << "a "; a.printSolution();
+    cout << "b "; b.printSolution();
+    a.pop_NeighborhoodMove();
+    cout << "a "; a.printSolution();
+    cout << "b "; b.printSolution();
+}
+
+int main(int argc, char** argv) {
+    srand(time(NULL));
+
+    int dim;
+    readData(argc, argv, &dim, &matrizAdj);
+    dimension = uint(dim);
+    realignData();
+    simple_best_swap_test();
     return 0;
 }
 

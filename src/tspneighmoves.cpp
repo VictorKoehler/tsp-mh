@@ -1,29 +1,68 @@
 #include "tspneighmoves.h"
 
+const double INFINITYLF = std::numeric_limits<double>::infinity();
+
 #define mat sol->matrizAdj
 #define it(i) begin() + i
 
-void SwapMove::apply(TSPSolution *sol) {
-    sol->cost += swap_cost(sol, a, b);
-    auto i = sol->it(a), j = sol->it(b);
+
+inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+    sol->cost += delta;
     int tmpi = *i;
     *i = *j;
     *j = tmpi;
+}
+
+inline double swap_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
+    const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
+    if (posi == *j) {
+        return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
+    }
+    return mat[prej][*i] + mat[*i][posj] + mat[prei][*j] + mat[*j][posi]
+        - (mat[prej][*j] + mat[*j][posj] + mat[prei][*i] + mat[*i][posi]);
+}
+
+inline double swap_cost(TSPSolution *sol, int o, int p) {
+    auto i = sol->it(o), j = sol->it(p);
+    if (o > p) return swap_cost(sol, j, i);
+    else       return swap_cost(sol, i, j);
+}
+
+
+
+
+
+void SwapMove::apply(TSPSolution *sol) {
+    auto i = sol->it(a), j = sol->it(b);
+    swap_apply(sol, i, j, swap_cost(sol, i, j));
 }
 
 void SwapMove::undo(TSPSolution *sol) {
     apply(sol);
 }
 
-inline double SwapMove::swap_cost(TSPSolution *sol, int o, int p)
-{
-    if (o > p) return swap_cost(sol, p, o);
-
-    auto i = sol->it(o), j = sol->it(p);
-    const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
-    if (o + 1 == p) {
-        return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
+double SwapMove::swap_best(TSPSolution *sol, bool auto_push) {
+    double delta = INFINITYLF;
+    vecit bi, bj;
+    auto end = sol->end() - 1;
+    for (auto i = sol->begin() + 1; i != end; i++) {
+        for (auto j = i + 1; j != end; j++) {
+            double d = swap_cost(sol, i, j);
+            if (d < delta) {
+                bi = i;
+                bj = j;
+                delta = d;
+            }
+        }
     }
-    return mat[prej][*i] + mat[*i][posj] + mat[prei][*j] + mat[*j][posi]
-        - (mat[prej][*j] + mat[*j][posj] + mat[prei][*i] + mat[*i][posi]);
+
+    if (delta < 0) {
+        if (!auto_push) swap_apply(sol, bi, bj, delta);
+        else {
+            int i = std::distance(sol->begin(), bi);
+            int j = std::distance(sol->begin(), bj);
+            sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
+        }
+    }
+    return delta;
 }
