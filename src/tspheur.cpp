@@ -63,22 +63,25 @@ TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
 
 TSPSolution doubleBridge(TSPSolution* sol) {
     TSPSolution ret(sol->dimension, sol->matrizAdj);
+    ret.cost = sol->cost;
     ret.clear();
     ret.reserve(sol->size());
 
     int sz4 = sol->size() / 4;
-    int pos1 = 1 + _random(sz4);
-    int pos2 = pos1 + 1 + _random(sz4);
-    int pos3 = pos2 + 1 + _random(sz4);
+    auto apos1 = sol->it(_random(sz4)), pos1 = apos1+1;
+    auto apos2 = pos1 + (_random(sz4)), pos2 = apos2+1;
+    auto apos3 = pos2 + (_random(sz4)), pos3 = apos3+1;
+    auto end1 = sol->end() - 1, end2 = end1 - 1;
 
-    ret.insert(ret.end(), sol->begin(), sol->it(pos1));
-    ret.insert(ret.end(), sol->it(pos3), sol->end() - 1);
-    ret.insert(ret.end(), sol->it(pos2), sol->it(pos3));
-    ret.insert(ret.end(), sol->it(pos1), sol->it(pos2));
-    ret.push_back(TSPSolution::route_start);
+    ret.insert(ret.end(), sol->begin(), pos1); // 0
+    ret.insert(ret.end(), pos3, end1); // 3
+    ret.insert(ret.end(), pos2, pos3); // 2
+    ret.insert(ret.end(), pos1, pos2); // 1
+    ret.push_back(TSPSolution::route_start); // 4
 
-    // TODO: Lazy Calc
-    ret.update_cost();
+    ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
+    ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
+    assert(ret.cost == ret.update_cost());
 
     return ret;
 }
