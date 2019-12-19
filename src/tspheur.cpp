@@ -16,12 +16,6 @@ const double INFINITYLF = std::numeric_limits<double>::infinity();
 
 #define it(i) begin() + (i)
 
-#ifndef NDEBUG
-#define dprintf(...) printf(__VA_ARGS__)
-#else
-#define dprintf(...)
-#endif
-
 
 int _random(int excl_max) {
     return rand() % excl_max;
@@ -104,21 +98,26 @@ TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
 
         int ccrvnd = 0;
         for (int j = 0; j < Iils; j++, ccrvnd++) {
-            NeighborhoodMove neighsbase[] = { SwapMove(), TwoOptMove(),
-                ReinsertionMove(1), ReinsertionMove(2), ReinsertionMove(3)};
             vector<int> neighs = { 0, 1, 2, 3, 4 };
 
             // RVND    
             while (!neighs.empty()) { // s := rvnd
                 double c = candidate.cost;
                 int ind = _random(neighs.size());
-                neighsbase[ind].best(&candidate, false);
+                switch (ind) {
+                    case 0: SwapMove::swap_best(&candidate, false); break;
+                    case 1: TwoOptMove::twoopt_best(&candidate, false); break;
+                    case 2: ReinsertionMove::reinsertion_best(&candidate, 1, false); break;
+                    case 3: ReinsertionMove::reinsertion_best(&candidate, 2, false); break;
+                    case 4: ReinsertionMove::reinsertion_best(&candidate, 3, false); break;
+                }
                 if (candidate.cost < c) neighs = { 0, 1, 2, 3, 4 };
                 else neighs.erase(neighs.it(ind));
             }
 
             if (candidate.cost < bestCandidate.cost) { // s < s'
                 dprintf("RVND loop #%d, new cost update: %lf\n", ccrvnd, candidate.cost);
+                assert(candidate.cost == candidate.update_cost());
                 bestCandidate = candidate; // s' := s
                 j = 0;
             }
@@ -127,6 +126,7 @@ TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
 
         if (bestCandidate.cost < best.cost) {
             best = bestCandidate;
+            assert(bestCandidate.cost == bestCandidate.update_cost());
             dprintf("GILS-RVND loop #%d of %d, with %d iterations updated cost to %lf\n", i, Imax, ccrvnd, best.cost);
         }
     }

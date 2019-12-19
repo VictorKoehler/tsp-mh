@@ -7,6 +7,12 @@ const double INFINITYLF = std::numeric_limits<double>::infinity();
 #define mat sol->matrizAdj
 #define it(i) begin() + i
 
+#ifdef vprintfen
+#define vprintf dprintf
+#else
+#define vprintf(...)
+#endif
+
 
 inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
     sol->cost += delta;
@@ -57,13 +63,14 @@ double SwapMove::swap_best(TSPSolution *sol, bool auto_push) {
     }
 
     if (delta < 0) {
+        vprintf("Passive SwapMove with delta %.0lf\n", delta);
         if (!auto_push) swap_apply(sol, bi, bj, delta);
         else {
             int i = std::distance(sol->begin(), bi);
             int j = std::distance(sol->begin(), bj);
             sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
         }
-    }
+    } else vprintf("Positive delta %.0lf => NOP\n", delta);
     return delta;
 }
 
@@ -121,13 +128,14 @@ double TwoOptMove::twoopt_best(TSPSolution *sol, bool auto_push) {
     }
 
     if (delta < 0) {
+        vprintf("Passive TwoOptMove with delta %.0lf\n", delta);
         if (!auto_push) twoopt_apply(sol, bi, bj, delta);
         else {
             int i = std::distance(sol->begin(), bi);
             int j = std::distance(sol->begin(), bj);
             sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new TwoOptMove(i, j)));
         }
-    }
+    } else vprintf("Positive delta %.0lf => NOP\n", delta);
     return delta;
 }
 
@@ -195,12 +203,13 @@ double ReinsertionMove::reinsertion_best(TSPSolution *sol, size_t len, bool auto
     }
 
     if (delta < 0) {
+        vprintf("Passive ReinsertionMove with delta %.0lf\n", delta);
         int o = std::distance(sol->begin(), bi);
         int n = std::distance(sol->begin(), bn);
         if (!auto_push) reinsertion_apply(sol, o, len, n, delta);
         else {
             sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new ReinsertionMove(o, len, n)));
         }
-    }
+    } else vprintf("Positive delta %.0lf => NOP\n", delta);
     return delta;
 }
