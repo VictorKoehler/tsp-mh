@@ -102,6 +102,14 @@ class MLPSolution : public std::vector<int> {
     }
 
     void printSolution() {
+        static bool alert = true;
+        if (alert) {
+            std::cout << "ALERT: UPDATING SEQUENCE!" << std::endl;
+            alert = false;
+        }
+        update_subseqConcatenation();
+
+        
         double c = cost, d = duration;
         update_cost();
         std::cout << "Solution (" << c << "/" << cost << "; " << d << "/" << duration << "):";

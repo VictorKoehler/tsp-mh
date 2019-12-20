@@ -8,8 +8,7 @@ extern uint dimension;      // quantidade total de vertices
 void simple_test() {
     auto a = solutionConstructor(dimension, matrizAdj);
     a.alloc_subseqConcatenation();
-    a.update_subseqConcatenation();
-    simple_best_swap_test(a);
+    simple_best_reinserion_test(a, 3);
 }
 
 void simple_swap_test(MLPSolution &a) {
@@ -28,13 +27,10 @@ void simple_best_swap_test(MLPSolution &a) {
     a.printSolution();
     SwapMove::swap_best(&a, true);
     a.printSolution();
-    a.update_subseqConcatenation();
     SwapMove::swap_best(&a, true);
     a.printSolution();
-    a.update_subseqConcatenation();
     a.pop_NeighborhoodMove();
     a.printSolution();
-    a.update_subseqConcatenation();
     a.pop_NeighborhoodMove();
     a.printSolution();
 }
