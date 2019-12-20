@@ -62,17 +62,23 @@ MLPSolution solutionConstructor(uint dimension, double** matrizAdj) {
     return sol;
 }
 
-MLPSolution doubleBridge(MLPSolution* sol) {
+#define add(i) _add(i, sol->matrizAdj, sol)
+MLPSolution doubleBridge(MLPSolution* sol, bool concatenate) {
     MLPSolution ret(sol->dimension, sol->matrizAdj);
-    ret.cost = sol->cost;
+    ret.subseqConcatenation = sol->subseqConcatenation;
     ret.clear();
     ret.reserve(sol->size());
 
     int sz4 = sol->size() / 4;
-    auto apos1 = sol->it(_random(sz4)), pos1 = apos1+1;
-    auto apos2 = pos1 + (_random(sz4)), pos2 = apos2+1;
-    auto apos3 = pos2 + (_random(sz4)), pos3 = apos3+1;
-    auto end1 = sol->end() - 1, end2 = end1 - 1;
+    const auto npos1 =         1 + _random(sz4);
+    const auto npos2 = npos1 + 1 + _random(sz4);
+    const auto npos3 = npos2 + 1 + _random(sz4);
+    const auto nend1 = sol->size() - 1, nend2 = nend1 - 1;
+
+    const auto pos1 = sol->it(npos1);
+    const auto pos2 = sol->it(npos2);
+    const auto pos3 = sol->it(npos3);
+    const auto end1 = sol->it(nend1), end2 = sol->it(nend2);
 
     ret.insert(ret.end(), sol->begin(), pos1); // 0
     ret.insert(ret.end(), pos3, end1); // 3
@@ -80,12 +86,25 @@ MLPSolution doubleBridge(MLPSolution* sol) {
     ret.insert(ret.end(), pos1, pos2); // 1
     ret.push_back(MLPSolution::route_start); // 4
 
-    ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
-    ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
+    if (concatenate) {
+        const auto last = sol->dimension;
+        const auto subseq = sol->subseqConcatenation;
+
+        // [0..*] [1..*] [2..*] [3..*] [4]
+        // [0..*] [3..*] [2..*] [1..*] [4]
+        auto seg0 = subcint(0, npos1-1), seg1 = subcint(npos1, npos2-1), seg2 = subcint(npos2, npos3-1), seg3 = subcint(npos3, nend1-1), seg4 = subcint(nend1, nend1);
+        auto d = seg0.add(seg3).add(seg2).add(seg1).add(seg4);
+        ret.cost = d.c;
+        ret.duration = d.t;
+    } else {
+        ret.update_cost();
+    }
+
     assert(ret.update_cost_duration_same());
 
     return ret;
 }
+#undef add
 
 MLPSolution gils_rvnd(uint d, double **m) {
     return gils_rvnd(d, m, 50, d >= 150 ? d/2 : d);
@@ -98,15 +117,17 @@ MLPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
 
     for (int i = 0; i < Imax; i++) {
         MLPSolution bestCandidate = solutionConstructor(d, m); // s'
+        bestCandidate.subseqConcatenation = best.subseqConcatenation;
         MLPSolution candidate = bestCandidate; // s
         dprintf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
 
         int ccrvnd = 0;
-        for (int j = 0; j < Iils; j++, ccrvnd++) {
+        for (int j = 0; j < Iils; j++) {
+            ccrvnd++;
             vector<int> neighs = { 0, 1, 2, 3, 4 };
             candidate.update_subseqConcatenation();
 
-            // RVND    
+            // RVND
             while (!neighs.empty()) { // s := rvnd
                 double c = candidate.cost;
                 int ind = _random(neighs.size());
@@ -129,8 +150,10 @@ MLPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
                 assert(candidate.update_cost_duration_same());
                 bestCandidate = candidate; // s' := s
                 j = 0;
+                candidate = doubleBridge(&bestCandidate, true);
+            } else {
+                candidate = doubleBridge(&bestCandidate, false);
             }
-            candidate = doubleBridge(&bestCandidate);
         }
 
         if (bestCandidate.cost < best.cost) {
