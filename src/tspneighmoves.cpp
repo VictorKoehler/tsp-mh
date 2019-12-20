@@ -14,64 +14,74 @@ const double INFINITYLF = std::numeric_limits<double>::infinity();
 #endif
 
 
-inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
-    sol->cost += delta;
+inline void swap_apply(MLPSolution *sol, vecit &i, vecit &j, double ncost, double ndur) {
+    sol->cost = ncost;
+    sol->duration = ndur;
     int tmpi = *i;
     *i = *j;
     *j = tmpi;
 }
 
-inline double swap_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
-    const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
-    if (posi == *j) {
-        return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
+
+
+#define add(i) _add(i, mat, sol)
+
+inline ConcatenationInterv swap_cost(MLPSolution *sol, int i, int j) {
+    assert(i < j);
+    const auto last = sol->dimension;
+    const auto subseq = sol->subseqConcatenation;
+    if (i + 1 == j) {
+        // [0..*] [1] [2] [3..*]
+        // [0..*] [2] [1] [3..*]
+        auto seg0 = subcint(0, i-1), seg1 = subcint(i, i), seg2 = subcint(j, j), seg3 = subcint(j+1, last);
+        auto d = seg0.add(seg2).add(seg1).add(seg3);
+        return d;
+    } else {
+        // [0..*] [1] [2..*] [3] [4..*]
+        // [0..*] [3] [2..*] [1] [4..*]
+        auto seg0 = subcint(0, i-1), seg1 = subcint(i, i), seg2 = subcint(i+1, j-1), seg3 = subcint(j, j), seg4 = subcint(j+1, last);
+        auto d = seg0.add(seg3).add(seg2).add(seg1).add(seg4);
+        return d;
     }
-    return mat[prej][*i] + mat[*i][posj] + mat[prei][*j] + mat[*j][posi]
-        - (mat[prej][*j] + mat[*j][posj] + mat[prei][*i] + mat[*i][posi]);
-}
-
-inline double swap_cost(TSPSolution *sol, int o, int p) {
-    auto i = sol->it(o), j = sol->it(p);
-    if (o > p) return swap_cost(sol, j, i);
-    else       return swap_cost(sol, i, j);
 }
 
 
 
-void SwapMove::apply(TSPSolution *sol) {
+void SwapMove::apply(MLPSolution *sol) {
     auto i = sol->it(a), j = sol->it(b);
-    swap_apply(sol, i, j, swap_cost(sol, i, j));
+    auto v = swap_cost(sol, a, b);
+    swap_apply(sol, i, j, v.c, v.t);
 }
 
-void SwapMove::undo(TSPSolution *sol) {
+void SwapMove::undo(MLPSolution *sol) {
     apply(sol);
 }
 
-double SwapMove::swap_best(TSPSolution *sol, bool auto_push) {
-    double delta = INFINITYLF;
-    vecit bi, bj;
-    auto end = sol->end() - 1;
-    for (auto i = sol->begin() + 1; i != end; i++) {
-        for (auto j = i + 1; j != end; j++) {
-            double d = swap_cost(sol, i, j);
-            if (d < delta) {
+double SwapMove::swap_best(MLPSolution *sol, bool auto_push) {
+    double ncost = sol->cost, ndur = sol->duration;
+    size_t bi, bj;
+    auto end = sol->size() - 1;
+    for (size_t i = 1; i != end; i++) {
+        for (size_t j = i + 1; j != end; j++) {
+            auto d0 = swap_cost(sol, i, j);
+            if (d0.c < ncost) {
                 bi = i;
                 bj = j;
-                delta = d;
+                ncost = d0.c;
+                ndur = d0.t;
             }
         }
     }
 
-    if (delta < 0) {
+    if (ncost < sol->cost) {
         vprintf("Passive SwapMove with delta %.0lf\n", delta);
-        if (!auto_push) swap_apply(sol, bi, bj, delta);
+        auto i = sol->it(bi), j = sol->it(bj);
+        if (!auto_push) swap_apply(sol, i, j, ncost, ndur);
         else {
-            int i = std::distance(sol->begin(), bi);
-            int j = std::distance(sol->begin(), bj);
-            sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
+            sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(bi, bj)));
         }
     } else vprintf("Positive delta %.0lf => NOP\n", delta);
-    return delta;
+    return ncost;
 }
 
 
@@ -83,12 +93,12 @@ double SwapMove::swap_best(TSPSolution *sol, bool auto_push) {
 
 
 
-inline void twoopt_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+inline void twoopt_apply(MLPSolution *sol, vecit &i, vecit &j, double delta) {
     sol->cost += delta;
     std::reverse(i, j+1);
 }
 
-inline double twoopt_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
+inline double twoopt_cost(MLPSolution *sol, const vecit &i, const vecit &j) {
     const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
     assert(posi != *j);
     assert(mat[prei][*j] == mat[*j][prei] && mat[*j][posj] == mat[posj][*j]);
@@ -96,23 +106,23 @@ inline double twoopt_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
     return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
 }
 
-inline double twoopt_cost(TSPSolution *sol, int o, int p) {
+inline double twoopt_cost(MLPSolution *sol, int o, int p) {
     auto i = sol->it(o), j = sol->it(p);
     if (o > p) return twoopt_cost(sol, j, i);
     else       return twoopt_cost(sol, i, j);
 }
 
 
-void TwoOptMove::apply(TSPSolution *sol) {
+void TwoOptMove::apply(MLPSolution *sol) {
     auto i = sol->it(a), j = sol->it(b);
     twoopt_apply(sol, i, j, twoopt_cost(sol, i, j));
 }
 
-void TwoOptMove::undo(TSPSolution *sol) {
+void TwoOptMove::undo(MLPSolution *sol) {
     apply(sol);
 }
 
-double TwoOptMove::twoopt_best(TSPSolution *sol, bool auto_push) {
+double TwoOptMove::twoopt_best(MLPSolution *sol, bool auto_push) {
     double delta = INFINITYLF;
     vecit bi, bj;
     auto end = sol->end() - 1, end2 = end - 1;
@@ -149,7 +159,7 @@ double TwoOptMove::twoopt_best(TSPSolution *sol, bool auto_push) {
 
 
 
-inline void reinsertion_apply(TSPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
+inline void reinsertion_apply(MLPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
     sol->cost += delta;
     //std::cout << "Reinserting [" << opos << "..(" << len << ")] to " << npos << " with delta=" << delta << std::endl;
     std::vector<int> cpy(sol->it(opos), sol->it(opos + len));
@@ -158,24 +168,24 @@ inline void reinsertion_apply(TSPSolution *sol, size_t opos, size_t len, size_t 
     sol->insert(sol->it(npos - dlen), cpy.begin(), cpy.end());
 }
 
-inline double reinsertion_cost(TSPSolution *sol, const vecit &o, size_t len, const vecit &n) {
+inline double reinsertion_cost(MLPSolution *sol, const vecit &o, size_t len, const vecit &n) {
     const int preo = *(o - 1), poso = *(o + len), pren = *(n - 1), posn = *n,
               bego = *o, endo = *(o + (len - 1));
     return mat[preo][poso] + mat[pren][bego] + mat[endo][posn]
         - (mat[preo][bego] + mat[endo][poso] + mat[pren][posn]);
 }
 
-inline double reinsertion_cost(TSPSolution *sol, size_t opos, size_t len, size_t npos) {
+inline double reinsertion_cost(MLPSolution *sol, size_t opos, size_t len, size_t npos) {
     auto o = sol->it(opos), n = sol->it(npos);
     return reinsertion_cost(sol, o, len, n);
 }
 
 
-void ReinsertionMove::apply(TSPSolution *sol) {
+void ReinsertionMove::apply(MLPSolution *sol) {
     reinsertion_apply(sol, opos, len, npos, reinsertion_cost(sol, opos, len, npos));
 }
 
-void ReinsertionMove::undo(TSPSolution *sol) {
+void ReinsertionMove::undo(MLPSolution *sol) {
     int t = opos;
     opos = npos;
     npos = t;
@@ -185,7 +195,7 @@ void ReinsertionMove::undo(TSPSolution *sol) {
     apply(sol);
 }
 
-double ReinsertionMove::reinsertion_best(TSPSolution *sol, size_t len, bool auto_push) {
+double ReinsertionMove::reinsertion_best(MLPSolution *sol, size_t len, bool auto_push) {
     double delta = INFINITYLF;
     vecit bi, bn;
     auto end_max = sol->end() - len;

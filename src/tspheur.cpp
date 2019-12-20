@@ -26,8 +26,8 @@ int _random(int incl_min, int excl_max) {
 }
 
 
-TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
-    TSPSolution sol(dimension, matrizAdj);
+MLPSolution solutionConstructor(uint dimension, double** matrizAdj) {
+    MLPSolution sol(dimension, matrizAdj);
     vector<int> candidatos(dimension - 1);
     iota(candidatos.begin(), candidatos.end(), 1);
 
@@ -46,7 +46,7 @@ TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
 
         for (size_t pos = 1; pos < sol.size(); pos++) {
             for (size_t c = 0; c < candidatos.size(); c++) {
-                custoInsercao.insert(make_tuple(sol.insertion_cost(candidatos[c], sol.it(pos)), c, pos));
+                custoInsercao.insert(make_tuple(sol.tsp_insertion_cost(candidatos[c], sol.it(pos)), c, pos));
                 if (custoInsercao.size() > choose + 1) {
                     custoInsercao.erase(--custoInsercao.end());
                 }
@@ -54,15 +54,16 @@ TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
         }
 
         auto cand = *--custoInsercao.end();
-        sol.insert_candidate(candidatos[get<1>(cand)], get<2>(cand));
+        sol.insert(sol.it(get<2>(cand)), candidatos[get<1>(cand)]);
         candidatos.erase(candidatos.it(get<1>(cand)));
     }
+    sol.update_cost();
 
     return sol;
 }
 
-TSPSolution doubleBridge(TSPSolution* sol) {
-    TSPSolution ret(sol->dimension, sol->matrizAdj);
+MLPSolution doubleBridge(MLPSolution* sol) {
+    MLPSolution ret(sol->dimension, sol->matrizAdj);
     ret.cost = sol->cost;
     ret.clear();
     ret.reserve(sol->size());
@@ -77,31 +78,33 @@ TSPSolution doubleBridge(TSPSolution* sol) {
     ret.insert(ret.end(), pos3, end1); // 3
     ret.insert(ret.end(), pos2, pos3); // 2
     ret.insert(ret.end(), pos1, pos2); // 1
-    ret.push_back(TSPSolution::route_start); // 4
+    ret.push_back(MLPSolution::route_start); // 4
 
     ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
     ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
-    assert(ret.cost == ret.update_cost());
+    assert(ret.update_cost_duration_same());
 
     return ret;
 }
 
-TSPSolution gils_rvnd(uint d, double **m) {
+MLPSolution gils_rvnd(uint d, double **m) {
     return gils_rvnd(d, m, 50, d >= 150 ? d/2 : d);
 }
 
-TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
-    TSPSolution best(d, m);
+MLPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
+    MLPSolution best(d, m);
+    best.alloc_subseqConcatenation();
     best.cost = INFINITYLF;
 
     for (int i = 0; i < Imax; i++) {
-        TSPSolution bestCandidate = solutionConstructor(d, m); // s'
-        TSPSolution candidate = bestCandidate; // s
+        MLPSolution bestCandidate = solutionConstructor(d, m); // s'
+        MLPSolution candidate = bestCandidate; // s
         dprintf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
 
         int ccrvnd = 0;
         for (int j = 0; j < Iils; j++, ccrvnd++) {
             vector<int> neighs = { 0, 1, 2, 3, 4 };
+            candidate.update_subseqConcatenation();
 
             // RVND    
             while (!neighs.empty()) { // s := rvnd
@@ -114,13 +117,16 @@ TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
                     case 3: ReinsertionMove::reinsertion_best(&candidate, 2, false); break;
                     case 4: ReinsertionMove::reinsertion_best(&candidate, 3, false); break;
                 }
-                if (candidate.cost < c) neighs = { 0, 1, 2, 3, 4 };
+                if (candidate.cost < c) {
+                    neighs = { 0, 1, 2, 3, 4 };
+                    candidate.update_subseqConcatenation();
+                }
                 else neighs.erase(neighs.it(ind));
             }
 
             if (candidate.cost < bestCandidate.cost) { // s < s'
                 dprintf("RVND loop #%d, new cost update: %lf\n", ccrvnd, candidate.cost);
-                assert(candidate.cost == candidate.update_cost());
+                assert(candidate.update_cost_duration_same());
                 bestCandidate = candidate; // s' := s
                 j = 0;
             }
@@ -129,10 +135,11 @@ TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
 
         if (bestCandidate.cost < best.cost) {
             best = bestCandidate;
-            assert(bestCandidate.cost == bestCandidate.update_cost());
+            assert(bestCandidate.update_cost_duration_same());
             dprintf("GILS-RVND loop #%d of %d, with %d iterations updated cost to %lf\n", i, Imax, ccrvnd, best.cost);
         }
     }
 
+    best.dealloc_subseqConcatenation();
     return best;
 }

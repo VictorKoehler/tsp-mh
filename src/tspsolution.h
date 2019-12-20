@@ -10,71 +10,69 @@
 #include <vector>
 
 #include "tspneigh.h"
+#include "mlpconcat.h"
 
 typedef std::vector<int>::iterator vecit;
 
-class TSPSolution : public std::vector<int> {
+
+class MLPSolution : public std::vector<int> {
    public:
     static const uint route_start = 0;
     uint dimension;
-    double cost, **matrizAdj;
+    double cost, duration, **matrizAdj;
     std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+    Concatenation **subseqConcatenation;
 
-    TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
-        dimension = obj.dimension;
-        cost = obj.cost;
-        matrizAdj = obj.matrizAdj;
+
+    MLPSolution(const MLPSolution& t) : vector<int>(t) {
+        dimension = t.dimension;
+        cost = t.cost;
+        duration = t.duration;
+        matrizAdj = t.matrizAdj;
+        subseqConcatenation = t.subseqConcatenation;
     }
 
-    TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
+    MLPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), duration(0), matrizAdj(m), subseqConcatenation(NULL) {
         this->at(route_start) = this->at(route_start) = 0;
     }
 
-    TSPSolution& operator=(const TSPSolution& t) {
+    MLPSolution& operator=(const MLPSolution& t) {
         std::vector<int>::operator=(t);
         dimension = t.dimension;
         cost = t.cost;
+        duration = t.duration;
         matrizAdj = t.matrizAdj;
+        subseqConcatenation = t.subseqConcatenation;
         return *this;
     }
 
 
 
-    inline void insert_candidate(int c, const vecit& pos) {
-        cost += insertion_cost(c, pos);
-        insert(pos, c);
-    }
-
-    inline void insert_candidate(int c, int pos) {
-        insert_candidate(c, begin() + pos);
-    }
-
-    inline double insertion_cost(uint n, uint i, uint j) const {
+    inline double tsp_insertion_cost(uint n, uint i, uint j) const {
         return matrizAdj[i][n] + matrizAdj[n][j] - matrizAdj[i][j];
     }
 
-    inline double insertion_cost(uint n, const vecit& p) const {
-        return insertion_cost(n, *(p - 1), *p);
+    inline double tsp_insertion_cost(uint n, const vecit& p) const {
+        return tsp_insertion_cost(n, *(p - 1), *p);
     }
 
-    inline double remotion_cost(const vecit& i) const {
-        return matrizAdj[*(i - 1)][*(i + 1)] - matrizAdj[*(i - 1)][*i] -
-               matrizAdj[*i][*(i - 1)];
-    }
 
-    inline double reinsertion_cost(const vecit& i, const vecit& p) const {
-        return remotion_cost(i) + insertion_cost(*i, p);
-    }
-
-    double update_cost() {
-        double ncost = 0;
+    inline void update_cost() {
+        cost = 0;
+        duration = 0;
         for (auto it = begin(); it != end() - 1; it++) {
             assert(matrizAdj[*it][*(it + 1)] == matrizAdj[*(it + 1)][*it]);
-            ncost += matrizAdj[*it][*(it + 1)];
+            duration += matrizAdj[*it][*(it + 1)];
+            cost += duration;
         }
-        cost = ncost;
-        return ncost;
     }
+
+    inline bool update_cost_duration_same() {
+        double c = cost, d = duration;
+        update_cost();
+        return c == cost && d == duration;
+    }
+
 
     /**
      * If this represents a valid solution.
@@ -104,13 +102,54 @@ class TSPSolution : public std::vector<int> {
     }
 
     void printSolution() {
-        double d = cost;
-        std::cout << "Solution (" << d << "/" << update_cost() << "):";
+        double c = cost, d = duration;
+        update_cost();
+        std::cout << "Solution (" << c << "/" << cost << "; " << d << "/" << duration << "):";
         // cout << "Solution:";
+        int p = -1;
         for (auto e : *this) {
+            //if (p != -1) std::cout << " <" << matrizAdj[p][e] << ">";
+            //p = e;
             std::cout << " " << e;
         }
         std::cout << std::endl;
+    }
+
+
+    void update_subseqConcatenation() {
+        const auto subseq = subseqConcatenation;
+        const auto mat = matrizAdj;
+        const auto mat_at = this;
+
+        uint sz = dimension + 1;
+        for (uint len = 2; len <= sz; len++) { // Length varies between 1 and max=dimension
+            // Index varies between 0 and the max it can reach before overflowing.
+            for (uint i = 0; i <= sz - len; i++) {
+                uint j = i + len - 1; // Less one because it is inclusive.
+                subconc(i, j) = concat_fullb(i, j-1, j, j);
+                subconc(j, i) = concat_fullb(j, j, j-1, i);
+            }
+        }
+    }
+
+    void alloc_subseqConcatenation() {
+        Concatenation* t = new Concatenation[(dimension+1)*(dimension+1)];
+        subseqConcatenation = new Concatenation*[(dimension+1)];
+
+        for (uint i = 0; i <= dimension; ++i)
+            subseqConcatenation[i] = t + i * (dimension+1);
+        
+        const auto subseq = subseqConcatenation;
+        subconc(0, 0) = {0, 0, 0};
+        for (uint i = 1; i <= dimension; i++) {
+            subconc(i, i) = {0, 0, 1};
+        }
+    }
+
+    void dealloc_subseqConcatenation() {
+        delete[] subseqConcatenation[0];
+        delete[] subseqConcatenation;
+        subseqConcatenation = NULL;
     }
 };
 

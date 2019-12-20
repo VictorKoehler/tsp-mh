@@ -1,9 +1,9 @@
 #include "tspsolution.h"
 #include "tspneighmoves.h"
 
-TSPSolution solutionConstructor(uint dimension, double** matrizAdj);
+MLPSolution solutionConstructor(uint dimension, double** matrizAdj);
 
-TSPSolution doubleBridge(TSPSolution* sol);
+MLPSolution doubleBridge(MLPSolution* sol);
 
-TSPSolution gils_rvnd(uint d, double **m);
-TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils);
+MLPSolution gils_rvnd(uint d, double **m);
+MLPSolution gils_rvnd(uint d, double **m, int Imax, int Iils);

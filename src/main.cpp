@@ -21,9 +21,10 @@ int main(int argc, char** argv) {
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
     realignData();
-    auto a = gils_rvnd(dimension, matrizAdj);
-    cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
-    for (auto i : a) cout << " " << i;
+    simple_test();
+    // auto a = gils_rvnd(dimension, matrizAdj);
+    // cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
+    // for (auto i : a) cout << " " << i;
     cout << endl;
     return 0;
 }

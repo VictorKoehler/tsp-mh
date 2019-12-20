@@ -9,12 +9,12 @@
 #endif
 
 
-class TSPSolution;
+class MLPSolution;
 class NeighborhoodMove {
     public:
-    virtual void apply(TSPSolution *sol) {};
-    virtual void undo(TSPSolution *sol) {};
-    virtual void best(TSPSolution *sol, bool auto_push) {};
+    virtual void apply(MLPSolution *sol) {};
+    virtual void undo(MLPSolution *sol) {};
+    virtual void best(MLPSolution *sol, bool auto_push) {};
     virtual ~NeighborhoodMove() {}
 };
 
