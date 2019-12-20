@@ -9,13 +9,17 @@
 #endif
 
 
-class MLPSolution;
-class NeighborhoodMove {
-    public:
-    virtual void apply(MLPSolution *sol) {};
-    virtual void undo(MLPSolution *sol) {};
-    virtual void best(MLPSolution *sol, bool auto_push) {};
-    virtual ~NeighborhoodMove() {}
-};
+namespace MLPMH {
+
+    class MLPSolution;
+    class NeighborhoodMove {
+        public:
+        virtual void apply(MLPSolution *sol) {};
+        virtual void undo(MLPSolution *sol) {};
+        virtual void best(MLPSolution *sol, bool auto_push) {};
+        virtual ~NeighborhoodMove() {}
+    };
+
+}
 
 #endif

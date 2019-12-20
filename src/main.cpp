@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     dimension = uint(dim);
     realignData();
     // simple_test();
-    auto a = gils_rvnd(dimension, matrizAdj);
+    auto a = MLPMH::gils_rvnd(dimension, matrizAdj);
     cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
     for (auto i : a) cout << " " << i;
     cout << endl;
