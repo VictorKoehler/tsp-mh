@@ -3,8 +3,8 @@
 using namespace std;
 using namespace TSPMH;
 
-extern double** matrizAdj;  // matriz de adjacencia
-extern uint dimension;      // quantidade total de vertices
+double** matrizAdj;  // matriz de adjacencia
+uint dimension;      // quantidade total de vertices
 
 void simple_swap_test() {
     auto a = solutionConstructor(dimension, matrizAdj);

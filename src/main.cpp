@@ -1,12 +1,12 @@
 #include <fstream>
 #include <iostream>
-#include "readData.h"
+#include "data.h"
 #include "tests.h"
+#include "hungarian.h"
+#include "bab.h"
 
 using namespace std;
 
-double** matrizAdj;  // matriz de adjacencia
-uint dimension;      // quantidade total de vertices
 
 template<bool guides>
 void printData();
@@ -17,40 +17,21 @@ void realignData();
 int main(int argc, char** argv) {
     srand(RSEED);
 
-    int dim;
-    readData(argc, argv, &dim, &matrizAdj);
-    dimension = uint(dim);
-    realignData();
+	hungarian_problem_t p;
+	int mode = HUNGARIAN_MODE_MINIMIZE_COST;
+	hungarian_init(&p, data->getMatrixCost(), data->getDimension(), data->getDimension(), mode); // Carregando o problema
+
+	double obj_value = hungarian_solve(&p);
+	cout << "Obj. value: " << obj_value << endl;
+
+	cout << "Assignment" << endl;
+	hungarian_print_assignment(&p);
+
+	hungarian_free(&p);
+
     auto a = TSPMH::gils_rvnd(dimension, matrizAdj);
     cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
     for (auto i : a) cout << " " << i;
     cout << endl;
     return 0;
-}
-
-template<bool guides>
-void printData() {
-    cout << "dimension: " << dimension << endl;
-    if constexpr (guides) {
-        printf("    ");
-        for (uint j = 0; j < dimension; j++) {
-            printf("%3u ", j);
-        }
-        printf("\n");
-    }
-    for (uint i = 0; i < dimension; i++) {
-        if constexpr (guides) printf("%2u: ", i);
-        for (uint j = 0; j < dimension; j++) {
-            printf("%3.0lf ", matrizAdj[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-void realignData() {
-    for (uint i = 0; i < dimension; i++) {
-        for (uint j = 0; j < dimension; j++) {
-            matrizAdj[i][j] = matrizAdj[i + 1][j + 1];
-        }
-    }
 }
