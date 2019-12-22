@@ -1,6 +1,7 @@
 #include "tests.h"
 
 using namespace std;
+using namespace TSPMH;
 
 extern double** matrizAdj;  // matriz de adjacencia
 extern uint dimension;      // quantidade total de vertices

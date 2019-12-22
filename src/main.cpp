@@ -12,14 +12,19 @@ template<bool guides>
 void printData();
 void realignData();
 
+#define RSEED 1574733907
+
 int main(int argc, char** argv) {
-    srand(time(NULL));
+    srand(RSEED);
 
     int dim;
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
     realignData();
-    cout << gils_rvnd(dimension, matrizAdj).cost << endl;
+    auto a = TSPMH::gils_rvnd(dimension, matrizAdj);
+    cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
+    for (auto i : a) cout << " " << i;
+    cout << endl;
     return 0;
 }
 
