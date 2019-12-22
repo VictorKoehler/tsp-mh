@@ -16,12 +16,13 @@ namespace TSPMH {
 
     typedef std::vector<int>::iterator vecit;
 
+    template <typename U>
     class TSPSolution : public std::vector<int> {
     public:
         static const uint route_start = 0;
         uint dimension;
-        double cost, **matrizAdj;
-        std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+        U cost, **matrizAdj;
+        std::stack<std::unique_ptr<NeighborhoodMove<U>> > neighmoves;
 
         TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
             dimension = obj.dimension;
@@ -29,7 +30,7 @@ namespace TSPMH {
             matrizAdj = obj.matrizAdj;
         }
 
-        TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
+        TSPSolution(uint d, U** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
             this->at(route_start) = this->at(route_start) = 0;
         }
 
@@ -52,25 +53,25 @@ namespace TSPMH {
             insert_candidate(c, begin() + pos);
         }
 
-        inline double insertion_cost(uint n, uint i, uint j) const {
+        inline U insertion_cost(uint n, uint i, uint j) const {
             return matrizAdj[i][n] + matrizAdj[n][j] - matrizAdj[i][j];
         }
 
-        inline double insertion_cost(uint n, const vecit& p) const {
+        inline U insertion_cost(uint n, const vecit& p) const {
             return insertion_cost(n, *(p - 1), *p);
         }
 
-        inline double remotion_cost(const vecit& i) const {
+        inline U remotion_cost(const vecit& i) const {
             return matrizAdj[*(i - 1)][*(i + 1)] - matrizAdj[*(i - 1)][*i] -
                 matrizAdj[*i][*(i - 1)];
         }
 
-        inline double reinsertion_cost(const vecit& i, const vecit& p) const {
+        inline U reinsertion_cost(const vecit& i, const vecit& p) const {
             return remotion_cost(i) + insertion_cost(*i, p);
         }
 
-        double update_cost() {
-            double ncost = 0;
+        U update_cost() {
+            U ncost = 0;
             for (auto it = begin(); it != end() - 1; it++) {
                 assert(matrizAdj[*it][*(it + 1)] == matrizAdj[*(it + 1)][*it]);
                 ncost += matrizAdj[*it][*(it + 1)];
@@ -86,13 +87,13 @@ namespace TSPMH {
 
 
 
-        inline double push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove> n) {
+        inline U push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove<U>> n) {
             n->apply(this);
             neighmoves.push(move(n));
             return cost;
         }
 
-        inline double pop_NeighborhoodMove() {
+        inline U pop_NeighborhoodMove() {
             neighmoves.top()->undo(this);
             neighmoves.pop();
             return cost;
@@ -107,7 +108,7 @@ namespace TSPMH {
         }
 
         void printSolution() {
-            double d = cost;
+            U d = cost;
             std::cout << "Solution (" << d << "/" << update_cost() << "):";
             // cout << "Solution:";
             for (auto e : *this) {
@@ -116,6 +117,9 @@ namespace TSPMH {
             std::cout << std::endl;
         }
     };
+
+    template class TSPSolution<int>;
+    template class TSPSolution<double>;
 
 }
 #endif

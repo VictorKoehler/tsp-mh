@@ -11,15 +11,20 @@
 
 namespace TSPMH {
 
+    template <typename U>
     class TSPSolution;
+
+    template <typename U>
     class NeighborhoodMove {
         public:
-        virtual void apply(TSPSolution *sol) {};
-        virtual void undo(TSPSolution *sol) {};
-        virtual void best(TSPSolution *sol, bool auto_push) {};
+        virtual void apply(TSPSolution<U> *sol) {};
+        virtual void undo(TSPSolution<U> *sol) {};
+        virtual void best(TSPSolution<U> *sol, bool auto_push) {};
         virtual ~NeighborhoodMove() {}
     };
     
+    template class NeighborhoodMove<int>;
+    template class NeighborhoodMove<double>;
 }
 
 #endif
