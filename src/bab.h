@@ -8,7 +8,9 @@
 namespace BranchAndBound {
     
     const uint route_start = 0;
-    const double INFINITYLF = std::numeric_limits<double>::infinity();
+
+    // I didn't test, but I'm scared with the possibility of the Hungarian Algorithm doesn't properly deal with integer overflow.
+    const int INT_HIGH = 99999999;
 
     class Tree;
 
@@ -36,18 +38,33 @@ namespace BranchAndBound {
 
 
 
+    #define __copymatrix(src, dst, dimx, dimy) \
+    for (uint i = 0; i < dimx; i++) { \
+        for (uint j = 0; j < dimy; j++) { \
+            dst[i][j] = src[i][j]; \
+        } \
+    }
+
     class Tree {
         public:
         uint dimension;
-        double **matrizAdj, upper_bound;
+        int upper_bound;
         std::priority_queue< NodePtr, std::vector<NodePtr>, NodeComparator > nodes;
         NodePtr best_node;
+        hungarian_problem_t hp;
+        int **costMatrix, **assignmentMatrix;
 
-        Tree(uint d, double **m, NodePtr root, double upper=INFINITYLF) : dimension(d), matrizAdj(m), upper_bound(upper) {
-            nodes.push(std::move(root));
+
+        Tree(int d, double **m, int upper=INT_HIGH) : dimension(d), upper_bound(upper) {
+            hungarian_init(&hp, m, d, d, HUNGARIAN_MODE_MINIMIZE_COST);
+            costMatrix = hp.cost;
+            assignmentMatrix = hp.assignment;
         }
 
-        void solve() {
+        void solve(NodePtr root) {
+            setBest(root, false);
+            nodes.push(std::move(root));
+
             while (!nodes.empty()) {
                 NodePtr n = std::move(nodes.top());
                 nodes.pop();
@@ -57,8 +74,39 @@ namespace BranchAndBound {
             }
         }
 
+        inline void branch(NodePtr node) {
+            nodes.push(node);
+        }
+
         inline void branch(Node* node) {
-            nodes.push(shared_ptr<Node>(node));
+            branch(NodePtr(node));
+        }
+
+        inline void setBest(NodePtr node, bool setUB) {
+            best_node = node;
+            if (setUB) {
+                upper_bound = best_node->lower_bound;
+            }
+        }
+
+        inline void setBest(Node* node, bool setUB) {
+            setBest(NodePtr(node), setUB);
+        }
+
+        inline double solve_hungarian_problem() {
+            int bkpMatrix[dimension][dimension];
+            __copymatrix(hp.cost, bkpMatrix, dimension, dimension);
+            double d = hungarian_solve(&hp);
+            __copymatrix(bkpMatrix, hp.cost, dimension, dimension);
+            return d;
+        }
+
+        ~Tree() {
+            costMatrix = NULL;
+            assignmentMatrix = NULL;
+            hungarian_free(&hp);
         }
     };
+
+    #undef __copymatrix
 }

@@ -73,7 +73,7 @@ namespace TSPMH {
                 int j = std::distance(sol->begin(), bj);
                 sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
             }
-        } else vprintf("Positive delta %.0lf => NOP\n", delta);
+        } else { vprintf("Positive delta %.0lf => NOP\n", delta); }
         return delta;
     }
 
@@ -138,7 +138,7 @@ namespace TSPMH {
                 int j = std::distance(sol->begin(), bj);
                 sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new TwoOptMove(i, j)));
             }
-        } else vprintf("Positive delta %.0lf => NOP\n", delta);
+        } else {  vprintf("Positive delta %.0lf => NOP\n", delta); }
         return delta;
     }
 
@@ -213,7 +213,7 @@ namespace TSPMH {
             else {
                 sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new ReinsertionMove(o, len, n)));
             }
-        } else vprintf("Positive delta %.0lf => NOP\n", delta);
+        } else { vprintf("Positive delta %.0lf => NOP\n", delta); }
         return delta;
     }
 

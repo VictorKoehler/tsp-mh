@@ -2,8 +2,7 @@
 #include <iostream>
 #include "data.h"
 #include "tests.h"
-#include "hungarian.h"
-#include "bab.h"
+#include "tspbab.h"
 
 using namespace std;
 
@@ -17,21 +16,31 @@ void realignData();
 int main(int argc, char** argv) {
     srand(RSEED);
 
-	hungarian_problem_t p;
-	int mode = HUNGARIAN_MODE_MINIMIZE_COST;
-	hungarian_init(&p, data->getMatrixCost(), data->getDimension(), data->getDimension(), mode); // Carregando o problema
+    int upper_bound = BranchAndBound::INT_HIGH;
+    if (argc == 3) {
+        argc--;
+        upper_bound = atoi(argv[2]);
+    }
 
-	double obj_value = hungarian_solve(&p);
-	cout << "Obj. value: " << obj_value << endl;
+	unique_ptr<Data> data(new Data(argc, argv[1]));
+	data->readData();
 
-	cout << "Assignment" << endl;
-	hungarian_print_assignment(&p);
+    if (upper_bound == BranchAndBound::INT_HIGH) {
+        auto a = TSPMH::gils_rvnd(data->getDimension(), data->getMatrixCost(), 1, 10);
+        upper_bound = int(a.cost) + 5; // safety margin
+        printf("Choosen upperbound by heurist: %d\n", upper_bound);
+    }
 
-	hungarian_free(&p);
+    auto bab = TSPBaB::solveTSPBab(data->getDimension(), data->getMatrixCost(), upper_bound);
+    cout << "Prohibited arcs:";
+    for (auto a : bab->arcs) {
+        cout << " " << a.first << "," << a.second;
+    }
+    cout << endl << "Tour:";
+    for (auto t : bab->subtour) {
+        cout << " " << t;
+    }
+    cout << endl << "Cost: " << bab->lower_bound << endl;
 
-    auto a = TSPMH::gils_rvnd(dimension, matrizAdj);
-    cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
-    for (auto i : a) cout << " " << i;
-    cout << endl;
     return 0;
 }
