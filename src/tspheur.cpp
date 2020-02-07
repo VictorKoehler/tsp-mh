@@ -29,8 +29,8 @@ namespace TSPMH {
     }
 
 
-    TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
-        TSPSolution sol(dimension, matrizAdj);
+    StackedTSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
+        StackedTSPSolution sol(dimension, matrizAdj);
         vector<int> candidatos(dimension - 1);
         iota(candidatos.begin(), candidatos.end(), 1);
 

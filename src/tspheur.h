@@ -4,7 +4,7 @@
 
 namespace TSPMH {
 
-    TSPSolution solutionConstructor(uint dimension, double** matrizAdj);
+    StackedTSPSolution solutionConstructor(uint dimension, double** matrizAdj);
 
     TSPSolution doubleBridge(TSPSolution* sol);
 

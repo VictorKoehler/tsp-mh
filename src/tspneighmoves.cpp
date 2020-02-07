@@ -9,7 +9,7 @@
 #ifdef vprintfen
 #define vprintf dprintf
 #else
-#define vprintf(...)
+#define vprintf(...) {}
 #endif
 
 
@@ -71,7 +71,7 @@ namespace TSPMH {
             else {
                 int i = std::distance(sol->begin(), bi);
                 int j = std::distance(sol->begin(), bj);
-                sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
+                static_cast<StackedTSPSolution*>(sol)->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new SwapMove(i, j)));
             }
         } else vprintf("Positive delta %.0lf => NOP\n", delta);
         return delta;
@@ -136,7 +136,7 @@ namespace TSPMH {
             else {
                 int i = std::distance(sol->begin(), bi);
                 int j = std::distance(sol->begin(), bj);
-                sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new TwoOptMove(i, j)));
+                static_cast<StackedTSPSolution*>(sol)->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new TwoOptMove(i, j)));
             }
         } else vprintf("Positive delta %.0lf => NOP\n", delta);
         return delta;
@@ -211,7 +211,7 @@ namespace TSPMH {
             int n = std::distance(sol->begin(), bn);
             if (!auto_push) reinsertion_apply(sol, o, len, n, delta);
             else {
-                sol->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new ReinsertionMove(o, len, n)));
+                static_cast<StackedTSPSolution*>(sol)->push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove>(new ReinsertionMove(o, len, n)));
             }
         } else vprintf("Positive delta %.0lf => NOP\n", delta);
         return delta;

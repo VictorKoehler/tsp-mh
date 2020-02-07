@@ -21,7 +21,6 @@ namespace TSPMH {
         static const uint route_start = 0;
         uint dimension;
         double cost, **matrizAdj;
-        std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
 
         TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
             dimension = obj.dimension;
@@ -85,6 +84,24 @@ namespace TSPMH {
         inline bool completed() { return dimension + 1 == uint(size()); }
 
 
+        void printSolution() {
+            double d = cost;
+            std::cout << "Solution (" << d << "/" << update_cost() << "):";
+            // cout << "Solution:";
+            for (auto e : *this) {
+                std::cout << " " << e;
+            }
+            std::cout << std::endl;
+        }
+    };
+
+    class StackedTSPSolution : public TSPSolution {
+        public:
+        std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+
+        StackedTSPSolution(const StackedTSPSolution& obj) : TSPSolution(obj) { }
+
+        StackedTSPSolution(uint d, double** m) : TSPSolution(d, m) { }
 
         inline double push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove> n) {
             n->apply(this);
@@ -104,16 +121,6 @@ namespace TSPMH {
 
         inline void reset_NeighborhoodMove() {
             while (!neighmoves.empty()) neighmoves.pop();
-        }
-
-        void printSolution() {
-            double d = cost;
-            std::cout << "Solution (" << d << "/" << update_cost() << "):";
-            // cout << "Solution:";
-            for (auto e : *this) {
-                std::cout << " " << e;
-            }
-            std::cout << std::endl;
         }
     };
 
