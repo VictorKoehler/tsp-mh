@@ -11,7 +11,7 @@ ifeq ($(DEBUG), 1)
 else
     SPFLAGS = -O3 -DNDEBUG
 endif
-CCOPT = $(BITS_OPTION) $(SPFLAGS) -fPIC -fexceptions -DIL_STD -std=c++17 -lm -Wall -Wextra
+CCOPT = $(BITS_OPTION) $(SPFLAGS) -fPIC -fexceptions -DIL_STD -lm -Wall -Wextra -std=c++17
 #############################
 
 #### flags do linker
@@ -19,6 +19,7 @@ CCOPT = $(BITS_OPTION) $(SPFLAGS) -fPIC -fexceptions -DIL_STD -std=c++17 -lm -Wa
 
 #### diretorios com os source files e com os objs files
 SRCDIR = src
+SCRINC = legacycvrp
 ifdef $(OBJDIR)
    OBJDIR = $(OBJDIR)
 else
@@ -27,7 +28,7 @@ endif
 #############################
 
 #### lista de todos os srcs e todos os objs
-SRCS = $(wildcard $(SRCDIR)/*.cpp)
+SRCS = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/$(SCRINC)/*.cpp)
 OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 #############################
 
@@ -44,6 +45,7 @@ tsp: $(OBJS)
 #cada arquivo objeto depende do .c e dos headers (informacao dos header esta no arquivo de dependencias gerado pelo compiler)
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR)/$(SCRINC)
 	@echo  "\033[31m \nCompiling $<: \033[0m"
 	$(CPPC) $(CCOPT) -c $< -o $@
 	@echo  "\033[32m \ncreating $< dependency file: \033[0m"
