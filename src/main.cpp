@@ -14,7 +14,7 @@ void realignData();
 
 #define RSEED 1574733907
 
-int main(int argc, char** argv) {
+int tsp(int argc, char** argv) {
     srand(RSEED);
 
     int dim;
@@ -22,10 +22,26 @@ int main(int argc, char** argv) {
     dimension = uint(dim);
     realignData();
     auto a = TSPMH::gils_rvnd(dimension, matrizAdj);
-    cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
+    cout << " COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
     for (auto i : a) cout << " " << i;
     cout << endl;
     return 0;
+}
+
+int cvrp(int argc, char** argv) {
+    srand(RSEED);
+
+    char nome[100];
+    auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(fopen(argv[1], "r"), nome)));
+    if (!a.checkSolution()) cout << "Invalid solution\n";
+    cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
+    for (auto i : a) cout << " " << i << "(" << a.demand[i] << ")";
+    cout << endl;
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    cvrp(argc, argv);
 }
 
 template<bool guides>

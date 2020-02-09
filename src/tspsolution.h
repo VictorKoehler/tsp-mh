@@ -22,14 +22,16 @@ namespace TSPMH {
         uint dimension;
         double cost, **matrizAdj;
 
+        TSPSolution() {}
+
+        TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
+            this->at(route_start) = this->at(route_start) = 0;
+        }
+
         TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
             dimension = obj.dimension;
             cost = obj.cost;
             matrizAdj = obj.matrizAdj;
-        }
-
-        TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
-            this->at(route_start) = this->at(route_start) = 0;
         }
 
         TSPSolution& operator=(const TSPSolution& t) {
@@ -39,6 +41,19 @@ namespace TSPMH {
             matrizAdj = t.matrizAdj;
             return *this;
         }
+
+
+        virtual int &at(std::size_t __n) { return std::vector<int>::at(__n); }
+        virtual int& operator[](std::size_t index) { return at(index); }
+        virtual vecit begin() noexcept { return std::vector<int>::begin(); }
+        virtual vecit end() noexcept { return std::vector<int>::end(); }
+        virtual void push_back(int x) { std::vector<int>::push_back(x); }
+        virtual vecit insert(const vecit p, int i)  { return std::vector<int>::insert(p, i); }
+        virtual vecit insert(const vecit p, const vecit b, const vecit e)  { return std::vector<int>::insert(p, b, e); }
+        virtual vecit erase(const vecit b, const vecit e)  { return std::vector<int>::erase(b, e); }
+        virtual std::size_t size() noexcept { return std::vector<int>::size(); }
+        virtual vecit it(std::size_t ind) { return begin() + ind; }
+        virtual vecit it(int ind) { return begin() + ind; }
 
 
 

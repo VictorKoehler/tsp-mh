@@ -23,7 +23,9 @@ namespace LegacyCVRP {
         bool visited[inst->dimension] = {false};
         int vehicles_paths[inst->vehicles + 1] = {0};
         
-        inst->path[0] = inst->path[max_path - 1] = deposit;
+        for (int i = 0; i < inst->path_len; i++) {
+            inst->path[i] = deposit;
+        }
 
         /* PRIORITY QUEUE */
         parint menor_adj_elementos[inst->dimension];

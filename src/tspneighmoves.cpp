@@ -15,6 +15,7 @@
 
 namespace TSPMH {
 
+    int shitcc = 0; // TODO: R
     const double INFINITYLF = std::numeric_limits<double>::infinity();
 
     inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
@@ -54,8 +55,12 @@ namespace TSPMH {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1;
+        if (sol->size() < 4) return delta;
+        size_t icc=0, jcc, szd = sol->size(); // TODO: R
         for (auto i = sol->begin() + 1; i != end; i++) {
-            for (auto j = i + 1; j != end; j++) {
+            for (auto j = i + 1; j != end; j++, jcc++) {
+                icc = distance(sol->begin(), i);
+                jcc = distance(sol->begin(), j);
                 double d = swap_cost(sol, i, j);
                 if (d < delta) {
                     bi = i;
@@ -119,8 +124,12 @@ namespace TSPMH {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1, end2 = end - 1;
+        if (sol->size() < 5) return delta;
+        size_t icc=0, jcc, szd = sol->size(); // TODO: R
         for (auto i = sol->begin() + 1; i != end2; i++) {
             for (auto j = i + 2; j != end; j++) {
+                icc = distance(sol->begin(), i);
+                jcc = distance(sol->begin(), j);
                 double d = twoopt_cost(sol, i, j);
                 if (d < delta) {
                     bi = i;
@@ -192,9 +201,13 @@ namespace TSPMH {
         double delta = INFINITYLF;
         vecit bi, bn;
         auto end_max = sol->end() - len;
-        for (auto i = sol->begin() + 1; i != end_max; i++) {
+        size_t icc=0, jcc, szd = sol->size(); // TODO: R
+        if (sol->size() < len + 3) return delta;
+        for (auto i = sol->begin() + 1; i < end_max; i++) {
             auto maxi = i + len;
-            for (auto n = sol->begin() + 1; n != sol->end() - 1; n++) {
+            for (auto n = sol->begin() + 1; n < sol->end() - 1; n++) {
+                icc = distance(sol->begin(), i);
+                jcc = distance(sol->begin(), n);
                 if (i <= n && n <= maxi) continue;
                 double d = reinsertion_cost(sol, i, len, n);
                 if (d < delta) {

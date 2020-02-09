@@ -7,7 +7,7 @@ extern double** matrizAdj;  // matriz de adjacencia
 extern uint dimension;      // quantidade total de vertices
 
 void simple_swap_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
+    auto a = BestInsertionConstructor(dimension, matrizAdj).construct();
     a.printSolution();
     a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
     a.printSolution();
@@ -20,7 +20,7 @@ void simple_swap_test() {
 }
 
 void simple_best_swap_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
+    auto a = BestInsertionConstructor(dimension, matrizAdj).construct();
     a.printSolution();
     SwapMove::swap_best(&a, true);
     a.printSolution();
@@ -33,7 +33,7 @@ void simple_best_swap_test() {
 }
 
 void simple_best_twoopt_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
+    auto a = BestInsertionConstructor(dimension, matrizAdj).construct();
     a.printSolution();
     TwoOptMove::twoopt_best(&a, true);
     a.printSolution();
@@ -46,7 +46,7 @@ void simple_best_twoopt_test() {
 }
 
 void simple_best_reinserion_test(size_t len) {
-    auto a = solutionConstructor(dimension, matrizAdj);
+    auto a = BestInsertionConstructor(dimension, matrizAdj).construct();
     a.printSolution();
     ReinsertionMove::reinsertion_best(&a, len, true);
     a.printSolution();
@@ -59,7 +59,7 @@ void simple_best_reinserion_test(size_t len) {
 }
 
 void simple_copy_test() {
-    auto a = solutionConstructor(dimension, matrizAdj);
+    auto a = BestInsertionConstructor(dimension, matrizAdj).construct();
     auto b = a;
     cout << "a "; a.printSolution();
     a.push_NeighborhoodMove(unique_ptr<NeighborhoodMove>(new SwapMove(1, 2)));
