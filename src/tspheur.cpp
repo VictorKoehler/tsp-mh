@@ -7,6 +7,14 @@
 #include "tspheur.h"
 #include "cvrpneighmoves.h"
 
+
+#define CVRPPOOL_ENABLED
+
+
+#ifdef CVRPPOOL_ENABLED
+#include "cvrppool.h"
+#endif
+
 using namespace std;
 
 
@@ -152,12 +160,17 @@ namespace CVRPMH {
         return r;
     }
 
+    #ifdef CVRPPOOL_ENABLED
+    CVRPMH::CVRPPool* pool;
+    #endif
     void rvnd(CVRPSolution* candidate) {
         for (int i = 0; i < candidate->vehicles; i++) {
             auto s = SubRoute(candidate, i);
             s.cost = 0;
-            TSPMH::rvnd<TSPMH::TSPSolution>(static_cast<TSPMH::TSPSolution*>(&s));
-            candidate->cost += s.cost;
+            if (s.size() > 3) {
+                TSPMH::rvnd<TSPMH::TSPSolution>(static_cast<TSPMH::TSPSolution*>(&s));
+                candidate->cost += s.cost;
+            }
         }
         assert(candidate->checkSolution());
 
@@ -177,11 +190,33 @@ namespace CVRPMH {
             else neighs.erase(neighs.it(ind));
         }
         assert(candidate->size() == candidate->dimension + candidate->vehicles);
+
+        #ifdef CVRPPOOL_ENABLED
+        for (int i = 0; i < candidate->vehicles; i++) {
+            auto s = SubRoute(candidate, i);
+            s.cost = 0;
+            if (s.size() > 3) {
+                auto sb = s.begin(), se = s.end();
+                pool->insert(sb, se, candidate->cost);
+            }
+        }
+        #endif
     }
 
     CVRPSolution gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia> inst) {
         const int d = inst->dimension;
-        return TSPMH::gen_gils_rvnd<CVRPSolution, GreedyDummyConstructor>(50, d >= 150 ? d/2 : d, GreedyDummyConstructor(inst.get()));
+        #ifdef CVRPPOOL_ENABLED
+        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension, 1000*inst->vehicles);
+        pool = &pq;
+        #endif
+        auto r = TSPMH::gen_gils_rvnd<CVRPSolution, GreedyDummyConstructor>(50, d >= 150 ? d/2 : d, GreedyDummyConstructor(inst.get()));
+        #ifdef CVRPPOOL_ENABLED
+        auto p = pq.commit().first;
+        r.assign(p.begin(), p.end());
+        r.update_cost();
+        r.updateSubRoutes();
+        #endif
+        return r;
     }
 
 }

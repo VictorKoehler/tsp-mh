@@ -82,7 +82,8 @@ namespace CVRPMH {
 
         bool checkSolution() {
             bool visited[dimension]={false};
-            int ccvisited = 0, c=0, ind=0;
+            uint ccvisited = 0;
+            int c=0, ind=0;
             for (auto a : *this) {
                 ind++;
                 if (a == CVRPSolution::route_start) {

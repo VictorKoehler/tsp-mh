@@ -1,3 +1,5 @@
+#define CVRPPOOL_ENABLED
+
 #include <fstream>
 #include <iostream>
 #include "readData.h"
