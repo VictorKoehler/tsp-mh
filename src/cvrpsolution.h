@@ -6,7 +6,7 @@
 
 namespace CVRPMH {
 
-    class SubRoute;
+    class SubRoutesIterable;
 
     class CVRPSolution : public TSPMH::TSPSolution {
         template<class T>
@@ -19,7 +19,7 @@ namespace CVRPMH {
 
         public:
 
-        int vehicles, capac;
+        int vehicles, maxcapacity;
         std::vector<int> demand, subroutes, subcapacity;
         bool isSubRoute;
 
@@ -28,7 +28,7 @@ namespace CVRPMH {
 
         CVRPSolution(uint d, double** m) : TSPSolution(d, m) { }
 
-        CVRPSolution(uint d, double** m, int* dem, int c, int v) : TSPSolution(d, m), vehicles(v), capac(c) {
+        CVRPSolution(uint d, double** m, int* dem, int c, int v) : TSPSolution(d, m), vehicles(v), maxcapacity(c) {
             isSubRoute = false;
             demand.assign(dem, dem+d);
             subroutes.resize(v);
@@ -49,7 +49,7 @@ namespace CVRPMH {
 
         inline void cpy(const CVRPSolution& obj) {
             vehicles = obj.vehicles;
-            capac = obj.capac;
+            maxcapacity = obj.maxcapacity;
             demand = obj.demand;
             subroutes = obj.subroutes;
             subcapacity = obj.subcapacity;
@@ -80,6 +80,8 @@ namespace CVRPMH {
             }
         }
 
+        SubRoutesIterable getSubRoutes();
+
         bool checkSolution() {
             bool visited[dimension]={false};
             uint ccvisited = 0;
@@ -87,8 +89,8 @@ namespace CVRPMH {
             for (auto a : *this) {
                 ind++;
                 if (a == CVRPSolution::route_start) {
-                    if (c > capac) {
-                        printf("checkSolution: Overcapacity (%d/%d) on %dth pos was visited.\n", c, capac, ind);
+                    if (c > maxcapacity) {
+                        printf("checkSolution: Overcapacity (%d/%d) on %dth pos was visited.\n", c, maxcapacity, ind);
                         return false;
                     }
                     c = 0;
@@ -114,22 +116,22 @@ namespace CVRPMH {
 
         inline TSPMH::vecit b() const noexcept { return src->it(_b); };
         inline TSPMH::vecit e() const noexcept { return src->it(_e); };
-    public:
-        // ...
-        SubRoute(TSPSolution* src, int b, int e)
-            : CVRPSolution(src->dimension, src->matrizAdj), _b(b), _e(e), src(src) {
-            cost = 0;
-            isSubRoute = true;
-        }
 
         SubRoute(CVRPSolution* src, int i)
             : SubRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
             cpy(*src);
             cost = 0;
             isSubRoute = true;
-            capac = src->subcapacity[i];
+            maxcapacity = src->subcapacity[i];
             vehicles = 1;
             _i = i;
+        }
+    public:
+        // ...
+        SubRoute(TSPSolution* src, int b, int e)
+            : CVRPSolution(src->dimension, src->matrizAdj), _b(b), _e(e), src(src) {
+            cost = 0;
+            isSubRoute = true;
         }
 
         inline void setCapacity(int c) {
@@ -148,8 +150,34 @@ namespace CVRPMH {
         std::size_t size() const noexcept { return std::distance(b(), e()); }
         TSPMH::vecit it(std::size_t ind) override { return b() + ind; }
         TSPMH::vecit it(int ind) override { return b() + ind; }
+
+        static SubRoute importfrom(CVRPSolution* src, int i) {
+            return SubRoute(src, i);
+        }
     };
 
+    class SubRoutesIterable {
+        public:
+        class iterator {
+            private:
+            CVRPSolution* src;
+            unsigned ptr;
+
+            public:
+            iterator(CVRPSolution* src, unsigned ptr): src(src), ptr(ptr){}
+            iterator operator++() { ++ptr; return *this; }
+            bool operator!=(const iterator & other) const { return ptr != other.ptr; }
+            const SubRoute operator*() const { return SubRoute::importfrom(src, ptr); }
+        };
+
+        private:
+        CVRPSolution* src;
+
+        public:
+        SubRoutesIterable(CVRPSolution* src) : src(src) { }
+        iterator begin() const { return iterator(src, 0); }
+        iterator end() const { return iterator(src, unsigned(src->vehicles)); }
+    };
 
 }
 

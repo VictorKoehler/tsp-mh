@@ -144,8 +144,7 @@ namespace CVRPMH {
         sol->updateSubRoutes();
         r.reserve(sol->size());
         r.cpy(*sol);
-        for (int i = 0; i < sol->vehicles; i++) {
-            auto s = SubRoute(sol, i);
+        for (auto s : sol->getSubRoutes()) {
             if (s.size() < 8) {
                 r.insert(r.end(), s.begin(), s.end()-1);
             } else {
@@ -163,50 +162,61 @@ namespace CVRPMH {
     #ifdef CVRPPOOL_ENABLED
     CVRPMH::CVRPPool* pool;
     #endif
+
+    inline double vndsub(CVRPSolution* candidate, SubRoute& s) {
+        if (s.size() > 3) {
+            TSPMH::rvnd<TSPMH::TSPSolution>(static_cast<TSPMH::TSPSolution*>(&s));
+            candidate->cost += s.cost;
+            #ifdef CVRPPOOL_ENABLED
+            s.update_cost(); // TODO: Refactor
+            auto sb = s.begin(), se = s.end();
+            pool->insert(sb, se, s.cost);
+            return s.cost;
+            #endif
+        }
+        return 0;
+    }
+
     void rvnd(CVRPSolution* candidate) {
-        for (int i = 0; i < candidate->vehicles; i++) {
-            auto s = SubRoute(candidate, i);
+        double costssum = 0;
+        for (auto s : candidate->getSubRoutes()) {
             s.cost = 0;
-            if (s.size() > 3) {
-                TSPMH::rvnd<TSPMH::TSPSolution>(static_cast<TSPMH::TSPSolution*>(&s));
-                candidate->cost += s.cost;
-            }
+            costssum += vndsub(candidate, s);
         }
         assert(candidate->checkSolution());
+        #ifdef CVRPPOOL_ENABLED
+        assert(candidate->cost == costssum);
+        #endif
+
 
         vector<int> neighs = { 0, 1, 2, 3 };
 
         while (!neighs.empty()) { // s := rvnd
-            double c = candidate->cost;
             int ind = TSPMH::_random(neighs.size());
+            MovementResult mr;
             switch (ind) {
-                case 0: SwapMove::swap_best(candidate); break;
-                case 1: ReinsertionMove::reinsertion_best(candidate, 1); break;
-                case 2: ReinsertionMove::reinsertion_best(candidate, 2); break;
-                case 3: ReinsertionMove::reinsertion_best(candidate, 3); break;
+                case 0: mr = SwapMove::swap_best(candidate); break;
+                case 1: mr = ReinsertionMove::reinsertion_best(candidate, 1); break;
+                case 2: mr = ReinsertionMove::reinsertion_best(candidate, 2); break;
+                case 3: mr = ReinsertionMove::reinsertion_best(candidate, 3); break;
             }
             assert(candidate->checkSolution());
-            if (candidate->cost < c) neighs = { 0, 1, 2, 3 };
-            else neighs.erase(neighs.it(ind));
-        }
-        assert(candidate->size() == candidate->dimension + candidate->vehicles);
 
-        #ifdef CVRPPOOL_ENABLED
-        for (int i = 0; i < candidate->vehicles; i++) {
-            auto s = SubRoute(candidate, i);
-            s.cost = 0;
-            if (s.size() > 3) {
-                auto sb = s.begin(), se = s.end();
-                pool->insert(sb, se, candidate->cost);
+            if (mr) {
+                neighs = { 0, 1, 2, 3 };
+                vndsub(candidate, mr->first);
+                vndsub(candidate, mr->second);
+            } else {
+                neighs.erase(neighs.it(ind));
             }
         }
-        #endif
+        assert(candidate->size() == candidate->dimension + candidate->vehicles);
     }
 
     CVRPSolution gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia> inst) {
         const int d = inst->dimension;
         #ifdef CVRPPOOL_ENABLED
-        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension, 1000*inst->vehicles);
+        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension);
         pool = &pq;
         #endif
         auto r = TSPMH::gen_gils_rvnd<CVRPSolution, GreedyDummyConstructor>(50, d >= 150 ? d/2 : d, GreedyDummyConstructor(inst.get()));

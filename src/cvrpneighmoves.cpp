@@ -29,7 +29,7 @@ namespace CVRPMH {
     }
 
     inline SubRoute getNearSubRoute(CVRPSolution* sol, int solindex) {
-        return SubRoute(sol, getSubRouteIndex(sol, solindex));
+        return SubRoute::importfrom(sol, getSubRouteIndex(sol, solindex));
     }
 
     inline SubRoute getNearSubRoute(CVRPSolution* sol, vecit it) {
@@ -92,7 +92,7 @@ namespace CVRPMH {
         // apply(sol);
     }
 
-    double SwapMove::swap_best(CVRPSolution *sol) {
+    MovementResult SwapMove::swap_best(CVRPSolution *sol) {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1;
@@ -101,7 +101,7 @@ namespace CVRPMH {
                 double d = swap_cost(sol, i, j);
                 if (d < delta && *i != CVRPSolution::route_start && *j != CVRPSolution::route_start) {
                     auto dc = swap_dcap<false>(sol, i, j);
-                    if (dc.first > sol->capac || dc.second > sol->capac) continue;
+                    if (dc.first > sol->maxcapacity || dc.second > sol->maxcapacity) continue;
                     bi = i;
                     bj = j;
                     delta = d;
@@ -111,9 +111,13 @@ namespace CVRPMH {
 
         if (delta < 0) {
             vprintf("Passive SwapMove with delta %.0lf\n", delta);
+            auto si = getSubRouteIndex(sol, bi), sj = getSubRouteIndex(sol, bj);
             swap_apply(sol, bi, bj, delta);
-        } else vprintf("Positive delta %.0lf => NOP\n", delta);
-        return delta;
+            return make_pair(getNearSubRoute(sol, si), getNearSubRoute(sol, sj));
+        } else {
+            vprintf("Positive delta %.0lf => NOP\n", delta);
+            return {};
+        }
     }
 
 
@@ -177,7 +181,7 @@ namespace CVRPMH {
         // apply(sol);
     }
 
-    double ReinsertionMove::reinsertion_best(CVRPSolution *sol, size_t len) {
+    MovementResult ReinsertionMove::reinsertion_best(CVRPSolution *sol, size_t len) {
         double delta = INFINITYLF;
         vecit bi, bn;
         auto end_max = sol->end() - len, bg = sol->begin() + 1;
@@ -199,7 +203,7 @@ namespace CVRPMH {
                 jcc = distance(sol->begin(), n);
                 if (i <= n && n <= maxi) continue;
                 double d = reinsertion_cost(sol, i, len, n);
-                if (d < delta && reinsertion_dcap(sol, i, len, n).second <= sol->capac) {
+                if (d < delta && reinsertion_dcap(sol, i, len, n).second <= sol->maxcapacity) {
                     bi = i;
                     bn = n;
                     delta = d;
@@ -208,12 +212,15 @@ namespace CVRPMH {
         }
 
         if (delta < 0) {
-            int o = distance(sol->begin(), bi);
-            int n = distance(sol->begin(), bn);
+            int o = distance(sol->begin(), bi), n = distance(sol->begin(), bn);
+            auto so = getSubRouteIndex(sol, o), sn = getSubRouteIndex(sol, n);
             vprintf("Passive ReinsertionMove with delta %.0lf; origin: %d {len: %lud}; dest: %d\n", delta, o, len, n);
             reinsertion_apply(sol, o, len, n, delta);
-        } else vprintf("Positive delta %.0lf => NOP\n", delta);
-        return delta;
+            return make_pair(getNearSubRoute(sol, so), getNearSubRoute(sol, sn));
+        } else {
+            vprintf("Positive delta %.0lf => NOP\n", delta);
+            return {};
+        }
     }
 
 }

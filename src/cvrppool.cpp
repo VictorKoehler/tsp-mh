@@ -36,13 +36,23 @@ namespace CVRPMH
     }
 
     void CVRPPool::insert(vector<int>::iterator& srb, vector<int>::iterator& sre, double cost) {
-        if (shouldInsert(std::distance(srb, sre), cost, this))
+        if (shouldInsert(std::distance(srb, sre), cost, this)) {
+            #ifdef DISABLE_CPLEX
+            if (pool.find(make_pair(vector<int>(srb, sre), cost)) == pool.end())
+                inserted++;
+            #endif
             pool.insert(make_pair(vector<int>(srb, sre), cost));
+        }
     }
 
     void CVRPPool::insert(vector<int> subroute, double cost) {
-        if (shouldInsert(subroute.size(), cost, this))
+        if (shouldInsert(subroute.size(), cost, this)) {
+            #ifdef DISABLE_CPLEX
+            if (pool.find(make_pair(subroute, cost)) == pool.end())
+                inserted++;
+            #endif
             pool.insert(make_pair(subroute, cost));
+        }
     }
     
     pair<vector<int>, double> CVRPPool::commit() {
@@ -135,6 +145,9 @@ namespace CVRPMH
         
         env.end();
         return make_pair(finalroute, finalcost);
+
+        #else
+        printf("Solutions present: %ld / %d\n", pool.size(), inserted);
         #endif
     }
 }

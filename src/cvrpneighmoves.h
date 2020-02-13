@@ -1,8 +1,11 @@
 #ifndef __CVRPNEIGHMOVES__
 #define __CVRPNEIGHMOVES__
 #include "cvrpsolution.h"
+#include <optional>
 
 namespace CVRPMH {
+
+    typedef std::optional<std::pair<SubRoute, SubRoute>> MovementResult;
 
     class SwapMove : public TSPMH::NeighborhoodMove {
         public:
@@ -19,7 +22,7 @@ namespace CVRPMH {
 
         ~SwapMove() override {}
 
-        static double swap_best(CVRPSolution *sol);
+        static MovementResult swap_best(CVRPSolution *sol);
     };
 
 
@@ -38,7 +41,7 @@ namespace CVRPMH {
 
         ~ReinsertionMove() override {}
 
-        static double reinsertion_best(CVRPSolution *sol, size_t len);
+        static MovementResult reinsertion_best(CVRPSolution *sol, size_t len);
     };
 
 }
