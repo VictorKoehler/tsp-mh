@@ -1,6 +1,10 @@
 #ifndef __CVRPPOOL__
 #define __CVRPPOOL__
 
+
+#define DISABLE_CPLEX
+
+
 #include <unordered_set>
 #include <vector>
 

@@ -1,5 +1,7 @@
 #include "cvrppool.h"
+#ifndef DISABLE_CPLEX
 #include "cplex_utils.h"
+#endif
 
 using namespace std;
 
@@ -44,6 +46,7 @@ namespace CVRPMH
     }
     
     pair<vector<int>, double> CVRPPool::commit() {
+        #ifndef DISABLE_CPLEX
         size_t sz = pool.size();
         bool presente[sz][nclient];
         double custos[sz];
@@ -132,5 +135,6 @@ namespace CVRPMH
         
         env.end();
         return make_pair(finalroute, finalcost);
+        #endif
     }
 }
