@@ -17,8 +17,6 @@ void realignData();
 #define RSEED 1574733907
 
 int tsp(int argc, char** argv) {
-    srand(RSEED);
-
     int dim;
     readData(argc, argv, &dim, &matrizAdj);
     dimension = uint(dim);
@@ -31,8 +29,6 @@ int tsp(int argc, char** argv) {
 }
 
 int cvrp(int argc, char** argv) {
-    srand(RSEED);
-
     char nome[100];
     auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(fopen(argv[1], "r"), nome)));
     if (!a.checkSolution()) cout << "Invalid solution\n";
@@ -43,6 +39,8 @@ int cvrp(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+    TSPMH::_random_seed(RSEED);
+
     cvrp(argc, argv);
 }
 

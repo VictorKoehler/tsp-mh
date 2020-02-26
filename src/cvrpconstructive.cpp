@@ -1,0 +1,206 @@
+#include <numeric>
+#include <set>
+#include <tuple>
+#include <cmath>
+#include <algorithm>
+
+#include "tspheur.h"
+#include "cplex_utils.h"
+
+using namespace std;
+
+
+#define INITIAL_SUBTOUR_SIZE 3
+#define INITIAL_SUBTOUR_ALFA 0.5
+
+#define it(i) begin() + (i)
+
+const double INFINITYLF = numeric_limits<double>::infinity();
+
+namespace CVRPMH {
+
+    CVRPSolution GreedyDummyConstructor::construct() {
+        LegacyCVRP::greedy_constructor(inst);
+        return CVRPSolution(inst);
+    }
+    
+    void reajusta_rotas(CVRPSolution& sol, vector<int>& faltantes) {
+        
+        int rota_original_clientes[sol.dimension];
+        int rotaind = -1;
+        for (auto cliente : sol) {
+            if (cliente != CVRPSolution::route_start) {
+                rota_original_clientes[cliente] = rotaind;
+            } else {
+                rotaind++;
+            }
+        }
+        
+        for (auto f : faltantes) {
+            rota_original_clientes[f] = -1;
+        }
+
+
+        // Ambiente
+        IloEnv env;
+
+        // Criando um modelo
+        IloModel modelo(env);
+        CPLEX_MUTE(env);
+
+        // Variáveis de decisão
+
+        ////////////////////////////////////////////////////////////////////////////
+        // Variável Mi
+        // True se o cliente i está na mesma rota que foi designado originalmente
+        ////////////////////////////////////////////////////////////////////////////
+        IloBoolVarArray m(env, sol.dimension);
+
+        // Adicao da variável M ao modelo
+        for (uint j = 1; j < sol.dimension; j++) {
+            char var[100];
+            sprintf(var, "M(%d)", j);
+            m[j].setName(var);
+            modelo.add(m[j]);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        // Variável Cir
+        // True se o cliente i está na rota r.
+        ////////////////////////////////////////////////////////////////////////////
+        IloArray<IloBoolVarArray> c(env, sol.dimension);
+        for (uint i = 1; i < sol.dimension; ++i) {
+            c[i] = IloBoolVarArray(env, sol.vehicles);
+        }
+
+        // Adicao da variável Cir ao modelo
+        for (uint i = 1; i < sol.dimension; i++) {
+            for (int r = 0; r < sol.vehicles; r++) {
+                char var[100];
+                sprintf(var, "c(%d,%d)", i, r);
+                c[i][r].setName(var);
+                modelo.add(c[i][r]);
+            }
+        }
+
+        // Adicionando a FO
+        modelo.add(IloMaximize(env, IloSum(m)));
+
+
+
+        // Restrição: Cada cliente aparece uma única vez na solução
+        // Com exceção do depósito.
+        for (uint i = 1; i < sol.dimension; i++) {
+            modelo.add(IloSum(c[i]) == 1); // (I)
+        }
+
+        // Restrição: Cada rota tem sua capacidade.
+        for (int r = 0; r < sol.vehicles; r++) {
+            IloExpr temp(env);
+            for (uint i = 1; i < sol.dimension; i++) {
+                temp += sol.demand[i]*c[i][r];
+            }
+            modelo.add(temp <= sol.maxcapacity); // (II)
+            temp.end();
+        }
+
+        // Restrição: Cir é 1 quando o cliente i está na rota r.
+        // Quando Mi for 0, Cir pode ser 0 ou 1.
+        // Quando Mi for 1, Cir só pode ser 1.
+        // Então, quando dizemos que r = rota original de i, fazendo Mi = 1 (problema de maximização),
+        // forçamos que a rota escolhida seja a rota original. Quando Mi = 0, a rota pode ser qualquer coisa.
+        for (uint i = 1; i < sol.dimension; i++) {
+            if (rota_original_clientes[i] == -1) continue;
+
+            modelo.add(c[i][rota_original_clientes[i]] >= m[i]); // (III)
+        }
+
+
+        // Let the games begin
+        IloCplex cvrpModel(modelo);
+        cvrpModel.setParam(IloCplex::Param::MIP::Limits::Solutions, 1);
+
+        IloNum startTime;
+        startTime = cvrpModel.getTime();
+        cvrpModel.solve();
+
+        cout << "STATUS: " <<  cvrpModel.getCplexStatus() << endl;
+        cout << "BEST: " <<  cvrpModel.getBestObjValue() << endl;
+        cout << "OBJ VALUE: " <<  cvrpModel.getObjValue() << endl;
+        cout << "TIME ELAPSED: " << (cvrpModel.getTime()-startTime) << endl << endl << "-----" << endl;
+
+
+
+        vector<IloNumArray> val_c(sol.dimension);
+        for (uint i = 1; i < sol.dimension; ++i) {
+            val_c[i] = IloNumArray(env, sol.vehicles);
+            cvrpModel.getValues(c[i], val_c[i]);
+        }
+
+        sol.resize(sol.dimension + sol.vehicles, 0);
+        int insert_ind = 0;
+        sol[insert_ind++] = 0;
+        for (int r = 0; r < sol.vehicles; r++) {
+            for (uint i = 1; i < sol.dimension; i++) {
+                if (val_c[i][r] > 0.98) {
+                    sol[insert_ind++] = i;
+                }
+            }
+            sol[insert_ind++] = 0;
+        }
+        sol.update_cost();
+        sol.updateSubRoutes();
+
+        env.end();
+    }
+
+    CVRPSolution BestInsertionConstructor::construct() {
+        CVRPSolution sol(inst, false);
+        sol.resize(sol.vehicles+1, 0);
+        vector<int> candidatos(sol.dimension - 1);
+        iota(candidatos.begin(), candidatos.end(), 1);
+
+        for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {
+            int r;
+            do {
+                r = TSPMH::_random(candidatos.size());
+            } while (sol.insertion_cost(candidatos[r], i) == INFINITYLF);
+            sol.insert_candidate(candidatos[r], i);
+            candidatos.erase(candidatos.it(r));
+        }
+        sol.update_cost();
+        sol.updateSubRoutes();
+        assert(sol.checkSolution(true, false));
+
+        while (!candidatos.empty()) {
+            set< tuple<double, size_t, size_t> > custoInsercao;
+            size_t curr_sz = sol.size()-1;
+            int maxtamp = floor(double(curr_sz*candidatos.size())*INITIAL_SUBTOUR_ALFA);
+            size_t choose = size_t(TSPMH::_random(maxtamp));
+
+            for (size_t pos = 1; pos < sol.size(); pos++) {
+                for (size_t c = 0; c < candidatos.size(); c++) {
+                    const auto t = make_tuple(sol.insertion_cost(candidatos[c], pos), c, pos);
+                    if (get<0>(t) != INFINITYLF) {
+                        custoInsercao.insert(t);
+                        if (custoInsercao.size() > choose + 1) {
+                            custoInsercao.erase(--custoInsercao.end());
+                        }
+                    }
+                }
+            }
+
+            if (custoInsercao.empty()) break;
+            auto cand = *--custoInsercao.end();
+            sol.insert_candidate(candidatos[get<1>(cand)], get<2>(cand));
+            assert(sol.checkSolution(true, false));
+            candidatos.erase(candidatos.it(get<1>(cand)));
+        }
+
+        if (!candidatos.empty()) {
+            reajusta_rotas(sol, candidatos);
+        }
+        assert(sol.checkSolution(true));
+        return sol;
+    }
+}

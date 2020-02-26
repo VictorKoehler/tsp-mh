@@ -7,7 +7,7 @@ using namespace std;
 
 #ifndef dprintf
 
-#ifndef NDEBUG
+#ifndef NOTDEBUG
 #define PRINTDEBUG 1
 #define ifdebug(...) __VA_ARGS__
 #else

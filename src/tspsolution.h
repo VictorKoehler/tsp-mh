@@ -1,7 +1,7 @@
 #ifndef __TSPSOLUTION_CLASS__
 #define __TSPSOLUTION_CLASS__
 
-#include <assert.h>
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <limits>

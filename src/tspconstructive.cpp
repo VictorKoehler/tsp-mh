@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "tspheur.h"
+#include <random>
 
 using namespace std;
 
@@ -14,8 +15,21 @@ using namespace std;
 
 #define it(i) begin() + (i)
 
-
 namespace TSPMH {
+
+    minstd_rand simple_rand;
+
+    int _random(int excl_max) {
+        return int(simple_rand()) % excl_max;
+    }
+
+    int _random(int incl_min, int excl_max) {
+        return _random(excl_max - incl_min) + incl_min;
+    }
+
+    void _random_seed(uint_fast32_t s) {
+        simple_rand.seed(s);
+    }
 
     StackedTSPSolution BestInsertionConstructor::construct() {
         StackedTSPSolution sol(dimension, matrizAdj);
@@ -52,13 +66,4 @@ namespace TSPMH {
         return sol;
     }
 
-}
-
-namespace CVRPMH {
-
-    CVRPSolution GreedyDummyConstructor::construct() {
-        LegacyCVRP::greedy_constructor(inst);
-        return CVRPSolution(inst);
-    }
-    
 }

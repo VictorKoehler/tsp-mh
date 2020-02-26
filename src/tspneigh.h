@@ -3,7 +3,7 @@
 
 #define PRINTDEBUG 1
 
-#ifndef NDEBUG
+#ifndef NOTDEBUG
 #define PRINTDEBUG 1
 #define ifdebug(...) __VA_ARGS__
 #else

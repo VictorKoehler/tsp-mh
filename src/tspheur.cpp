@@ -210,7 +210,7 @@ namespace CVRPMH {
             s.cost = 0;
             costssum += vndsub(candidate, s);
         }
-        candidate->checkSolution(true);
+        assert(candidate->checkSolution(true));
         #ifdef CVRPPOOL_ENABLED
         assert(candidate->cost == costssum);
         #endif
@@ -229,7 +229,7 @@ namespace CVRPMH {
                 case 2: mr = ReinsertionMove::reinsertion_best(candidate, 2); break;
                 case 3: mr = ReinsertionMove::reinsertion_best(candidate, 3); break;
             }
-            candidate->checkSolution(true);
+            assert(candidate->checkSolution(true));
 
             if (mr) {
                 neighs = { 0, 1, 2, 3 };
@@ -251,10 +251,10 @@ namespace CVRPMH {
         pool = &pq;
         #endif
 
-        auto r = TSPMH::gen_gils_rvnd<CVRPSolution, GreedyDummyConstructor>(50, d >= 150 ? d/2 : d, GreedyDummyConstructor(inst.get()));
+        auto r = TSPMH::gen_gils_rvnd<CVRPSolution, BestInsertionConstructor>(50, d >= 150 ? d/2 : d, BestInsertionConstructor(inst.get()));
 
         #ifdef CVRPPOOL_ENABLED
-        // #ifndef NDEBUG
+        // #ifndef NOTDEBUG
         // cout << "Current Best: ";
         // for (auto s : r.getSubRoutes()) {
         //     s.update_cost(); // TODO: Refactor

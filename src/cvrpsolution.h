@@ -1,6 +1,7 @@
 #ifndef __CVRPSOLUTION_CLASS__
 #define __CVRPSOLUTION_CLASS__
 
+#include <algorithm>
 #include "tspsolution.h"
 #include "legacycvrp/construtores.hpp"
 
@@ -35,16 +36,18 @@ namespace CVRPMH {
             subcapacity.resize(v);
         }
 
-        CVRPSolution(LegacyCVRP::Instancia* inst)
+        CVRPSolution(LegacyCVRP::Instancia* inst, bool importRoute = true)
             : CVRPSolution(inst->dimension, qMatrTInit<double>(inst->dimension), inst->demand, inst->capacity, inst->vehicles) {
-            assign(inst->path, inst->path + inst->path_len);
             for (uint i = 0; i < dimension; i++) {
                 for (uint j = 0; j < dimension; j++) {
                     matrizAdj[i][j] = double(inst->edges_weight[i][j]);
                 }
             }
-            updateSubRoutes();
-            update_cost();
+            if (importRoute) {
+                assign(inst->path, inst->path + inst->path_len);
+                updateSubRoutes();
+                update_cost();
+            }
         }
 
         inline void cpy(const CVRPSolution& obj) {
@@ -80,9 +83,26 @@ namespace CVRPMH {
             }
         }
 
+        inline int getSubRouteIndex(int solindex) {
+            auto a = std::upper_bound(subroutes.begin(), subroutes.end(), solindex);
+            return a - subroutes.begin() - 1;
+        }
+
+        inline int getSubRouteIndex(TSPMH::vecit& it) {
+            return getSubRouteIndex(distance(begin(), it));
+        }
+
+        inline int getSubRouteIndex(const TSPMH::vecit& it) {
+            return getSubRouteIndex(distance(begin(), it));
+        }
+
         SubRoutesIterable getSubRoutes();
 
-        bool checkSolution(bool autoassert=false);
+        bool checkSolution(bool autoassert=false, bool complete=true);
+
+        double insertion_cost(uint n, int p);
+
+        void insert_candidate(int c, int pos);
     };
 
 
