@@ -82,30 +82,7 @@ namespace CVRPMH {
 
         SubRoutesIterable getSubRoutes();
 
-        bool checkSolution() {
-            bool visited[dimension]={false};
-            uint ccvisited = 0;
-            int c=0, ind=0;
-            for (auto a : *this) {
-                ind++;
-                if (a == CVRPSolution::route_start) {
-                    if (c > maxcapacity) {
-                        printf("checkSolution: Overcapacity (%d/%d) on %dth pos was visited.\n", c, maxcapacity, ind);
-                        return false;
-                    }
-                    c = 0;
-                }
-                c += demand[a];
-                if (visited[a] && a != CVRPSolution::route_start) {
-                    printf("checkSolution: %d repeated.", a);
-                    return false;
-                } else if (!visited[a]) {
-                    visited[a] = true;
-                    ccvisited++;
-                }
-            }
-            return ccvisited == dimension;
-        }
+        bool checkSolution(bool autoassert=false);
     };
 
 
@@ -138,16 +115,18 @@ namespace CVRPMH {
             static_cast<CVRPSolution*>(src)->subcapacity[_i] = c;
         }
 
+        bool operator!=(const SubRoute & other) const { return _b != other._b; }
+
         TSPMH::vecit begin() noexcept override { return b(); }
         TSPMH::vecit end() noexcept override   { return e(); }
         typename std::iterator_traits<TSPMH::vecit>::reference
-        operator[](std::size_t index) { return b()[index]; }
-        int &at(std::size_t index) { return b()[index]; }
-        void push_back(int x) { src->insert(e(), x); }
-        TSPMH::vecit insert(const TSPMH::vecit p, int i)  { return src->insert(p, i); }
-        TSPMH::vecit insert(const TSPMH::vecit p, const TSPMH::vecit b, const TSPMH::vecit e)  { return src->insert(p, b, e); }
-        TSPMH::vecit erase(const TSPMH::vecit b, const TSPMH::vecit e)  { return src->erase(b, e); }
-        std::size_t size() const noexcept { return std::distance(b(), e()); }
+        operator[](std::size_t index) override { return b()[index]; }
+        int &at(std::size_t index) override { return b()[index]; }
+        void push_back(int x) override { src->insert(e(), x); }
+        TSPMH::vecit insert(const TSPMH::vecit p, int i)  override { return src->insert(p, i); }
+        TSPMH::vecit insert(const TSPMH::vecit p, const TSPMH::vecit b, const TSPMH::vecit e)  override { return src->insert(p, b, e); }
+        TSPMH::vecit erase(const TSPMH::vecit b, const TSPMH::vecit e)  override { return src->erase(b, e); }
+        std::size_t size() noexcept override { return std::distance(b(), e()); }
         TSPMH::vecit it(std::size_t ind) override { return b() + ind; }
         TSPMH::vecit it(int ind) override { return b() + ind; }
 

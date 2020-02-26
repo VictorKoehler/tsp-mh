@@ -46,6 +46,24 @@ int main(int argc, char** argv) {
     cvrp(argc, argv);
 }
 
+// #include <iostream>     // std::cout
+// #include <algorithm>    // std::lower_bound, std::upper_bound, std::sort
+// #include <vector>       // std::vector
+
+// int main () {
+//     std::vector<int> v = {0, 9, 10}, k = {0, 1, 8, 9, 10, 11};
+
+//     for (auto i : k) {
+//         std::vector<int>::iterator low,up;
+//         low=std::lower_bound (v.begin(), v.end(), i); //          ^
+//         up= std::upper_bound (v.begin(), v.end(), i); //                   ^
+
+//         std::cout << i << ": lower_bound at " << (low- v.begin()) << "; upper_bound at " << (up - v.begin()) << '\n';
+//     }
+
+//     return 0;
+// }
+
 template<bool guides>
 void printData() {
     cout << "dimension: " << dimension << endl;

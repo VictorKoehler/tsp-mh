@@ -42,6 +42,15 @@ namespace CVRPMH {
 
         CVRPSolution construct();
     };
+
+    class BestInsertionConstructor : public TSPMH::TSPSolutionConstructor<CVRPSolution> {
+        public:
+        LegacyCVRP::Instancia *inst;
+
+        BestInsertionConstructor(LegacyCVRP::Instancia *inst) : inst(inst) { }
+
+        CVRPSolution construct();
+    };
 }
 
 #endif

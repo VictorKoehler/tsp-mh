@@ -55,7 +55,8 @@ namespace TSPMH {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1;
-        if (sol->size() < 4) return delta;
+        if (sol->size() < 4)
+            return delta;
         size_t icc=0, jcc, szd = sol->size(); // TODO: R
         for (auto i = sol->begin() + 1; i != end; i++) {
             for (auto j = i + 1; j != end; j++, jcc++) {

@@ -2,8 +2,6 @@
 #define __CVRPPOOL__
 
 
-#define DISABLE_CPLEX
-
 
 #include <unordered_set>
 #include <vector>
@@ -18,8 +16,7 @@ namespace CVRPMH
             for (int i : v.first) {
                 seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
             }
-            // return seed
-            return 0;
+            return seed;
         }
     };
 

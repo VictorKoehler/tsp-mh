@@ -6,8 +6,20 @@
 using namespace std;
 
 #ifndef dprintf
+
+#ifndef NDEBUG
+#define PRINTDEBUG 1
+#define ifdebug(...) __VA_ARGS__
+#else
+#define ifdebug(...)
+#endif
+
+#ifdef PRINTDEBUG
+#define dprintf(...) printf(__VA_ARGS__)
+#else
 #define dprintf(...)
-// #define dprintf(...) printf(__VA_ARGS__)
+#endif
+
 #endif
 
 namespace CVRPMH
@@ -58,17 +70,21 @@ namespace CVRPMH
     pair<vector<int>, double> CVRPPool::commit() {
         #ifndef DISABLE_CPLEX
         size_t sz = pool.size();
-        bool presente[sz][nclient];
+        bool presente[sz][nclient] = {false};
         double custos[sz];
 
+        dprintf("Pool costs:");
         int i = 0;
         for (auto s : pool) {
             for (auto c : s.first) {
                 presente[i][c] = true;
             }
+            ifdebug(VectorHash v);
+            dprintf(" %.0lf(%lu)", s.second, v(s));
             custos[i] = s.second;
             i++;
         }
+        dprintf("\n");
 
         // Ambiente
         IloEnv env;
@@ -111,14 +127,14 @@ namespace CVRPMH
         for (int c = 1; c < nclient; ++c) {
             IloExpr temp(env); // Se o cliente está na subrota...
             for (size_t r = 0; r < sz; r++) {
-                if (presente[r][c]) temp += x[r];
+                temp += presente[r][c]*x[r];
             }
             modelo.add(temp == 1); // 5.24
             temp.end();
         }
 
         // Existem exatamente K (num. de veículos) rotas ativas.
-        modelo.add(IloSum(x) == nveic);
+        modelo.add(IloSum(x) <= nveic);
 
 
 
@@ -129,19 +145,22 @@ namespace CVRPMH
         startTime = cvrpModel.getTime();
         cvrpModel.solve();
 
+        cout << "STATUS: " <<  cvrpModel.getCplexStatus() << endl;
         cout << "BEST: " <<  cvrpModel.getBestObjValue() << endl;
         cout << "OBJ VALUE: " <<  cvrpModel.getObjValue() << endl;
-        cout << "STATUS: " <<  cvrpModel.getCplexStatus() << endl;
         cout << "TIME ELAPSED: " << (cvrpModel.getTime()-startTime) << endl << endl << "-----" << endl;
 
         double finalcost = cvrpModel.getBestObjValue();
         vector<int> finalroute;
+
+        IloNumArray xarr(env, sz);
+        cvrpModel.getValues(x, xarr);
         i = 0;
         for (auto s : pool) {
-            if (cvrpModel.getValue(x[i]) > 0.98)
+            if (xarr[i++] > 0.98)
                 finalroute.insert(finalroute.end(), s.first.begin(), s.first.end()-1);
         }
-        finalroute.push_back(0);
+        finalroute.resize(nclient + nveic, 0);
         
         env.end();
         return make_pair(finalroute, finalcost);
