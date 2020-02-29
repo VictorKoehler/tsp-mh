@@ -8,21 +8,26 @@
 
 namespace TSPMH {
 
-    TSPSolution doubleBridge(TSPSolution* sol);
+    class TSPW_BI_RVND_DB {
+        public:
+        typedef TSPSolution Solution;
+        
+        uint dimension;
+        double** matrizAdj;
+
+        TSPW_BI_RVND_DB(uint dimension, double** matrizAdj) : dimension(dimension), matrizAdj(matrizAdj) { }
+
+        Solution construct();
+
+        void neighborhood(Solution* sol);
+
+        Solution pertubation(Solution* sol);
+    };
+
+    void rvnd(TSPSolution* candidate);
 
     TSPSolution gils_rvnd(uint d, double **m);
 
-    void rvnd(TSPSolution* candidate);
-}
-
-namespace CVRPMH {
-
-    CVRPSolution doubleBridge(CVRPSolution* sol);
-
-    CVRPSolution gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia> inst);
-
-    void rvnd(CVRPSolution* candidate);
-    
 }
 
 #endif

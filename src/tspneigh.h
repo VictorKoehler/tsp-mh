@@ -1,21 +1,7 @@
 #ifndef __TSPNEIGHBORHOOD_CLASS__
 #define __TSPNEIGHBORHOOD_CLASS__
 
-#define PRINTDEBUG 1
-
-#ifndef NOTDEBUG
-#define PRINTDEBUG 1
-#define ifdebug(...) __VA_ARGS__
-#else
-#define ifdebug(...)
-#endif
-
-#ifdef PRINTDEBUG
-#define dprintf(...) printf(__VA_ARGS__)
-#else
-#define dprintf(...)
-#endif
-
+#include "global.h"
 
 namespace TSPMH {
 

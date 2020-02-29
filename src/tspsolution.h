@@ -1,7 +1,6 @@
 #ifndef __TSPSOLUTION_CLASS__
 #define __TSPSOLUTION_CLASS__
 
-#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <limits>

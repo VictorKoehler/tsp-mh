@@ -1,25 +1,11 @@
-#include "cvrppool.h"
-#ifndef DISABLE_CPLEX
-#include "cplex_utils.h"
-#endif
+#include <set>
+#include "global.h"
 
 using namespace std;
 
-#ifndef dprintf
-
-#ifndef NOTDEBUG
-#define PRINTDEBUG 1
-#define ifdebug(...) __VA_ARGS__
-#else
-#define ifdebug(...)
-#endif
-
-#ifdef PRINTDEBUG
-#define dprintf(...) printf(__VA_ARGS__)
-#else
-#define dprintf(...)
-#endif
-
+#include "cvrppool.h"
+#ifndef DISABLE_CPLEX
+#include "cplex_utils.h"
 #endif
 
 namespace CVRPMH
@@ -34,8 +20,8 @@ namespace CVRPMH
             int i = _random(int(p->pool.size()));
             auto t = p->pool.begin();
             while (i--) t++;
-            auto dd = t->second;
-            auto ds = t->first.size();
+            auto dd = t->first;
+            auto ds = t->second.size();
             if (dd/double(ds) > cost/double(size)) {
                 p->pool.erase(t);
                 dprintf("Pool Overflow! Replaced random subroute{%ld clients, %lf cost} by {%ld clients, %lf cost}\n", ds, dd, size, cost);
@@ -53,7 +39,7 @@ namespace CVRPMH
             if (pool.find(make_pair(vector<int>(srb, sre), cost)) == pool.end())
                 inserted++;
             #endif
-            pool.insert(make_pair(vector<int>(srb, sre), cost));
+            pool.insert(make_pair(cost, vector<int>(srb, sre)));
         }
     }
 
@@ -63,11 +49,89 @@ namespace CVRPMH
             if (pool.find(make_pair(subroute, cost)) == pool.end())
                 inserted++;
             #endif
-            pool.insert(make_pair(subroute, cost));
+            pool.insert(make_pair(cost, subroute));
         }
     }
+
+    // Pool Permutation Enrichment Algorithm
+    #ifdef PPEA
+
+    template<typename T>
+    class ordered_fixed_size_set {
+        size_t msz;
+        public:
+        set<T> cont;
+
+        ordered_fixed_size_set(size_t max_size) : msz(max_size) { }
+
+        size_t max_size() const { return msz; }
+
+        void set_max_size(size_t new_max_size) const {
+            msz = new_max_size;
+            if (new_max_size < cont.size()) {
+                auto tend = cont.end();
+                auto trem = tend-(cont.size()-new_max_size);
+                cont.erase(trem, tend);
+            }
+        }
+
+        void insert(T &&__x) {
+            cont.insert(__x);
+            if (cont.size() > msz)
+                cont.erase(cont.end()-1);
+        }
+
+        void insert(const T &__x) {
+            cont.insert(__x);
+            if (cont.size() > msz)
+                cont.erase(cont.end()-1);
+        }
+    };
+
+    // https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
+    template<typename T>
+    typename T::size_type LevensteinDistance(const T &source, const T &target) {
+        if (source.size() > target.size()) {
+            return LevensteinDistance(target, source);
+        }
+
+        using TSizeType = typename T::size_type;
+        const TSizeType min_size = source.size(), max_size = target.size();
+        std::vector<TSizeType> lev_dist(min_size + 1);
+
+        for (TSizeType i = 0; i <= min_size; ++i) {
+            lev_dist[i] = i;
+        }
+
+        for (TSizeType j = 1; j <= max_size; ++j) {
+            TSizeType previous_diagonal = lev_dist[0], previous_diagonal_save;
+            ++lev_dist[0];
+
+            for (TSizeType i = 1; i <= min_size; ++i) {
+                previous_diagonal_save = lev_dist[i];
+                if (source[i - 1] == target[j - 1]) {
+                    lev_dist[i] = previous_diagonal;
+                } else {
+                    lev_dist[i] = std::min(std::min(lev_dist[i - 1], lev_dist[i]), previous_diagonal) + 1;
+                }
+                previous_diagonal = previous_diagonal_save;
+            }
+        }
+
+        return lev_dist[min_size];
+    }
+
+    void pool_permutation_enrichment_algorithm(CVRPPool* pool) {
+        ordered_fixed_size_set< pair< double, vector<int> > > subpool(4*pool->pool.size());
+
+    }
+    #endif
     
     pair<vector<int>, double> CVRPPool::commit() {
+        #ifdef PPEA
+
+        #endif
+
         #ifndef DISABLE_CPLEX
         size_t sz = pool.size();
         bool presente[sz][nclient] = {false};
@@ -76,12 +140,12 @@ namespace CVRPMH
         dprintf("Pool costs:");
         int i = 0;
         for (auto s : pool) {
-            for (auto c : s.first) {
+            for (auto c : s.second) {
                 presente[i][c] = true;
             }
             ifdebug(VectorHash v);
-            dprintf(" %.0lf(%lu)", s.second, v(s));
-            custos[i] = s.second;
+            dprintf(" %.0lf(%lu)", s.first, v(s));
+            custos[i] = s.first;
             i++;
         }
         dprintf("\n");
@@ -158,7 +222,7 @@ namespace CVRPMH
         i = 0;
         for (auto s : pool) {
             if (xarr[i++] > 0.98)
-                finalroute.insert(finalroute.end(), s.first.begin(), s.first.end()-1);
+                finalroute.insert(finalroute.end(), s.second.begin(), s.second.end()-1);
         }
         finalroute.resize(nclient + nveic, 0);
         

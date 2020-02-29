@@ -4,6 +4,7 @@
 #include <iostream>
 #include "readData.h"
 #include "tests.h"
+#include "cvrpheur.h"
 
 using namespace std;
 
@@ -15,6 +16,8 @@ void printData();
 void realignData();
 
 #define RSEED 1574733907
+
+
 
 int tsp(int argc, char** argv) {
     int dim;
@@ -28,6 +31,8 @@ int tsp(int argc, char** argv) {
     return 0;
 }
 
+
+
 int cvrp(int argc, char** argv) {
     char nome[100];
     auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(fopen(argv[1], "r"), nome)));
@@ -38,9 +43,14 @@ int cvrp(int argc, char** argv) {
     return 0;
 }
 
+
+
 int main(int argc, char** argv) {
     TSPMH::_random_seed(RSEED);
 
+    ifdebug(printf("WARNING: DEBUG ENABLED!\n"));
+    assert(printf("WARNING: ASSERTIVES ENABLED!\n") >= 0);
+    dprintf("WARNING: VERBOSITY ENABLED!\n");
     cvrp(argc, argv);
 }
 

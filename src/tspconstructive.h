@@ -2,7 +2,6 @@
 #define __TSPCONSTRUCTIVE_CLASS__
 
 #include "tspsolution.h"
-#include "cvrpsolution.h"
 
 namespace TSPMH {
 
@@ -27,27 +26,6 @@ namespace TSPMH {
         BestInsertionConstructor(uint d, double** m) : dimension(d), matrizAdj(m) { }
 
         StackedTSPSolution construct();
-    };
-}
-
-namespace CVRPMH {
-
-    class GreedyDummyConstructor : public TSPMH::TSPSolutionConstructor<CVRPSolution> {
-        public:
-        LegacyCVRP::Instancia *inst;
-
-        GreedyDummyConstructor(LegacyCVRP::Instancia *inst) : inst(inst) { }
-
-        CVRPSolution construct();
-    };
-
-    class BestInsertionConstructor : public TSPMH::TSPSolutionConstructor<CVRPSolution> {
-        public:
-        LegacyCVRP::Instancia *inst;
-
-        BestInsertionConstructor(LegacyCVRP::Instancia *inst) : inst(inst) { }
-
-        CVRPSolution construct();
     };
 }
 

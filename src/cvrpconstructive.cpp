@@ -4,18 +4,17 @@
 #include <cmath>
 #include <algorithm>
 
-#include "tspheur.h"
+#include "cvrpheur.h"
+#include "cvrpconstructive.h"
 #include "cplex_utils.h"
 
 using namespace std;
 
 
-#define INITIAL_SUBTOUR_SIZE 3
+#define INITIAL_SUBTOUR_SIZE 1
 #define INITIAL_SUBTOUR_ALFA 0.5
 
 #define it(i) begin() + (i)
-
-const double INFINITYLF = numeric_limits<double>::infinity();
 
 namespace CVRPMH {
 
@@ -159,6 +158,7 @@ namespace CVRPMH {
         sol.resize(sol.vehicles+1, 0);
         vector<int> candidatos(sol.dimension - 1);
         iota(candidatos.begin(), candidatos.end(), 1);
+        random_shuffle(candidatos.begin(), candidatos.end());
 
         for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {
             int r;

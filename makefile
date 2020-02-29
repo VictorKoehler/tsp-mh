@@ -36,17 +36,17 @@ CONCERTLIBDIR = $(CONCERTDIR)/lib/$(SYSTEM)/$(LIBFORMAT)
 #### define o compilador
 CPPC = g++
 ifeq ($(DEBUG), 2)
-    lCCOPTFLAGS = -g3 -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize=null -fsanitize=signed-integer-overflow
+    lCCOPTFLAGS = -DENVERBOSE -DENDEBUG -g3 -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize=null -fsanitize=signed-integer-overflow
 else ifeq ($(DEBUG), 1)
-    lCCOPTFLAGS = -O0 -DNOTDEBUG
+    lCCOPTFLAGS = -O0 -DENVERBOSE
 else
-    lCCOPTFLAGS = -O3 -DNDEBUG -DNOTDEBUG
+    lCCOPTFLAGS = -O3 -DNDEBUG
 endif
 
 ifeq ($(ENASSERTS), 1)
-    lCCOPTFLAGS = $(lCCOPTFLAGS) -DENASSERTS
+    lCCOPTFLAGSASSERTS = -DENASSERTS
 endif
-CCOPTFLAGS = $(lCCOPTFLAGS) -Wall -Wextra -mcmodel=medium -Wl,--no-relax -std=c++17
+CCOPTFLAGS = $(lCCOPTFLAGS) $(lCCOPTFLAGSASSERTS) -Wall -Wextra -mcmodel=medium -Wl,--no-relax -std=c++17
 #############################
 
 #### opcoes de compilacao e includes

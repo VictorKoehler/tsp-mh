@@ -35,8 +35,6 @@ namespace CVRPMH {
 
 
 
-    const double INFINITYLF = numeric_limits<double>::infinity();
-
     template<bool setMode>
     inline pair<double, double> swap_dcap(CVRPSolution *sol, const vecit &i, const vecit &j) {
         if (sol->isSubRoute) return make_pair(0, 0);
@@ -146,11 +144,9 @@ namespace CVRPMH {
         return reinsertion_cost(sol, o, len, n);
     }
 
-    //int shitccagain = 0; // TODO: R
     inline pair<double, double> reinsertion_dcap(CVRPSolution *sol, const vecit &o, size_t len, const vecit &n) {
         if (sol->isSubRoute) return make_pair(0, 0);
         else {
-            //std::cout << ++shitccagain << std::endl;
             auto co = sol->getSubRouteIndex(o), cn = sol->getSubRouteIndex(n);
             if (co == cn) return make_pair(0, 0);
             else {

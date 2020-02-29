@@ -4,7 +4,6 @@
 #define autoassertOrReturn(statement) assertOrReturn(statement, autoassert)
 
 #include <numeric>
-const double INFINITYLF = std::numeric_limits<double>::infinity();
 
 namespace CVRPMH {
 

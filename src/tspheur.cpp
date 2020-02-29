@@ -5,74 +5,30 @@
 #include <algorithm>
 
 #include "tspheur.h"
-#include "cvrpneighmoves.h"
-
-
-#define CVRPPOOL_ENABLED
-
-
-#ifdef CVRPPOOL_ENABLED
-#include "cvrppool.h"
-#endif
+#include "tspneighmoves.h"
+#include "doubleBridge.h"
+#include "ils.h"
 
 using namespace std;
 
-
-#define INITIAL_SUBTOUR_SIZE 3
-#define INITIAL_SUBTOUR_ALFA 0.3
-
 #define it(i) begin() + (i)
-
 
 namespace TSPMH {
 
 
-    const double INFINITYLF = std::numeric_limits<double>::infinity();
-
-    inline TSPSolution doubleBridge(TSPSolution* sol, TSPMH::vecit sbeg, TSPMH::vecit send, size_t ssize, double ncost) {
-        TSPSolution ret(sol->dimension, sol->matrizAdj);
-        ret.cost = ncost;
-        ret.clear();
-        ret.reserve(ssize);
-
-        int sz4 = ssize / 4;
-        auto apos1 = sbeg + (_random(sz4)), pos1 = apos1+1;
-        auto apos2 = pos1 + (_random(sz4)), pos2 = apos2+1;
-        auto apos3 = pos2 + (_random(sz4)), pos3 = apos3+1;
-        auto end1 =  send - 1, end2 = end1 - 1;
-
-        ret.insert(ret.end(), sbeg, pos1); // 0
-        ret.insert(ret.end(), pos3, end1); // 3
-        ret.insert(ret.end(), pos2, pos3); // 2
-        ret.insert(ret.end(), pos1, pos2); // 1
-        ret.push_back(TSPSolution::route_start); // 4
-
-        ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
-        ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
-        if (ncost != 0)
-            assert(ret.cost == ret.update_cost());
-        assert(ret.size() == ssize);
-
-        return ret;
+    TSPW_BI_RVND_DB::Solution TSPW_BI_RVND_DB::construct() {
+        return BestInsertionConstructor(dimension, matrizAdj).construct();
     }
 
-    template<class T=TSPSolution>
-    inline T doubleBridge(T* sol) {
-        return doubleBridge(sol, sol->begin(), sol->end(), sol->size(), sol->cost);
+    void TSPW_BI_RVND_DB::neighborhood(Solution* sol) {
+        rvnd(sol);
     }
 
-    template<>
-    inline CVRPMH::CVRPSolution doubleBridge(CVRPMH::CVRPSolution* sol) {
-        return CVRPMH::doubleBridge(sol);
+    TSPW_BI_RVND_DB::Solution TSPW_BI_RVND_DB::pertubation(Solution* sol) {
+        return doubleBridge(sol);
     }
 
 
-
-
-    template<class T=TSPSolution>
-    void rvnd(T* candidate);
-
-    template<>
     void rvnd(TSPSolution* candidate) {
         vector<int> neighs = { 0, 1, 2, 3, 4 };
 
@@ -91,189 +47,8 @@ namespace TSPMH {
         }
     }
 
-    template<>
-    void rvnd(CVRPMH::CVRPSolution* candidate) {
-        return CVRPMH::rvnd(candidate);
-    }
-
-
-
-    template<class TSPClass, class TSPConstr>
-    TSPClass gen_gils_rvnd(int Imax, int Iils, TSPConstr constr) {
-        TSPClass best;
-        best.cost = INFINITYLF;
-
-        for (int i = 0; i < Imax; i++) {
-            TSPClass bestCandidate = constr.construct(); // s'
-            TSPClass candidate = bestCandidate; // s
-            printf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
-            fflush(stdout);
-
-            int ccrvnd = 0;
-            for (int j = 0; j < Iils; j++, ccrvnd++) {
-                rvnd<TSPClass>(&candidate);
-
-                if (candidate.cost < bestCandidate.cost) { // s < s'
-                    dprintf("RVND loop #%d, new cost update: %lf\n", ccrvnd, candidate.cost);
-                    assert(candidate.cost == candidate.update_cost());
-                    bestCandidate = candidate; // s' := s
-                    j = 0;
-                }
-                candidate = doubleBridge<TSPClass>(&bestCandidate);
-            }
-
-            if (bestCandidate.cost < best.cost) {
-                best = bestCandidate;
-                assert(bestCandidate.cost == bestCandidate.update_cost());
-                dprintf("GILS-RVND loop #%d of %d, with %d iterations updated cost to %lf\n", i, Imax, ccrvnd, best.cost);
-            }
-        }
-
-        return best;
-    }
 
     TSPSolution gils_rvnd(uint d, double **m) {
-        return gen_gils_rvnd<TSPSolution, BestInsertionConstructor>(50, d >= 150 ? d/2 : d, BestInsertionConstructor(d, m));
+        return gils<TSPW_BI_RVND_DB, TSPW_BI_RVND_DB::Solution>(50, d >= 150 ? d/2 : d, TSPW_BI_RVND_DB(d, m));
     }
-}
-
-namespace CVRPMH {
-
-    CVRPSolution doubleBridge(CVRPSolution* sol) {
-        CVRPSolution r;
-        sol->updateSubRoutes();
-        r.reserve(sol->size());
-        r.cpy(*sol);
-        for (auto s : sol->getSubRoutes()) {
-            if (s.size() < 8) {
-                r.insert(r.end(), s.begin(), s.end()-1);
-            } else {
-                auto n = TSPMH::doubleBridge(&s, s.begin(), s.end(), s.size(), 0); // TODO: FIX
-                r.insert(r.end(), n.begin(), n.end()-1);
-            }
-        }
-        const auto rs = CVRPSolution::route_start;
-        r.push_back(rs);
-
-        // if (*(sol->end() - 2) == rs) {
-            
-        //     set< pair<double, TSPMH::vecit> > custoInsercao;
-        //     size_t choose = max(3LU, size_t(random() % min(long(r.size()/3), 50l)));
-
-        //     for (TSPMH::vecit zit = r.begin() + 2; zit < r.end() - 1; zit++) {
-        //         if (*(zit-1) != rs && *zit != rs) {
-        //             custoInsercao.insert(make_pair(r.insertion_cost(rs, zit), zit));
-        //             if (custoInsercao.size() > choose) {
-        //                 custoInsercao.erase(--custoInsercao.end());
-        //             }
-        //         }
-        //     }
-
-        //     auto rcand = *--custoInsercao.end(), bcand = *custoInsercao.begin();
-        //     auto& cand = bcand.first < 0 ? bcand : rcand;
-        //     if (cand.first < 0 || random() % 3 > 0) {
-        //         dprintf("Inserted a pertubation-zero in %ld, delta cost %lf\n", cand.second-r.begin(), cand.first);
-        //         r.pop_back();
-        //         r.insert(cand.second, rs);
-        //     }
-        // }
-
-        r.update_cost();
-        r.updateSubRoutes();
-        assert(r.size() == r.dimension + r.vehicles);
-        return r;
-    }
-
-    #ifdef CVRPPOOL_ENABLED
-    CVRPMH::CVRPPool* pool;
-    #endif
-
-    inline double vndsub(CVRPSolution* candidate, SubRoute& s) {
-        if (s.size() > 3) {
-            TSPMH::rvnd<TSPMH::TSPSolution>(static_cast<TSPMH::TSPSolution*>(&s));
-            candidate->cost += s.cost;
-            
-            #ifdef CVRPPOOL_ENABLED
-            s.update_cost(); // TODO: Refactor
-            auto sb = s.begin(), se = s.end();
-            pool->insert(sb, se, s.cost);
-            return s.cost;
-            #endif
-        } else {
-            return s.update_cost(); // TODO: Refactor
-        }
-    }
-
-    void rvnd(CVRPSolution* candidate) {
-        double costssum = 0;
-        for (auto s : candidate->getSubRoutes()) {
-            s.cost = 0;
-            costssum += vndsub(candidate, s);
-        }
-        assert(candidate->checkSolution(true));
-        #ifdef CVRPPOOL_ENABLED
-        assert(candidate->cost == costssum);
-        #endif
-
-
-        vector<int> neighs = { 0, 1, 2, 3 };
-
-        static int cc = 0;
-        while (!neighs.empty()) { // s := rvnd
-            cc++; // TODO: R
-            int ind = TSPMH::_random(neighs.size());
-            MovementResult mr;
-            switch (neighs[ind]) {
-                case 0: mr = SwapMove::swap_best(candidate); break;
-                case 1: mr = ReinsertionMove::reinsertion_best(candidate, 1); break;
-                case 2: mr = ReinsertionMove::reinsertion_best(candidate, 2); break;
-                case 3: mr = ReinsertionMove::reinsertion_best(candidate, 3); break;
-            }
-            assert(candidate->checkSolution(true));
-
-            if (mr) {
-                neighs = { 0, 1, 2, 3 };
-                assert(mr->first != mr->second);
-                vndsub(candidate, mr->first);
-                vndsub(candidate, mr->second);
-            } else {
-                neighs.erase(neighs.it(ind));
-            }
-        }
-        assert(candidate->size() == candidate->dimension + candidate->vehicles);
-    }
-
-    CVRPSolution gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia> inst) {
-        const int d = inst->dimension;
-
-        #ifdef CVRPPOOL_ENABLED
-        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension);
-        pool = &pq;
-        #endif
-
-        auto r = TSPMH::gen_gils_rvnd<CVRPSolution, BestInsertionConstructor>(50, d >= 150 ? d/2 : d, BestInsertionConstructor(inst.get()));
-
-        #ifdef CVRPPOOL_ENABLED
-        // #ifndef NOTDEBUG
-        // cout << "Current Best: ";
-        // for (auto s : r.getSubRoutes()) {
-        //     s.update_cost(); // TODO: Refactor
-        //     auto sb = s.begin(), se = s.end();
-        //     pool->insert(sb, se, s.cost);
-        //     VectorHash v;
-        //     auto h = v(make_pair(vector<int>(sb, se), s.cost));
-        //     cout << s.cost << "(" << h << ") ";
-        // }
-        // cout << "\n";
-        // #endif
-
-        auto p = pq.commit().first;
-        r.assign(p.begin(), p.end());
-        r.update_cost();
-        r.updateSubRoutes();
-        #endif
-        
-        return r;
-    }
-
 }
