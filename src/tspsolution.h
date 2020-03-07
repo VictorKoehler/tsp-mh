@@ -25,6 +25,7 @@ namespace TSPMH {
 
         TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
             this->at(route_start) = this->at(route_start) = 0;
+            this->reserve(size_t(d));
         }
 
         TSPSolution(const TSPSolution& obj) : vector<int>(obj) {

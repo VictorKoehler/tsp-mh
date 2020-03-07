@@ -22,6 +22,30 @@ namespace CVRPMH {
         LegacyCVRP::greedy_constructor(inst);
         return CVRPSolution(inst);
     }
+
+    void bestinsertion_backup_model_sumup(TSPMH::TSPSolution& sol, vector<int>& candidatos) {
+        sol.update_cost();
+
+        while (!candidatos.empty()) {
+            set< tuple<double, size_t, size_t> > custoInsercao;
+            size_t curr_sz = sol.size()-1;
+            int maxtamp = floor(double(curr_sz*candidatos.size())*INITIAL_SUBTOUR_ALFA);
+            size_t choose = size_t(TSPMH::_random(maxtamp));
+
+            for (size_t pos = 1; pos < sol.size(); pos++) {
+                for (size_t c = 0; c < candidatos.size(); c++) {
+                    custoInsercao.insert(make_tuple(sol.insertion_cost(candidatos[c], sol.it(pos)), c, pos));
+                    if (custoInsercao.size() > choose + 1) {
+                        custoInsercao.erase(--custoInsercao.end());
+                    }
+                }
+            }
+
+            auto cand = *--custoInsercao.end();
+            sol.insert_candidate(candidatos[get<1>(cand)], get<2>(cand));
+            candidatos.erase(candidatos.it(get<1>(cand)));
+        }
+    }
     
     void reajusta_rotas(CVRPSolution& sol, vector<int>& faltantes) {
         
@@ -136,17 +160,32 @@ namespace CVRPMH {
             cvrpModel.getValues(c[i], val_c[i]);
         }
 
-        sol.resize(sol.dimension + sol.vehicles, 0);
-        int insert_ind = 0;
-        sol[insert_ind++] = 0;
+        // Brand new copy, because we're iterating over original
+        vector<int> newsol(1, 0);
+
         for (int r = 0; r < sol.vehicles; r++) {
+            vector<int> newpushes;
+            uint routesz = 0;
             for (uint i = 1; i < sol.dimension; i++) {
                 if (val_c[i][r] > 0.98) {
-                    sol[insert_ind++] = i;
+                    routesz++;
+                    if (rota_original_clientes[i] != r)
+                        newpushes.push_back(i);
                 }
             }
-            sol[insert_ind++] = 0;
+
+            TSPMH::TSPSolution newroute(routesz, sol.matrizAdj);
+            for (auto o : sol.getRoute(r)) {
+                if (o != 0 && val_c[o][r] > 0.98) {
+                    newroute.insert(newroute.end()-1, o);
+                }
+            }
+
+            bestinsertion_backup_model_sumup(newroute, newpushes);
+            newsol.insert(newsol.end(), newroute.it(1), newroute.end());
         }
+
+        sol.swap(newsol);
         sol.update_cost();
         sol.updateRoutes();
 

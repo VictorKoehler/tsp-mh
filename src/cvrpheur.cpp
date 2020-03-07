@@ -109,9 +109,7 @@ namespace CVRPMH {
             costssum += vndsub(candidate, s);
         }
         assert(candidate->checkSolution(true));
-        #ifdef CVRPPOOL_ENABLED
         assert(candidate->cost == costssum);
-        #endif
 
 
         vector<int> neighs = { 0, 1, 2, 3 };
