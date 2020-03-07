@@ -14,7 +14,10 @@
 
 namespace TSPMH {
     
+    uint tsp_nmcc_swap = 0, tsp_nmcc_twoopt = 0, tsp_nmcc_reinsertion = 0;
+    
     inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+        tsp_nmcc_swap++;
         sol->cost += delta;
         int tmpi = *i;
         *i = *j;
@@ -86,6 +89,7 @@ namespace TSPMH {
 
 
     inline void twoopt_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+        tsp_nmcc_twoopt++;
         sol->cost += delta;
         std::reverse(i, j+1);
     }
@@ -153,6 +157,7 @@ namespace TSPMH {
 
 
     inline void reinsertion_apply(TSPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
+        tsp_nmcc_reinsertion++;
         sol->cost += delta;
         //std::cout << "Reinserting [" << opos << "..(" << len << ")] to " << npos << " with delta=" << delta << std::endl;
         std::vector<int> cpy(sol->it(opos), sol->it(opos + len));

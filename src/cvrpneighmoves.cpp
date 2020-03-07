@@ -14,9 +14,11 @@
 using namespace std;
 
 namespace CVRPMH {
-
+    
     typedef TSPMH::TSPSolution TSPSolution;
     typedef TSPMH::vecit vecit;
+
+    uint cvrp_nmcc_swap = 0, cvrp_nmcc_reinsertion = 0;
 
 
     #define __implies(a, b) !(a) || (b)
@@ -53,6 +55,7 @@ namespace CVRPMH {
     }
 
     inline void swap_apply(CVRPSolution *sol, vecit &i, vecit &j, double delta) {
+        cvrp_nmcc_swap++;
         swap_dcap<true>(sol, i, j);
         sol->cost += delta;
         int tmpi = *i;
@@ -123,6 +126,7 @@ namespace CVRPMH {
 
 
     inline void reinsertion_apply(CVRPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
+        cvrp_nmcc_reinsertion++;
         sol->cost += delta;
         //cout << "Reinserting [" << opos << "..(" << len << ")] to " << npos << " with delta=" << delta << endl;
         vector<int> cpy(sol->it(opos), sol->it(opos + len));
@@ -198,8 +202,8 @@ namespace CVRPMH {
                 if (i <= n && n <= maxi) continue;
                 if (*n == CVRPSolution::route_start && *(n-1) != CVRPSolution::route_start) continue;
                 double d = reinsertion_cost(sol, i, len, n);
-                if (d < delta && reinsertion_dcap(sol, i, len, n).second <= sol->maxcapacity &&
-                                    sol->getRouteIndex(i) != sol->getRouteIndex(i)) {
+                if (d < delta &&
+                    reinsertion_dcap(sol, i, len, n).second <= sol->maxcapacity) {
                     bi = i;
                     bn = n;
                     delta = d;

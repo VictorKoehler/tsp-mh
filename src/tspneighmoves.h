@@ -5,6 +5,8 @@
 
 namespace TSPMH {
 
+    extern uint tsp_nmcc_swap, tsp_nmcc_twoopt, tsp_nmcc_reinsertion;
+
     class SwapMove : public NeighborhoodMove {
         public:
         int a, b;

@@ -7,6 +7,8 @@ namespace CVRPMH {
 
     typedef std::optional<std::pair<CVRPRoute, CVRPRoute>> MovementResult;
 
+    extern uint cvrp_nmcc_swap, cvrp_nmcc_reinsertion;
+
     class SwapMove : public TSPMH::NeighborhoodMove {
         public:
         int a, b;
