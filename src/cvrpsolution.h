@@ -7,6 +7,8 @@
 
 namespace CVRPMH {
 
+    class CVRPRoute;
+
     class RoutesIterable;
 
     class CVRPSolution : public TSPMH::TSPSolution {
@@ -50,16 +52,18 @@ namespace CVRPMH {
             }
         }
 
-        inline void cpy(const CVRPSolution& obj) {
+        inline void cpy(const CVRPSolution& obj, bool deep=true) {
             vehicles = obj.vehicles;
             maxcapacity = obj.maxcapacity;
-            demand = obj.demand;
-            subroutes = obj.subroutes;
-            subcapacity = obj.subcapacity;
             isSubRoute = obj.isSubRoute;
             dimension = obj.dimension;
             cost = obj.cost;
             matrizAdj = obj.matrizAdj;
+            if (deep) {
+                demand = obj.demand;
+                subroutes = obj.subroutes;
+                subcapacity = obj.subcapacity;
+            }
         }
 
         CVRPSolution(const CVRPSolution& obj) : TSPSolution(obj) {
@@ -98,6 +102,8 @@ namespace CVRPMH {
 
         RoutesIterable getRoutes();
 
+        CVRPRoute getRoute(int index);
+
         bool checkSolution(bool autoassert=false, bool complete=true);
 
         double insertion_cost(uint n, int p);
@@ -113,25 +119,28 @@ namespace CVRPMH {
 
         inline TSPMH::vecit b() const noexcept { return src->it(_b); };
         inline TSPMH::vecit e() const noexcept { return src->it(_e); };
-
-        CVRPRoute(CVRPSolution* src, int i)
-            : CVRPRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
-            cpy(*src);
-            cost = 0;
-            isSubRoute = true;
-            maxcapacity = src->maxcapacity;
-            vehicles = 1;
-            _i = i;
-        }
     public:
-        // ...
+        int capacity;
+
         CVRPRoute(TSPSolution* src, int b, int e)
             : CVRPSolution(src->dimension, src->matrizAdj), _b(b), _e(e), src(src) {
             cost = 0;
+            capacity = 0;
             isSubRoute = true;
         }
 
+        CVRPRoute(CVRPSolution* src, int i)
+            : CVRPRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
+            cpy(*src, false);
+            _i = i;
+            isSubRoute = true;
+            vehicles = 1;
+            capacity = src->subcapacity[_i];
+            cost = 0;
+        }
+
         inline void setCapacity(int c) {
+            capacity = c;
             static_cast<CVRPSolution*>(src)->subcapacity[_i] = c;
         }
 
@@ -149,10 +158,6 @@ namespace CVRPMH {
         std::size_t size() noexcept override { return std::distance(b(), e()); }
         TSPMH::vecit it(std::size_t ind) override { return b() + ind; }
         TSPMH::vecit it(int ind) override { return b() + ind; }
-
-        static CVRPRoute importfrom(CVRPSolution* src, int i) {
-            return CVRPRoute(src, i);
-        }
     };
 
     class RoutesIterable {
@@ -160,13 +165,13 @@ namespace CVRPMH {
         class iterator {
             private:
             CVRPSolution* src;
-            unsigned ptr;
+            int ptr;
 
             public:
-            iterator(CVRPSolution* src, unsigned ptr): src(src), ptr(ptr){}
+            iterator(CVRPSolution* src, int ptr): src(src), ptr(ptr){}
             iterator operator++() { ++ptr; return *this; }
             bool operator!=(const iterator & other) const { return ptr != other.ptr; }
-            const CVRPRoute operator*() const { return CVRPRoute::importfrom(src, ptr); }
+            const CVRPRoute operator*() const { return CVRPRoute(src, ptr); }
         };
 
         private:

@@ -11,6 +11,10 @@ namespace CVRPMH {
         return RoutesIterable(this);
     }
 
+    CVRPRoute CVRPSolution::getRoute(int index) {
+        return CVRPRoute(this, index);
+    }
+
     bool CVRPSolution::checkSolution(bool autoassert, bool complete) {
         bool visited[dimension]={false};
         uint ccvisited = 0;
