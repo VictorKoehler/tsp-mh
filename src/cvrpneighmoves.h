@@ -5,7 +5,7 @@
 
 namespace CVRPMH {
 
-    typedef std::optional<std::pair<SubRoute, SubRoute>> MovementResult;
+    typedef std::optional<std::pair<CVRPRoute, CVRPRoute>> MovementResult;
 
     class SwapMove : public TSPMH::NeighborhoodMove {
         public:

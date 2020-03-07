@@ -86,7 +86,7 @@ namespace CVRPMH {
     CVRPMH::CVRPPool* pool;
     #endif
 
-    inline double vndsub(CVRPSolution* candidate, SubRoute& s) {
+    inline double vndsub(CVRPSolution* candidate, CVRPRoute& s) {
         if (s.size() > 3) {
             TSPMH::rvnd(static_cast<TSPMH::TSPSolution*>(&s));
             candidate->cost += s.cost;

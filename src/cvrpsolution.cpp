@@ -7,8 +7,8 @@
 
 namespace CVRPMH {
 
-    SubRoutesIterable CVRPSolution::getSubRoutes() {
-        return SubRoutesIterable(this);
+    RoutesIterable CVRPSolution::getSubRoutes() {
+        return RoutesIterable(this);
     }
 
     bool CVRPSolution::checkSolution(bool autoassert, bool complete) {

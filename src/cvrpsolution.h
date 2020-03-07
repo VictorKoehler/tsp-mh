@@ -7,7 +7,7 @@
 
 namespace CVRPMH {
 
-    class SubRoutesIterable;
+    class RoutesIterable;
 
     class CVRPSolution : public TSPMH::TSPSolution {
         template<class T>
@@ -96,7 +96,7 @@ namespace CVRPMH {
             return getSubRouteIndex(distance(begin(), it));
         }
 
-        SubRoutesIterable getSubRoutes();
+        RoutesIterable getSubRoutes();
 
         bool checkSolution(bool autoassert=false, bool complete=true);
 
@@ -107,25 +107,25 @@ namespace CVRPMH {
 
 
 
-    class SubRoute : public CVRPSolution {
+    class CVRPRoute : public CVRPSolution {
         int _b, _e, _i;
         TSPSolution* src;
 
         inline TSPMH::vecit b() const noexcept { return src->it(_b); };
         inline TSPMH::vecit e() const noexcept { return src->it(_e); };
 
-        SubRoute(CVRPSolution* src, int i)
-            : SubRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
+        CVRPRoute(CVRPSolution* src, int i)
+            : CVRPRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
             cpy(*src);
             cost = 0;
             isSubRoute = true;
-            maxcapacity = src->subcapacity[i];
+            maxcapacity = src->maxcapacity;
             vehicles = 1;
             _i = i;
         }
     public:
         // ...
-        SubRoute(TSPSolution* src, int b, int e)
+        CVRPRoute(TSPSolution* src, int b, int e)
             : CVRPSolution(src->dimension, src->matrizAdj), _b(b), _e(e), src(src) {
             cost = 0;
             isSubRoute = true;
@@ -135,7 +135,7 @@ namespace CVRPMH {
             static_cast<CVRPSolution*>(src)->subcapacity[_i] = c;
         }
 
-        bool operator!=(const SubRoute & other) const { return _b != other._b; }
+        bool operator!=(const CVRPRoute & other) const { return _b != other._b; }
 
         TSPMH::vecit begin() noexcept override { return b(); }
         TSPMH::vecit end() noexcept override   { return e(); }
@@ -150,12 +150,12 @@ namespace CVRPMH {
         TSPMH::vecit it(std::size_t ind) override { return b() + ind; }
         TSPMH::vecit it(int ind) override { return b() + ind; }
 
-        static SubRoute importfrom(CVRPSolution* src, int i) {
-            return SubRoute(src, i);
+        static CVRPRoute importfrom(CVRPSolution* src, int i) {
+            return CVRPRoute(src, i);
         }
     };
 
-    class SubRoutesIterable {
+    class RoutesIterable {
         public:
         class iterator {
             private:
@@ -166,14 +166,14 @@ namespace CVRPMH {
             iterator(CVRPSolution* src, unsigned ptr): src(src), ptr(ptr){}
             iterator operator++() { ++ptr; return *this; }
             bool operator!=(const iterator & other) const { return ptr != other.ptr; }
-            const SubRoute operator*() const { return SubRoute::importfrom(src, ptr); }
+            const CVRPRoute operator*() const { return CVRPRoute::importfrom(src, ptr); }
         };
 
         private:
         CVRPSolution* src;
 
         public:
-        SubRoutesIterable(CVRPSolution* src) : src(src) { }
+        RoutesIterable(CVRPSolution* src) : src(src) { }
         iterator begin() const { return iterator(src, 0); }
         iterator end() const { return iterator(src, unsigned(src->vehicles)); }
     };

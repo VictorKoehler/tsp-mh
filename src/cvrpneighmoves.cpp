@@ -20,16 +20,16 @@ namespace CVRPMH {
 
 
     #define __implies(a, b) !(a) || (b)
-    inline SubRoute getNearSubRoute(CVRPSolution* sol, int solindex) {
+    inline CVRPRoute getNearSubRoute(CVRPSolution* sol, int solindex) {
         auto d = sol->getSubRouteIndex(solindex);
         assert(d >= 0);
         assert(__implies(solindex == 0, d == 0));
         assert(__implies(solindex < sol->subroutes[1], d == 0));
         assert(__implies(solindex >= sol->subroutes[1], d > 0));
-        return SubRoute::importfrom(sol, d);
+        return CVRPRoute::importfrom(sol, d);
     }
 
-    inline SubRoute getNearSubRoute(CVRPSolution* sol, vecit it) {
+    inline CVRPRoute getNearSubRoute(CVRPSolution* sol, vecit it) {
         return getNearSubRoute(sol, distance(sol->begin(), it));
     }
 
@@ -108,7 +108,7 @@ namespace CVRPMH {
             vprintf("Passive SwapMove with delta %.0lf\n", delta);
             auto si = sol->getSubRouteIndex(bi), sj = sol->getSubRouteIndex(bj);
             swap_apply(sol, bi, bj, delta);
-            return make_pair(SubRoute::importfrom(sol, si), SubRoute::importfrom(sol, sj));
+            return make_pair(CVRPRoute::importfrom(sol, si), CVRPRoute::importfrom(sol, sj));
         } else {
             vprintf("Positive delta %.0lf => NOP\n", delta);
             return {};
@@ -213,7 +213,7 @@ namespace CVRPMH {
             assert(so != sn);
             vprintf("Passive ReinsertionMove with delta %.0lf; origin: %d {len: %lud}; dest: %d\n", delta, o, len, n);
             reinsertion_apply(sol, o, len, n, delta);
-            return make_pair(SubRoute::importfrom(sol, so), SubRoute::importfrom(sol, sn));
+            return make_pair(CVRPRoute::importfrom(sol, so), CVRPRoute::importfrom(sol, sn));
         } else {
             vprintf("Positive delta %.0lf => NOP\n", delta);
             return {};
