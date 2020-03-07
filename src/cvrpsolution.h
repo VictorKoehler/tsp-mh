@@ -45,7 +45,7 @@ namespace CVRPMH {
             }
             if (importRoute) {
                 assign(inst->path, inst->path + inst->path_len);
-                updateSubRoutes();
+                updateRoutes();
                 update_cost();
             }
         }
@@ -72,7 +72,7 @@ namespace CVRPMH {
             return *this;
         }
 
-        void updateSubRoutes() {
+        void updateRoutes() {
             for (size_t i = 0; i < subcapacity.size(); i++) {
                 subcapacity[i] = 0;
             }
@@ -83,20 +83,20 @@ namespace CVRPMH {
             }
         }
 
-        inline int getSubRouteIndex(int solindex) {
+        inline int getRouteIndex(int solindex) {
             auto a = std::upper_bound(subroutes.begin(), subroutes.end(), solindex);
             return a - subroutes.begin() - 1;
         }
 
-        inline int getSubRouteIndex(TSPMH::vecit& it) {
-            return getSubRouteIndex(distance(begin(), it));
+        inline int getRouteIndex(TSPMH::vecit& it) {
+            return getRouteIndex(distance(begin(), it));
         }
 
-        inline int getSubRouteIndex(const TSPMH::vecit& it) {
-            return getSubRouteIndex(distance(begin(), it));
+        inline int getRouteIndex(const TSPMH::vecit& it) {
+            return getRouteIndex(distance(begin(), it));
         }
 
-        RoutesIterable getSubRoutes();
+        RoutesIterable getRoutes();
 
         bool checkSolution(bool autoassert=false, bool complete=true);
 

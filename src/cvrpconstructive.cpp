@@ -148,7 +148,7 @@ namespace CVRPMH {
             sol[insert_ind++] = 0;
         }
         sol.update_cost();
-        sol.updateSubRoutes();
+        sol.updateRoutes();
 
         env.end();
     }
@@ -169,7 +169,7 @@ namespace CVRPMH {
             candidatos.erase(candidatos.it(r));
         }
         sol.update_cost();
-        sol.updateSubRoutes();
+        sol.updateRoutes();
         assert(sol.checkSolution(true, false));
 
         while (!candidatos.empty()) {

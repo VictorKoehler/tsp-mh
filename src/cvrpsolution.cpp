@@ -7,7 +7,7 @@
 
 namespace CVRPMH {
 
-    RoutesIterable CVRPSolution::getSubRoutes() {
+    RoutesIterable CVRPSolution::getRoutes() {
         return RoutesIterable(this);
     }
 
@@ -42,8 +42,8 @@ namespace CVRPMH {
 
     inline int getsubrindex_shifted(CVRPSolution *s, int p) {
         if (s->at(p) == CVRPSolution::route_start)
-            return s->getSubRouteIndex(p-1);
-        else return s->getSubRouteIndex(p);
+            return s->getRouteIndex(p-1);
+        else return s->getRouteIndex(p);
     }
 
     double CVRPSolution::insertion_cost(uint n, int p) {

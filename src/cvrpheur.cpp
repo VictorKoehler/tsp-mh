@@ -35,10 +35,10 @@ namespace CVRPMH {
 
     CVRPSolution doubleBridge(CVRPSolution* sol) {
         CVRPSolution r;
-        sol->updateSubRoutes();
+        sol->updateRoutes();
         r.reserve(sol->size());
         r.cpy(*sol);
-        for (auto s : sol->getSubRoutes()) {
+        for (auto s : sol->getRoutes()) {
             if (s.size() < 8) {
                 r.insert(r.end(), s.begin(), s.end()-1);
             } else {
@@ -73,7 +73,7 @@ namespace CVRPMH {
         // }
 
         r.update_cost();
-        r.updateSubRoutes();
+        r.updateRoutes();
         assert(r.size() == r.dimension + r.vehicles);
         return r;
     }
@@ -104,7 +104,7 @@ namespace CVRPMH {
 
     void rvnd(CVRPSolution* candidate) {
         double costssum = 0;
-        for (auto s : candidate->getSubRoutes()) {
+        for (auto s : candidate->getRoutes()) {
             s.cost = 0;
             costssum += vndsub(candidate, s);
         }
@@ -166,7 +166,7 @@ namespace CVRPMH {
         auto p = pq.commit().first;
         r.assign(p.begin(), p.end());
         r.update_cost();
-        r.updateSubRoutes();
+        r.updateRoutes();
         #endif
         
         return r;

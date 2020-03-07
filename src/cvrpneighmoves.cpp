@@ -21,7 +21,7 @@ namespace CVRPMH {
 
     #define __implies(a, b) !(a) || (b)
     inline CVRPRoute getNearSubRoute(CVRPSolution* sol, int solindex) {
-        auto d = sol->getSubRouteIndex(solindex);
+        auto d = sol->getRouteIndex(solindex);
         assert(d >= 0);
         assert(__implies(solindex == 0, d == 0));
         assert(__implies(solindex < sol->subroutes[1], d == 0));
@@ -39,7 +39,7 @@ namespace CVRPMH {
     inline pair<double, double> swap_dcap(CVRPSolution *sol, const vecit &i, const vecit &j) {
         if (sol->isSubRoute) return make_pair(0, 0);
         else {
-            auto ci = sol->getSubRouteIndex(i), cj = sol->getSubRouteIndex(j);
+            auto ci = sol->getRouteIndex(i), cj = sol->getRouteIndex(j);
             if (ci == cj) return make_pair(0, 0);
             else {
                 auto di = sol->demand[*j]-sol->demand[*i], dj = sol->demand[*i]-sol->demand[*j];
@@ -106,7 +106,7 @@ namespace CVRPMH {
 
         if (delta < 0) {
             vprintf("Passive SwapMove with delta %.0lf\n", delta);
-            auto si = sol->getSubRouteIndex(bi), sj = sol->getSubRouteIndex(bj);
+            auto si = sol->getRouteIndex(bi), sj = sol->getRouteIndex(bj);
             swap_apply(sol, bi, bj, delta);
             return make_pair(CVRPRoute::importfrom(sol, si), CVRPRoute::importfrom(sol, sj));
         } else {
@@ -129,7 +129,7 @@ namespace CVRPMH {
         sol->erase(sol->it(opos), sol->it(opos + len));
         size_t dlen = opos < npos ? len : 0;
         sol->insert(sol->it(npos - dlen), cpy.begin(), cpy.end());
-        sol->updateSubRoutes();
+        sol->updateRoutes();
     }
 
     inline double reinsertion_cost(TSPSolution *sol, const vecit &o, size_t len, const vecit &n) {
@@ -147,7 +147,7 @@ namespace CVRPMH {
     inline pair<double, double> reinsertion_dcap(CVRPSolution *sol, const vecit &o, size_t len, const vecit &n) {
         if (sol->isSubRoute) return make_pair(0, 0);
         else {
-            auto co = sol->getSubRouteIndex(o), cn = sol->getSubRouteIndex(n);
+            auto co = sol->getRouteIndex(o), cn = sol->getRouteIndex(n);
             if (co == cn) return make_pair(0, 0);
             else {
                 int dcap = 0;
@@ -199,7 +199,7 @@ namespace CVRPMH {
                 if (*n == CVRPSolution::route_start && *(n-1) != CVRPSolution::route_start) continue;
                 double d = reinsertion_cost(sol, i, len, n);
                 if (d < delta && reinsertion_dcap(sol, i, len, n).second <= sol->maxcapacity &&
-                    sol->getSubRouteIndex(i) != sol->getSubRouteIndex(i)) {
+                                    sol->getRouteIndex(i) != sol->getRouteIndex(i)) {
                     bi = i;
                     bn = n;
                     delta = d;
@@ -209,7 +209,7 @@ namespace CVRPMH {
 
         if (delta < 0) {
             int o = distance(sol->begin(), bi), n = distance(sol->begin(), bn);
-            auto so = sol->getSubRouteIndex(o), sn = sol->getSubRouteIndex(n);
+            auto so = sol->getRouteIndex(o), sn = sol->getRouteIndex(n);
             assert(so != sn);
             vprintf("Passive ReinsertionMove with delta %.0lf; origin: %d {len: %lud}; dest: %d\n", delta, o, len, n);
             reinsertion_apply(sol, o, len, n, delta);
