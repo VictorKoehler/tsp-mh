@@ -49,6 +49,6 @@ namespace TSPMH {
 
 
     TSPSolution gils_rvnd(uint d, double **m) {
-        return gils<TSPW_BI_RVND_DB, TSPW_BI_RVND_DB::Solution>(50, d >= 150 ? d/2 : d, TSPW_BI_RVND_DB(d, m));
+        return gils<TSPW_BI_RVND_DB>(50, d >= 150 ? d/2 : d, TSPW_BI_RVND_DB(d, m));
     }
 }

@@ -145,7 +145,7 @@ namespace CVRPMH {
         pool = &pq;
         #endif
 
-        CVRPW_BI_RVND_DB::Solution r = TSPMH::gils<CVRPW_BI_RVND_DB, CVRPW_BI_RVND_DB::Solution>(50, d >= 150 ? d/2 : d, CVRPW_BI_RVND_DB(inst.get()));
+        CVRPW_BI_RVND_DB::Solution r = TSPMH::gils<CVRPW_BI_RVND_DB>(50, d >= 150 ? d/2 : d, CVRPW_BI_RVND_DB(inst.get()));
 
         #ifdef CVRPPOOL_ENABLED
         // #ifndef NOTDEBUG

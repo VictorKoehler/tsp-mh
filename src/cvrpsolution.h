@@ -148,14 +148,14 @@ namespace CVRPMH {
 
         TSPMH::vecit begin() noexcept override { return b(); }
         TSPMH::vecit end() noexcept override   { return e(); }
-        typename std::iterator_traits<TSPMH::vecit>::reference
-        operator[](std::size_t index) override { return b()[index]; }
+        const int operator[](std::size_t index) const noexcept override { return b()[index]; }
+        int& operator[](std::size_t index) noexcept override { return b()[index]; }
         int &at(std::size_t index) override { return b()[index]; }
         void push_back(int x) override { src->insert(e(), x); }
         TSPMH::vecit insert(const TSPMH::vecit p, int i)  override { return src->insert(p, i); }
         TSPMH::vecit insert(const TSPMH::vecit p, const TSPMH::vecit b, const TSPMH::vecit e)  override { return src->insert(p, b, e); }
         TSPMH::vecit erase(const TSPMH::vecit b, const TSPMH::vecit e)  override { return src->erase(b, e); }
-        std::size_t size() noexcept override { return std::distance(b(), e()); }
+        std::size_t size() const noexcept override { return std::distance(b(), e()); }
         TSPMH::vecit it(std::size_t ind) override { return b() + ind; }
         TSPMH::vecit it(int ind) override { return b() + ind; }
     };

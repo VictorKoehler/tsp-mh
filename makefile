@@ -44,9 +44,13 @@ else
 endif
 
 ifeq ($(ENASSERTS), 1)
-    lCCOPTFLAGSASSERTS = -DENASSERTS
+    lCCOPTFLAGS += -DENASSERTS
 endif
-CCOPTFLAGS = $(lCCOPTFLAGS) $(lCCOPTFLAGSASSERTS) -Wall -Wextra -mcmodel=medium -Wl,--no-relax -std=c++17
+
+ifeq ($(ENPERTUBTEST), 1)
+    lCCOPTFLAGS += -DENPERTUBTEST
+endif
+CCOPTFLAGS = $(lCCOPTFLAGS) -Wall -Wextra -mcmodel=medium -Wl,--no-relax -std=c++17
 #############################
 
 #### opcoes de compilacao e includes

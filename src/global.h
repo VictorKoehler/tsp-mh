@@ -9,6 +9,7 @@
 
 #ifdef ENDEBUG
 #define ENVERBOSE 1
+#define ENPERTUBTEST 1
 #define ifdebug(...) __VA_ARGS__
 #else
 #define ifdebug(...)
@@ -18,6 +19,12 @@
 #define dprintf(...) printf(__VA_ARGS__)
 #else
 #define dprintf(...)
+#endif
+
+#ifdef ENPERTUBTEST
+#define ifpertubationtest(...) __VA_ARGS__
+#else
+#define ifpertubationtest(...)
 #endif
 
 const double INFINITYLF = std::numeric_limits<double>::infinity();
