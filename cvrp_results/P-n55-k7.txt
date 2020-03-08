@@ -1,0 +1,183 @@
+WARNING: ASSERTIVES ENABLED!
+GILS-RVND loop #0 of 50, started with cost 1931.000000. Best know: inf
+GILS-RVND loop #0 of 50, with 67 iterations updated cost to 601.000000
+GILS-RVND loop #1 of 50, started with cost 1903.000000. Best know: 601.000000
+GILS-RVND loop #1 of 50, with 57 iterations didn't improved, stopped with cost 602.000000
+GILS-RVND loop #2 of 50, started with cost 1972.000000. Best know: 601.000000
+GILS-RVND loop #2 of 50, with 64 iterations didn't improved, stopped with cost 627.000000
+GILS-RVND loop #3 of 50, started with cost 1799.000000. Best know: 601.000000
+GILS-RVND loop #3 of 50, with 56 iterations didn't improved, stopped with cost 628.000000
+GILS-RVND loop #4 of 50, started with cost 1593.000000. Best know: 601.000000
+GILS-RVND loop #4 of 50, with 55 iterations updated cost to 595.000000
+GILS-RVND loop #5 of 50, started with cost 1639.000000. Best know: 595.000000
+GILS-RVND loop #5 of 50, with 57 iterations didn't improved, stopped with cost 596.000000
+GILS-RVND loop #6 of 50, started with cost 1806.000000. Best know: 595.000000
+GILS-RVND loop #6 of 50, with 55 iterations didn't improved, stopped with cost 663.000000
+GILS-RVND loop #7 of 50, started with cost 1938.000000. Best know: 595.000000
+GILS-RVND loop #7 of 50, with 57 iterations updated cost to 594.000000
+GILS-RVND loop #8 of 50, started with cost 1948.000000. Best know: 594.000000
+GILS-RVND loop #8 of 50, with 57 iterations didn't improved, stopped with cost 656.000000
+GILS-RVND loop #9 of 50, started with cost 1747.000000. Best know: 594.000000
+GILS-RVND loop #9 of 50, with 57 iterations didn't improved, stopped with cost 610.000000
+GILS-RVND loop #10 of 50, started with cost 1987.000000. Best know: 594.000000
+GILS-RVND loop #10 of 50, with 56 iterations updated cost to 588.000000
+GILS-RVND loop #11 of 50, started with cost 1918.000000. Best know: 588.000000
+GILS-RVND loop #11 of 50, with 62 iterations didn't improved, stopped with cost 674.000000
+GILS-RVND loop #12 of 50, started with cost 1942.000000. Best know: 588.000000
+GILS-RVND loop #12 of 50, with 56 iterations didn't improved, stopped with cost 613.000000
+GILS-RVND loop #13 of 50, started with cost 1834.000000. Best know: 588.000000
+GILS-RVND loop #13 of 50, with 59 iterations didn't improved, stopped with cost 610.000000
+GILS-RVND loop #14 of 50, started with cost 1805.000000. Best know: 588.000000
+GILS-RVND loop #14 of 50, with 64 iterations didn't improved, stopped with cost 625.000000
+GILS-RVND loop #15 of 50, started with cost 1786.000000. Best know: 588.000000
+GILS-RVND loop #15 of 50, with 58 iterations didn't improved, stopped with cost 594.000000
+GILS-RVND loop #16 of 50, started with cost 1884.000000. Best know: 588.000000
+GILS-RVND loop #16 of 50, with 57 iterations didn't improved, stopped with cost 645.000000
+GILS-RVND loop #17 of 50, started with cost 1979.000000. Best know: 588.000000
+GILS-RVND loop #17 of 50, with 56 iterations didn't improved, stopped with cost 618.000000
+GILS-RVND loop #18 of 50, started with cost 1974.000000. Best know: 588.000000
+GILS-RVND loop #18 of 50, with 56 iterations didn't improved, stopped with cost 628.000000
+GILS-RVND loop #19 of 50, started with cost 1804.000000. Best know: 588.000000
+GILS-RVND loop #19 of 50, with 61 iterations didn't improved, stopped with cost 625.000000
+GILS-RVND loop #20 of 50, started with cost 1673.000000. Best know: 588.000000
+GILS-RVND loop #20 of 50, with 62 iterations updated cost to 581.000000
+GILS-RVND loop #21 of 50, started with cost 1708.000000. Best know: 581.000000
+GILS-RVND loop #21 of 50, with 60 iterations didn't improved, stopped with cost 683.000000
+GILS-RVND loop #22 of 50, started with cost 1926.000000. Best know: 581.000000
+GILS-RVND loop #22 of 50, with 55 iterations didn't improved, stopped with cost 603.000000
+GILS-RVND loop #23 of 50, started with cost 1982.000000. Best know: 581.000000
+GILS-RVND loop #23 of 50, with 57 iterations didn't improved, stopped with cost 625.000000
+GILS-RVND loop #24 of 50, started with cost 1900.000000. Best know: 581.000000
+GILS-RVND loop #24 of 50, with 55 iterations didn't improved, stopped with cost 696.000000
+GILS-RVND loop #25 of 50, started with cost 2097.000000. Best know: 581.000000
+GILS-RVND loop #25 of 50, with 72 iterations didn't improved, stopped with cost 606.000000
+GILS-RVND loop #26 of 50, started with cost 1984.000000. Best know: 581.000000
+GILS-RVND loop #26 of 50, with 55 iterations didn't improved, stopped with cost 621.000000
+GILS-RVND loop #27 of 50, started with cost 1925.000000. Best know: 581.000000
+GILS-RVND loop #27 of 50, with 55 iterations didn't improved, stopped with cost 615.000000
+GILS-RVND loop #28 of 50, started with cost 1967.000000. Best know: 581.000000
+GILS-RVND loop #28 of 50, with 55 iterations updated cost to 577.000000
+GILS-RVND loop #29 of 50, started with cost 2033.000000. Best know: 577.000000
+GILS-RVND loop #29 of 50, with 55 iterations didn't improved, stopped with cost 632.000000
+GILS-RVND loop #30 of 50, started with cost 1819.000000. Best know: 577.000000
+GILS-RVND loop #30 of 50, with 56 iterations didn't improved, stopped with cost 600.000000
+GILS-RVND loop #31 of 50, started with cost 1821.000000. Best know: 577.000000
+GILS-RVND loop #31 of 50, with 57 iterations didn't improved, stopped with cost 599.000000
+GILS-RVND loop #32 of 50, started with cost 1913.000000. Best know: 577.000000
+GILS-RVND loop #32 of 50, with 58 iterations didn't improved, stopped with cost 624.000000
+GILS-RVND loop #33 of 50, started with cost 1950.000000. Best know: 577.000000
+GILS-RVND loop #33 of 50, with 62 iterations didn't improved, stopped with cost 622.000000
+GILS-RVND loop #34 of 50, started with cost 1905.000000. Best know: 577.000000
+GILS-RVND loop #34 of 50, with 56 iterations didn't improved, stopped with cost 606.000000
+GILS-RVND loop #35 of 50, started with cost 1568.000000. Best know: 577.000000
+GILS-RVND loop #35 of 50, with 59 iterations didn't improved, stopped with cost 624.000000
+GILS-RVND loop #36 of 50, started with cost 2035.000000. Best know: 577.000000
+GILS-RVND loop #36 of 50, with 55 iterations didn't improved, stopped with cost 609.000000
+GILS-RVND loop #37 of 50, started with cost 2080.000000. Best know: 577.000000
+GILS-RVND loop #37 of 50, with 55 iterations didn't improved, stopped with cost 638.000000
+GILS-RVND loop #38 of 50, started with cost 1739.000000. Best know: 577.000000
+GILS-RVND loop #38 of 50, with 57 iterations didn't improved, stopped with cost 609.000000
+GILS-RVND loop #39 of 50, started with cost 1822.000000. Best know: 577.000000
+GILS-RVND loop #39 of 50, with 55 iterations didn't improved, stopped with cost 588.000000
+GILS-RVND loop #40 of 50, started with cost 1925.000000. Best know: 577.000000
+GILS-RVND loop #40 of 50, with 55 iterations didn't improved, stopped with cost 583.000000
+GILS-RVND loop #41 of 50, started with cost 1811.000000. Best know: 577.000000
+GILS-RVND loop #41 of 50, with 59 iterations didn't improved, stopped with cost 600.000000
+GILS-RVND loop #42 of 50, started with cost 1691.000000. Best know: 577.000000
+GILS-RVND loop #42 of 50, with 56 iterations didn't improved, stopped with cost 606.000000
+GILS-RVND loop #43 of 50, started with cost 1722.000000. Best know: 577.000000
+GILS-RVND loop #43 of 50, with 60 iterations didn't improved, stopped with cost 610.000000
+GILS-RVND loop #44 of 50, started with cost 1760.000000. Best know: 577.000000
+GILS-RVND loop #44 of 50, with 56 iterations didn't improved, stopped with cost 590.000000
+GILS-RVND loop #45 of 50, started with cost 1850.000000. Best know: 577.000000
+GILS-RVND loop #45 of 50, with 57 iterations didn't improved, stopped with cost 609.000000
+GILS-RVND loop #46 of 50, started with cost 1997.000000. Best know: 577.000000
+GILS-RVND loop #46 of 50, with 56 iterations didn't improved, stopped with cost 645.000000
+GILS-RVND loop #47 of 50, started with cost 1985.000000. Best know: 577.000000
+GILS-RVND loop #47 of 50, with 56 iterations didn't improved, stopped with cost 643.000000
+GILS-RVND loop #48 of 50, started with cost 1988.000000. Best know: 577.000000
+GILS-RVND loop #48 of 50, with 56 iterations didn't improved, stopped with cost 614.000000
+GILS-RVND loop #49 of 50, started with cost 1866.000000. Best know: 577.000000
+GILS-RVND loop #49 of 50, with 55 iterations didn't improved, stopped with cost 615.000000
+Tried aggregator 1 time.
+MIP Presolve eliminated 0 rows and 528 columns.
+MIP Presolve modified 503 coefficients.
+Reduced MIP has 55 rows, 3699 columns, and 30820 nonzeros.
+Reduced MIP has 3699 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.04 sec. (32.64 ticks)
+Found incumbent of value 622.000000 after 0.12 sec. (90.68 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 55 rows, 3699 columns, and 30820 nonzeros.
+Reduced MIP has 3699 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.03 sec. (27.55 ticks)
+Probing time = 0.02 sec. (7.64 ticks)
+Clique table members: 54.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 0.04 sec. (30.29 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+*     0+    0                          622.0000        0.0000           100.00%
+      0     0      558.3924    35      622.0000      558.3924      230   10.23%
+*     0+    0                          583.0000      558.3924             4.22%
+      0     0      562.4513    44      583.0000      Cuts: 11      317    3.52%
+      0     0      564.4880    56      583.0000    Cliques: 6      369    3.18%
+*     0+    0                          582.0000      564.4880             3.01%
+
+Repeating presolve.
+Tried aggregator 1 time.
+MIP Presolve eliminated 0 rows and 2403 columns.
+MIP Presolve modified 205 coefficients.
+Reduced MIP has 55 rows, 1296 columns, and 10839 nonzeros.
+Reduced MIP has 1296 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (9.31 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 55 rows, 1296 columns, and 10839 nonzeros.
+Reduced MIP has 1296 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (6.47 ticks)
+Represolve time = 0.04 sec. (25.03 ticks)
+Probing fixed 148 vars, tightened 0 bounds.
+Probing time = 0.04 sec. (11.96 ticks)
+Clique table members: 1873.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 0.02 sec. (15.82 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+*     0+    0                          582.0000      564.4880             3.01%
+      0     0      564.5349    51      582.0000      564.5349      623    3.00%
+*     0+    0                          581.0000      564.5349             2.83%
+      0     0      567.2424    60      581.0000      Cuts: 47      717    2.37%
+      0     0      568.3704    62      581.0000   Cliques: 15      802    2.17%
+*     0+    0                          572.0000      568.3704             0.63%
+*     0+    0                          570.0000      568.3704             0.29%
+      0     0        cutoff            570.0000      568.3704      802    0.29%
+Elapsed time = 0.77 sec. (416.57 ticks, tree = 0.01 MB, solutions = 6)
+
+Clique cuts applied:  26
+Gomory fractional cuts applied:  1
+
+Root node processing (before b&c):
+  Real time             =    0.77 sec. (416.90 ticks)
+Parallel b&c, 4 threads:
+  Real time             =    0.00 sec. (0.42 ticks)
+  Sync time (average)   =    0.00 sec.
+  Wait time (average)   =    0.00 sec.
+                          ------------
+Total (root+branch&cut) =    0.78 sec. (417.32 ticks)
+STATUS: Optimal
+BEST: 570
+OBJ VALUE: 570
+TIME ELAPSED: 2.02
+
+-----
+610 1156 14547 32292 17653
+COST: 570
+SEED: 1574733907
+ROUTE: 0(0) 17(20) 40(33) 12(16) 26(18) 0(0) 2(26) 28(29) 21(28) 36(12) 47(19) 48(20) 30(22) 0(0) 51(12) 16(19) 23(6) 43(18) 41(15) 42(11) 22(12) 1(18) 33(27) 6(19) 0(0) 4(30) 45(21) 29(13) 5(21) 37(14) 20(22) 15(8) 27(17) 0(0) 7(15) 53(22) 11(37) 38(24) 10(26) 31(25) 39(16) 0(0) 46(27) 8(16) 35(10) 14(31) 19(15) 54(16) 13(12) 52(19) 34(19) 0(0) 49(5) 24(27) 18(13) 50(22) 25(14) 9(29) 32(28) 44(17) 3(11) 0(0)

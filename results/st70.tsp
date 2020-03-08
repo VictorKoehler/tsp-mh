@@ -1,5 +1,0 @@
-COST: 675
-SEED: 1574733907
-ROUTE: 0 35 28 12 69 34 68 30 37 58 21 65 62 56 14 23 18 6 1 3 17 41 31 2 7 25 54 48 27 13 19 29 43 67 26 45 44 24 38 60 39 8 16 42 40 5 52 4 9 51 59 11 33 20 32 61 53 66 47 10 63 64 55 50 49 57 36 46 15 22 0
-1.64user 0.00system 0:01.64elapsed 100%CPU (0avgtext+0avgdata 3824maxresident)k
-0inputs+8outputs (0major+154minor)pagefaults 0swaps

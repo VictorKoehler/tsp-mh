@@ -1,0 +1,424 @@
+WARNING: ASSERTIVES ENABLED!
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #0 of 50, started with cost 1517.000000. Best know: inf
+GILS-RVND loop #0 of 50, with 51 iterations updated cost to 884.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 4
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #1 of 50, started with cost 1525.000000. Best know: 884.000000
+GILS-RVND loop #1 of 50, with 51 iterations didn't improved, stopped with cost 949.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 8
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #2 of 50, started with cost 1430.000000. Best know: 884.000000
+GILS-RVND loop #2 of 50, with 51 iterations didn't improved, stopped with cost 993.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #3 of 50, started with cost 1473.000000. Best know: 884.000000
+GILS-RVND loop #3 of 50, with 52 iterations didn't improved, stopped with cost 893.000000
+GILS-RVND loop #4 of 50, started with cost 1935.000000. Best know: 884.000000
+GILS-RVND loop #4 of 50, with 51 iterations didn't improved, stopped with cost 1121.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 10
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #5 of 50, started with cost 1476.000000. Best know: 884.000000
+GILS-RVND loop #5 of 50, with 51 iterations didn't improved, stopped with cost 999.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #6 of 50, started with cost 1467.000000. Best know: 884.000000
+GILS-RVND loop #6 of 50, with 51 iterations didn't improved, stopped with cost 919.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #7 of 50, started with cost 1494.000000. Best know: 884.000000
+GILS-RVND loop #7 of 50, with 51 iterations didn't improved, stopped with cost 904.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 11
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #8 of 50, started with cost 1500.000000. Best know: 884.000000
+GILS-RVND loop #8 of 50, with 51 iterations didn't improved, stopped with cost 888.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #9 of 50, started with cost 1415.000000. Best know: 884.000000
+GILS-RVND loop #9 of 50, with 51 iterations updated cost to 862.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #10 of 50, started with cost 1476.000000. Best know: 862.000000
+GILS-RVND loop #10 of 50, with 51 iterations didn't improved, stopped with cost 907.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #11 of 50, started with cost 1448.000000. Best know: 862.000000
+GILS-RVND loop #11 of 50, with 51 iterations didn't improved, stopped with cost 948.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #12 of 50, started with cost 1505.000000. Best know: 862.000000
+GILS-RVND loop #12 of 50, with 51 iterations didn't improved, stopped with cost 967.000000
+GILS-RVND loop #13 of 50, started with cost 1800.000000. Best know: 862.000000
+GILS-RVND loop #13 of 50, with 51 iterations didn't improved, stopped with cost 986.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 8
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #14 of 50, started with cost 1488.000000. Best know: 862.000000
+GILS-RVND loop #14 of 50, with 51 iterations didn't improved, stopped with cost 908.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #15 of 50, started with cost 1518.000000. Best know: 862.000000
+GILS-RVND loop #15 of 50, with 51 iterations didn't improved, stopped with cost 918.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #16 of 50, started with cost 1513.000000. Best know: 862.000000
+GILS-RVND loop #16 of 50, with 51 iterations didn't improved, stopped with cost 964.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #17 of 50, started with cost 1516.000000. Best know: 862.000000
+GILS-RVND loop #17 of 50, with 51 iterations didn't improved, stopped with cost 883.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #18 of 50, started with cost 1444.000000. Best know: 862.000000
+GILS-RVND loop #18 of 50, with 51 iterations didn't improved, stopped with cost 962.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #19 of 50, started with cost 1502.000000. Best know: 862.000000
+GILS-RVND loop #19 of 50, with 51 iterations didn't improved, stopped with cost 980.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #20 of 50, started with cost 1479.000000. Best know: 862.000000
+GILS-RVND loop #20 of 50, with 51 iterations didn't improved, stopped with cost 963.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 8
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #21 of 50, started with cost 1503.000000. Best know: 862.000000
+GILS-RVND loop #21 of 50, with 51 iterations didn't improved, stopped with cost 907.000000
+GILS-RVND loop #22 of 50, started with cost 1992.000000. Best know: 862.000000
+GILS-RVND loop #22 of 50, with 51 iterations didn't improved, stopped with cost 973.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #23 of 50, started with cost 1435.000000. Best know: 862.000000
+GILS-RVND loop #23 of 50, with 52 iterations didn't improved, stopped with cost 954.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #24 of 50, started with cost 1511.000000. Best know: 862.000000
+GILS-RVND loop #24 of 50, with 52 iterations didn't improved, stopped with cost 1002.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #25 of 50, started with cost 1464.000000. Best know: 862.000000
+GILS-RVND loop #25 of 50, with 51 iterations didn't improved, stopped with cost 942.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #26 of 50, started with cost 1561.000000. Best know: 862.000000
+GILS-RVND loop #26 of 50, with 51 iterations didn't improved, stopped with cost 974.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #27 of 50, started with cost 1486.000000. Best know: 862.000000
+GILS-RVND loop #27 of 50, with 51 iterations didn't improved, stopped with cost 904.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #28 of 50, started with cost 1551.000000. Best know: 862.000000
+GILS-RVND loop #28 of 50, with 51 iterations didn't improved, stopped with cost 951.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #29 of 50, started with cost 1441.000000. Best know: 862.000000
+GILS-RVND loop #29 of 50, with 51 iterations didn't improved, stopped with cost 981.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #30 of 50, started with cost 1488.000000. Best know: 862.000000
+GILS-RVND loop #30 of 50, with 52 iterations didn't improved, stopped with cost 1001.000000
+GILS-RVND loop #31 of 50, started with cost 1877.000000. Best know: 862.000000
+GILS-RVND loop #31 of 50, with 51 iterations didn't improved, stopped with cost 1000.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #32 of 50, started with cost 1439.000000. Best know: 862.000000
+GILS-RVND loop #32 of 50, with 51 iterations didn't improved, stopped with cost 982.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #33 of 50, started with cost 1432.000000. Best know: 862.000000
+GILS-RVND loop #33 of 50, with 51 iterations didn't improved, stopped with cost 881.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #34 of 50, started with cost 1510.000000. Best know: 862.000000
+GILS-RVND loop #34 of 50, with 51 iterations didn't improved, stopped with cost 882.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #35 of 50, started with cost 1496.000000. Best know: 862.000000
+GILS-RVND loop #35 of 50, with 51 iterations didn't improved, stopped with cost 974.000000
+GILS-RVND loop #36 of 50, started with cost 2052.000000. Best know: 862.000000
+GILS-RVND loop #36 of 50, with 51 iterations didn't improved, stopped with cost 998.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #37 of 50, started with cost 1504.000000. Best know: 862.000000
+GILS-RVND loop #37 of 50, with 51 iterations didn't improved, stopped with cost 887.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #38 of 50, started with cost 1469.000000. Best know: 862.000000
+GILS-RVND loop #38 of 50, with 51 iterations didn't improved, stopped with cost 935.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #39 of 50, started with cost 1435.000000. Best know: 862.000000
+GILS-RVND loop #39 of 50, with 51 iterations didn't improved, stopped with cost 964.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 10
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #40 of 50, started with cost 1440.000000. Best know: 862.000000
+GILS-RVND loop #40 of 50, with 51 iterations didn't improved, stopped with cost 896.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #41 of 50, started with cost 1506.000000. Best know: 862.000000
+GILS-RVND loop #41 of 50, with 51 iterations didn't improved, stopped with cost 889.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 8
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #42 of 50, started with cost 1503.000000. Best know: 862.000000
+GILS-RVND loop #42 of 50, with 51 iterations didn't improved, stopped with cost 892.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #43 of 50, started with cost 1492.000000. Best know: 862.000000
+GILS-RVND loop #43 of 50, with 51 iterations updated cost to 852.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #44 of 50, started with cost 1447.000000. Best know: 852.000000
+GILS-RVND loop #44 of 50, with 51 iterations didn't improved, stopped with cost 914.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #45 of 50, started with cost 1418.000000. Best know: 852.000000
+GILS-RVND loop #45 of 50, with 51 iterations didn't improved, stopped with cost 904.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 5
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #46 of 50, started with cost 1453.000000. Best know: 852.000000
+GILS-RVND loop #46 of 50, with 51 iterations didn't improved, stopped with cost 911.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 6
+TIME ELAPSED: 0
+
+-----
+GILS-RVND loop #47 of 50, started with cost 1504.000000. Best know: 852.000000
+GILS-RVND loop #47 of 50, with 55 iterations didn't improved, stopped with cost 937.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 7
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #48 of 50, started with cost 1500.000000. Best know: 852.000000
+GILS-RVND loop #48 of 50, with 51 iterations didn't improved, stopped with cost 902.000000
+STATUS: SolLim
+BEST: 51
+OBJ VALUE: 9
+TIME ELAPSED: 0.01
+
+-----
+GILS-RVND loop #49 of 50, started with cost 1556.000000. Best know: 852.000000
+GILS-RVND loop #49 of 50, with 58 iterations didn't improved, stopped with cost 896.000000
+Tried aggregator 1 time.
+MIP Presolve eliminated 0 rows and 323 columns.
+MIP Presolve modified 292 coefficients.
+Reduced MIP has 51 rows, 911 columns, and 5292 nonzeros.
+Reduced MIP has 911 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (5.04 ticks)
+Probing time = 0.01 sec. (3.41 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 51 rows, 911 columns, and 5292 nonzeros.
+Reduced MIP has 911 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (3.75 ticks)
+Probing time = 0.01 sec. (3.41 ticks)
+Clique table members: 50.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 0.00 sec. (4.15 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0      781.7416    42                    781.7416      146         
+      0     0      793.7439    50                    Cuts: 39      235         
+      0     0      797.3735    51                    Cuts: 15      286         
+      0     0      799.1699    66                    Cuts: 13      323         
+      0     0      799.8517    65                  Cliques: 5      343         
+*     0+    0                          819.0000      799.8517             2.34%
+*     0+    0                          801.0000      799.8517             0.14%
+      0     0        cutoff            801.0000      800.8545      343    0.02%
+Elapsed time = 0.20 sec. (103.15 ticks, tree = 0.01 MB, solutions = 2)
+
+Clique cuts applied:  28
+Zero-half cuts applied:  2
+Gomory fractional cuts applied:  2
+
+Root node processing (before b&c):
+  Real time             =    0.20 sec. (103.23 ticks)
+Parallel b&c, 4 threads:
+  Real time             =    0.00 sec. (0.00 ticks)
+  Sync time (average)   =    0.00 sec.
+  Wait time (average)   =    0.00 sec.
+                          ------------
+Total (root+branch&cut) =    0.20 sec. (103.23 ticks)
+STATUS: Optimal
+BEST: 801
+OBJ VALUE: 801
+TIME ELAPSED: 0.55
+
+-----
+767 386 5664 11020 5047
+COST: 801
+SEED: 1574733907
+ROUTE: 0(0) 27(15) 6(15) 18(41) 4(9) 0(0) 41(27) 13(23) 25(28) 0(0) 22(8) 28(14) 31(11) 26(7) 8(23) 48(17) 0(0) 23(16) 7(19) 43(11) 24(10) 14(21) 0(0) 32(12) 2(30) 16(15) 11(19) 0(0) 47(25) 19(9) 40(7) 42(13) 44(16) 37(9) 0(0) 9(11) 34(26) 35(17) 36(6) 3(16) 0(0) 12(29) 17(3) 15(10) 45(10) 33(23) 10(5) 0(0) 5(21) 39(14) 30(19) 49(18) 46(5) 0(0) 1(7) 20(28) 29(6) 21(8) 50(10) 38(15) 0(0)
