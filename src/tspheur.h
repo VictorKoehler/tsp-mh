@@ -19,7 +19,7 @@ namespace TSPMH {
 
         Solution construct();
 
-        void neighborhood(Solution* sol);
+        void localsearch(Solution* sol);
 
         Solution pertubation(Solution* sol);
     };

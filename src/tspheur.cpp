@@ -20,7 +20,7 @@ namespace TSPMH {
         return BestInsertionConstructor(dimension, matrizAdj).construct();
     }
 
-    void TSPW_BI_RVND_DB::neighborhood(Solution* sol) {
+    void TSPW_BI_RVND_DB::localsearch(Solution* sol) {
         rvnd(sol);
     }
 

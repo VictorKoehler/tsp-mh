@@ -29,7 +29,7 @@ namespace CVRPMH {
         return BestInsertionConstructor(inst).construct();
     }
 
-    void CVRPW_BI_RVND_DB::neighborhood(Solution* sol) {
+    void CVRPW_BI_RVND_DB::localsearch(Solution* sol) {
         rvnd(sol);
     }
 
