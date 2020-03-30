@@ -6,6 +6,7 @@
 #endif
 #include <cassert>
 #include <numeric>
+#include <limits>
 
 #ifdef ENDEBUG
 #define ENVERBOSE 1
