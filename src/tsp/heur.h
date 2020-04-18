@@ -1,9 +1,9 @@
 #ifndef __TSPHEUR_CLASS__
 #define __TSPHEUR_CLASS__
 
-#include "tspsolution.h"
-#include "tspneighmoves.h"
-#include "tspconstructive.h"
+#include "solution.h"
+#include "neighmoves.h"
+#include "constructive.h"
 
 
 namespace TSPMH {

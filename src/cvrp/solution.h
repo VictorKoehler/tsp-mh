@@ -2,7 +2,7 @@
 #define __CVRPSOLUTION_CLASS__
 
 #include <algorithm>
-#include "tspsolution.h"
+#include "../tsp/solution.h"
 #include "legacycvrp/construtores.hpp"
 
 namespace CVRPMH {

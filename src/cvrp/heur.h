@@ -1,7 +1,7 @@
 #ifndef __CVRPHEUR_CLASS__
 #define __CVRPHEUR_CLASS__
 
-#include "cvrpsolution.h"
+#include "solution.h"
 
 namespace CVRPMH {
 

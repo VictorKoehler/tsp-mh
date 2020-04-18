@@ -4,7 +4,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "tspheur.h"
+#include "heur.h"
 #include <random>
 
 using namespace std;

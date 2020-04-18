@@ -1,4 +1,4 @@
-#include "cvrpsolution.h"
+#include "solution.h"
 
 #define assertOrReturn(statement, autoassert) { if (!autoassert) return statement; else { assert(statement); }}
 #define autoassertOrReturn(statement) assertOrReturn(statement, autoassert)
@@ -58,10 +58,10 @@ namespace CVRPMH {
 
     void CVRPSolution::insert_candidate(int c, int pos) {
         cost += insertion_cost(c, pos);
-        auto subind = getsubrindex_shifted(this, pos);
+        auto subind = size_t(getsubrindex_shifted(this, pos));
         subcapacity[subind] += demand[c];
         auto subrsz = subroutes.size();
-        for (int i = subind+1; i < subrsz; i++) {
+        for (auto i = subind+1; i < subrsz; i++) {
             subroutes[i] += 1;
         }
         insert(it(pos), c);

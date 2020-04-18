@@ -1,5 +1,5 @@
 
-#include "tspheur.h"
+#include "heur.h"
 
 namespace TSPMH {
 

@@ -2,11 +2,11 @@
 
 #include <fstream>
 #include <iostream>
-#include "readData.h"
 #include "tests.h"
-#include "cvrpheur.h"
-#include "cvrpneighmoves.h"
-#include "tspneighmoves.h"
+#include "tsp/readData.h"
+#include "tsp/neighmoves.h"
+#include "cvrp/heur.h"
+#include "cvrp/neighmoves.h"
 
 using namespace std;
 

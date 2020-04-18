@@ -4,8 +4,8 @@
 #include <cmath>
 #include <algorithm>
 
-#include "cvrpheur.h"
-#include "cvrpconstructive.h"
+#include "heur.h"
+#include "constructive.h"
 #include "cplex_utils.h"
 
 using namespace std;

@@ -1,7 +1,7 @@
 #ifndef __TSPCONSTRUCTIVE_CLASS__
 #define __TSPCONSTRUCTIVE_CLASS__
 
-#include "tspsolution.h"
+#include "solution.h"
 
 namespace TSPMH {
 

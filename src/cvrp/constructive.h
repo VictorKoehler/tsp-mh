@@ -1,8 +1,8 @@
 #ifndef __CVRPCONSTRUCTIVE_CLASS__
 #define __CVRPCONSTRUCTIVE_CLASS__
 
-#include "tspconstructive.h"
-#include "cvrpsolution.h"
+#include "../tsp/constructive.h"
+#include "solution.h"
 
 
 namespace CVRPMH {

@@ -1,5 +1,5 @@
 #include <algorithm>
-#include "tspneighmoves.h"
+#include "neighmoves.h"
 
 
 #define mat sol->matrizAdj

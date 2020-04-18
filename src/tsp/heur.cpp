@@ -4,10 +4,10 @@
 #include <cmath>
 #include <algorithm>
 
-#include "tspheur.h"
-#include "tspneighmoves.h"
+#include "heur.h"
+#include "neighmoves.h"
 #include "doubleBridge.h"
-#include "ils.h"
+#include "../ils.h"
 
 using namespace std;
 

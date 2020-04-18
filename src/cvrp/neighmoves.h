@@ -1,6 +1,6 @@
 #ifndef __CVRPNEIGHMOVES__
 #define __CVRPNEIGHMOVES__
-#include "cvrpsolution.h"
+#include "solution.h"
 #include <optional>
 
 namespace CVRPMH {

@@ -1,7 +1,7 @@
 #ifndef __TSPTESTS__
 #define __TSPTESTS__
 
-#include "tspheur.h"
+#include "tsp/heur.h"
 
 extern double** matrizAdj;  // matriz de adjacencia
 extern uint dimension;      // quantidade total de vertices

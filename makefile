@@ -70,21 +70,21 @@ CCLNFLAGS = -L$(CPLEXLIBDIR) -L$(CONCERTLIBDIR) $(CCOPTFLAGS) -lm -lpthread -lco
 
 #### diretorios com os source files e com os objs files
 SRCDIR = src
-SCRINC = legacycvrp
 ifdef $(OBJDIR)
    OBJDIR = $(OBJDIR)
 else
    OBJDIR = obj
 endif
+OBJALLDIR = $(patsubst $(SRCDIR)/%, $(OBJDIR)/%, $(shell find $(SRCDIR) -type d))
 #############################
 
 #### lista de todos os srcs e todos os objs
-SRCS = $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/$(SCRINC)/*.cpp)
+SRCS = $(shell find $(SRCDIR) -name '*.cpp')
 OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 #############################
 
 #### regra principal, gera o executavel
-tsp: $(OBJS)
+solver: $(OBJS)
 	@echo  "\033[31m \nLinking all objects files: \033[0m"
 	$(CPPC) $(BITS_OPTION) $(OBJS) -o $(OBJDIR)/$@ $(CCLNFLAGS)
 ############################
@@ -96,7 +96,7 @@ tsp: $(OBJS)
 #cada arquivo objeto depende do .c e dos headers (informacao dos header esta no arquivo de dependencias gerado pelo compiler)
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(OBJDIR)
-	@mkdir -p $(OBJDIR)/$(SCRINC)
+	@mkdir -p $(OBJALLDIR)
 	@echo  "\033[31m \nCompiling $<: \033[0m"
 	$(CPPC) $(CCFLAGS) -c $< -o $@
 	@echo  "\033[32m \ncreating $< dependency file: \033[0m"
@@ -110,4 +110,4 @@ clean:
 	@echo "\033[31mcleaning obj directory \033[0m"
 	@rm $(OBJDIR)/* -rf
 
-rebuild: clean tsp
+rebuild: clean solver

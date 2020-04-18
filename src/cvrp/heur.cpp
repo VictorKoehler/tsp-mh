@@ -4,12 +4,12 @@
 #include <cmath>
 #include <algorithm>
 
-#include "cvrpneighmoves.h"
-#include "tspheur.h"
-#include "cvrpheur.h"
-#include "doubleBridge.h"
-#include "ils.h"
-#include "cvrpconstructive.h"
+#include "../ils.h"
+#include "../tsp/heur.h"
+#include "../tsp/doubleBridge.h"
+#include "neighmoves.h"
+#include "heur.h"
+#include "constructive.h"
 
 #define CVRPPOOL_ENABLED
 

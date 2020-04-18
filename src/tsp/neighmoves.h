@@ -1,6 +1,6 @@
 #ifndef __TSPNEIGHMOVES__
 #define __TSPNEIGHMOVES__
-#include "tspsolution.h"
+#include "solution.h"
 
 
 namespace TSPMH {

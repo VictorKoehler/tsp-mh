@@ -8,7 +8,7 @@
 #include <stack>
 #include <vector>
 
-#include "tspneigh.h"
+#include "neigh.h"
 
 
 namespace TSPMH {

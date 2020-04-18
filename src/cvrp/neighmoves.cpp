@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <assert.h>
-#include "cvrpneighmoves.h"
+#include "neighmoves.h"
 
 
 #define mat sol->matrizAdj
