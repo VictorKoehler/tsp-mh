@@ -29,10 +29,6 @@ namespace CVRPMH {
         return BestInsertionConstructor(inst).construct();
     }
 
-    void CVRPW_BI_RVND_DB::localsearch(Solution* sol) {
-        rvnd(sol);
-    }
-
     CVRPSolution doubleBridge(CVRPSolution* sol) {
         CVRPSolution r;
         sol->updateRoutes();
@@ -86,27 +82,28 @@ namespace CVRPMH {
     CVRPMH::CVRPPool* pool;
     #endif
 
+    template<bool CVRPPoolEnabled>
     inline double vndsub(CVRPSolution* candidate, CVRPRoute& s) {
         if (s.size() > 3) {
             TSPMH::rvnd(static_cast<TSPMH::TSPSolution*>(&s));
             candidate->cost += s.cost;
             
-            #ifdef CVRPPOOL_ENABLED
-            s.update_cost(); // TODO: Refactor
-            auto sb = s.begin(), se = s.end();
-            pool->insert(sb, se, s.cost);
-            return s.cost;
-            #endif
-        } else {
-            return s.update_cost(); // TODO: Refactor
+            if constexpr (CVRPPoolEnabled) {
+                s.update_cost(); // TODO: Refactor
+                auto sb = s.begin(), se = s.end();
+                pool->insert(sb, se, s.cost);
+                return s.cost;
+            }
         }
+        return s.update_cost(); // TODO: Refactor
     }
 
-    void rvnd(CVRPSolution* candidate) {
+    template<bool CVRPPoolEnabled>
+    inline void rvndb(CVRPSolution* candidate) {
         double costssum = 0;
         for (auto s : candidate->getRoutes()) {
             s.cost = 0;
-            costssum += vndsub(candidate, s);
+            costssum += vndsub<CVRPPoolEnabled>(candidate, s);
         }
         assert(candidate->checkSolution(true));
         assert(candidate->cost == costssum);
@@ -128,13 +125,25 @@ namespace CVRPMH {
             if (mr) {
                 neighs = { 0, 1, 2, 3 };
                 assert(mr->first != mr->second);
-                vndsub(candidate, mr->first);
-                vndsub(candidate, mr->second);
+                vndsub<CVRPPoolEnabled>(candidate, mr->first);
+                vndsub<CVRPPoolEnabled>(candidate, mr->second);
             } else {
                 neighs.erase(neighs.it(ind));
             }
         }
         assert(candidate->size() == candidate->dimension + candidate->vehicles);
+    }
+
+    void rvnd(CVRPSolution* candidate) {
+        rvndb<false>(candidate);
+    }
+
+    void CVRPW_BI_RVND_DB::localsearch(Solution* sol) {
+        #ifdef CVRPPOOL_ENABLED
+        rvndb<true>(sol);
+        #else
+        rvndb<false>(sol);
+        #endif
     }
 
     CVRPSolution gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia> inst) {
