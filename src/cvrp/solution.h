@@ -23,7 +23,14 @@ namespace CVRPMH {
         public:
 
         int vehicles, maxcapacity;
-        std::vector<int> demand, subroutes, subcapacity;
+        class DemmandWrapper {
+            public:
+            std::vector<int>* demandptr;
+            DemmandWrapper() { }
+            DemmandWrapper(int* dem, uint d) { demandptr = new std::vector<int>(dem, dem+d); }
+            const int operator[](std::size_t index) const noexcept { return demandptr->at(index); }
+        } demand;
+        std::vector<int> subroutes, subcapacity;
         bool isSubRoute;
 
 
@@ -31,12 +38,13 @@ namespace CVRPMH {
 
         CVRPSolution(uint d, double** m) : TSPSolution(d, m) { }
 
-        CVRPSolution(uint d, double** m, int* dem, int c, int v) : TSPSolution(d, m), vehicles(v), maxcapacity(c) {
+        CVRPSolution(uint d, double** m, DemmandWrapper dptr, int c, int v) : TSPSolution(d, m), vehicles(v), maxcapacity(c), demand(dptr) {
             isSubRoute = false;
-            demand.assign(dem, dem+d);
             subroutes.resize(v);
             subcapacity.resize(v);
         }
+
+        CVRPSolution(uint d, double** m, int* dem, int c, int v) : CVRPSolution(d, m, DemmandWrapper(dem, d), c, v) { }
 
         CVRPSolution(LegacyCVRP::Instancia* inst, bool importRoute = true)
             : CVRPSolution(inst->dimension, qMatrTInit<double>(inst->dimension), inst->demand, inst->capacity, inst->vehicles) {
@@ -55,14 +63,19 @@ namespace CVRPMH {
         inline void cpy(const CVRPSolution& obj, bool deep=true) {
             vehicles = obj.vehicles;
             maxcapacity = obj.maxcapacity;
-            isSubRoute = obj.isSubRoute;
             dimension = obj.dimension;
             cost = obj.cost;
             matrizAdj = obj.matrizAdj;
+            demand = obj.demand;
             if (deep) {
-                demand = obj.demand;
+                isSubRoute = obj.isSubRoute;
                 subroutes = obj.subroutes;
                 subcapacity = obj.subcapacity;
+            } else {
+                isSubRoute = false;
+                subroutes.resize(vehicles);
+                subcapacity.resize(vehicles);
+                resize(vehicles + dimension);
             }
         }
 
@@ -109,6 +122,10 @@ namespace CVRPMH {
         double insertion_cost(uint n, int p);
 
         void insert_candidate(int c, int pos);
+
+        void dataDestroy() {
+            // TODO
+        }
     };
 
 
