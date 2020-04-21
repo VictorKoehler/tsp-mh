@@ -20,10 +20,9 @@ namespace TSPMH {
 
     class BestInsertionConstructor : public TSPSolutionConstructor<StackedTSPSolution> {
         public:
-        uint dimension;
-        double** matrizAdj;
+        TSPContextProblemData dataholder;
 
-        BestInsertionConstructor(uint d, double** m) : dimension(d), matrizAdj(m) { }
+        BestInsertionConstructor(uint d, double** m) : dataholder(d, m) { }
 
         StackedTSPSolution construct();
     };

@@ -32,8 +32,9 @@ namespace TSPMH {
     }
 
     StackedTSPSolution BestInsertionConstructor::construct() {
-        StackedTSPSolution sol(dimension, matrizAdj);
-        vector<int> candidatos(dimension - 1);
+        const auto data = &dataholder;
+        StackedTSPSolution sol(data);
+        vector<int> candidatos(data->dimension - 1);
         iota(candidatos.begin(), candidatos.end(), 1);
 
         for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {

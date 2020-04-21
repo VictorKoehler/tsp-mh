@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "../tsp/solution.h"
 #include "legacycvrp/construtores.hpp"
+#include "contextdata.h"
 
 namespace CVRPMH {
 
@@ -12,39 +13,20 @@ namespace CVRPMH {
     class RoutesIterable;
 
     class CVRPSolution : public TSPMH::TSPSolution {
-        template<class T>
-        static inline T** qMatrTInit(int d) {
-            T** r = new T *[d];
-            for (int i = 0; i < d; ++i)
-                r[i] = new T[d];
-            return r;
-        }
-
         public:
-
-        int vehicles, maxcapacity;
-        std::vector<int> demand, subroutes, subcapacity;
+        std::vector<int> subroutes, subcapacity;
         bool isSubRoute;
-
+        CVRPContextProblemData *data;
 
         CVRPSolution() {}
 
-        CVRPSolution(uint d, double** m) : TSPSolution(d, m) { }
-
-        CVRPSolution(uint d, double** m, int* dem, int c, int v) : TSPSolution(d, m), vehicles(v), maxcapacity(c) {
+        CVRPSolution(CVRPContextProblemData *data) : TSPSolution(data->getTSPPtr()), data(data) {
             isSubRoute = false;
-            demand.assign(dem, dem+d);
-            subroutes.resize(v);
-            subcapacity.resize(v);
+            subroutes.resize(data->vehicles);
+            subcapacity.resize(data->vehicles);
         }
 
-        CVRPSolution(LegacyCVRP::Instancia* inst, bool importRoute = true)
-            : CVRPSolution(inst->dimension, qMatrTInit<double>(inst->dimension), inst->demand, inst->capacity, inst->vehicles) {
-            for (uint i = 0; i < dimension; i++) {
-                for (uint j = 0; j < dimension; j++) {
-                    matrizAdj[i][j] = double(inst->edges_weight[i][j]);
-                }
-            }
+        CVRPSolution(LegacyCVRP::Instancia* inst, CVRPContextProblemData *data, bool importRoute = true) : CVRPSolution(data) {
             if (importRoute) {
                 assign(inst->path, inst->path + inst->path_len);
                 updateRoutes();
@@ -52,39 +34,21 @@ namespace CVRPMH {
             }
         }
 
-        inline void cpy(const CVRPSolution& obj, bool deep=true) {
-            vehicles = obj.vehicles;
-            maxcapacity = obj.maxcapacity;
-            isSubRoute = obj.isSubRoute;
-            dimension = obj.dimension;
-            cost = obj.cost;
-            matrizAdj = obj.matrizAdj;
-            if (deep) {
-                demand = obj.demand;
-                subroutes = obj.subroutes;
-                subcapacity = obj.subcapacity;
-            }
+        CVRPSolution(const CVRPSolution& obj) : TSPSolution(obj) {
+            copy(obj);
         }
 
-        CVRPSolution(const CVRPSolution& obj) : TSPSolution(obj) {
-            cpy(obj);
+        ~CVRPSolution() {
+            if (destroydata) {
+                delete data;
+                destroydata = false;
+            }
         }
 
         CVRPSolution& operator=(const CVRPSolution& obj) {
             TSPSolution::operator=(obj);
-            cpy(obj);
+            copy(obj);
             return *this;
-        }
-
-        void updateRoutes() {
-            for (size_t i = 0; i < subcapacity.size(); i++) {
-                subcapacity[i] = 0;
-            }
-            subroutes[0] = 0;
-            for (int i = 1, a = 0; size_t(i) < size()-1; i++) {
-                if (at(i) == 0) subroutes[++a] = i;
-                else subcapacity[a] += demand[at(i)];
-            }
         }
 
         inline int getRouteIndex(int solindex) {
@@ -100,6 +64,8 @@ namespace CVRPMH {
             return getRouteIndex(distance(begin(), it));
         }
 
+        void updateRoutes();
+
         RoutesIterable getRoutes();
 
         CVRPRoute getRoute(int index);
@@ -109,6 +75,8 @@ namespace CVRPMH {
         double insertion_cost(uint n, int p);
 
         void insert_candidate(int c, int pos);
+
+        void copy(const CVRPSolution& obj, int deep=true);
     };
 
 
@@ -116,6 +84,7 @@ namespace CVRPMH {
     class CVRPRoute : public CVRPSolution {
         int _b, _e, _i;
         TSPSolution* src;
+        CVRPContextProblemData holder;
 
         inline TSPMH::vecit b() const noexcept { return src->it(_b); };
         inline TSPMH::vecit e() const noexcept { return src->it(_e); };
@@ -123,18 +92,19 @@ namespace CVRPMH {
         int capacity;
 
         CVRPRoute(TSPSolution* src, int b, int e)
-            : CVRPSolution(src->dimension, src->matrizAdj), _b(b), _e(e), src(src) {
+            : CVRPSolution(), _b(b), _e(e), src(src), holder(src->data) {
             cost = 0;
             capacity = 0;
             isSubRoute = true;
+            data = &holder;
+            TSPSolution::data = holder.getTSPPtr();
         }
 
         CVRPRoute(CVRPSolution* src, int i)
             : CVRPRoute(src, src->subroutes[i], size_t(i+1) < src->subroutes.size() ? 1+src->subroutes[i+1] : src->size()) {
-            cpy(*src, false);
+            copy(*src, false);
             _i = i;
             isSubRoute = true;
-            vehicles = 1;
             capacity = src->subcapacity[_i];
             cost = 0;
         }
@@ -180,7 +150,7 @@ namespace CVRPMH {
         public:
         RoutesIterable(CVRPSolution* src) : src(src) { }
         iterator begin() const { return iterator(src, 0); }
-        iterator end() const { return iterator(src, unsigned(src->vehicles)); }
+        iterator end() const { return iterator(src, unsigned(src->data->vehicles)); }
     };
 
 }

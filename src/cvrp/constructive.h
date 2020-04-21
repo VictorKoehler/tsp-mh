@@ -10,8 +10,9 @@ namespace CVRPMH {
     class GreedyDummyConstructor : public TSPMH::TSPSolutionConstructor<CVRPSolution> {
         public:
         LegacyCVRP::Instancia *inst;
+        CVRPContextProblemData *data;
 
-        GreedyDummyConstructor(LegacyCVRP::Instancia *inst) : inst(inst) { }
+        GreedyDummyConstructor(LegacyCVRP::Instancia *inst, CVRPContextProblemData *data) : inst(inst), data(data) { }
 
         CVRPSolution construct();
     };
@@ -19,8 +20,9 @@ namespace CVRPMH {
     class BestInsertionConstructor : public TSPMH::TSPSolutionConstructor<CVRPSolution> {
         public:
         LegacyCVRP::Instancia *inst;
+        CVRPContextProblemData *data;
 
-        BestInsertionConstructor(LegacyCVRP::Instancia *inst) : inst(inst) { }
+        BestInsertionConstructor(LegacyCVRP::Instancia *inst, CVRPContextProblemData *data) : inst(inst), data(data) { }
 
         CVRPSolution construct();
     };

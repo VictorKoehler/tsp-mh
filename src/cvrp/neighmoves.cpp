@@ -3,7 +3,7 @@
 #include "neighmoves.h"
 
 
-#define mat sol->matrizAdj
+#define mat sol->data->matrizAdj
 
 #ifdef vprintfen
 #define vprintf dprintf
@@ -44,7 +44,7 @@ namespace CVRPMH {
             auto ci = sol->getRouteIndex(i), cj = sol->getRouteIndex(j);
             if (ci == cj) return make_pair(0, 0);
             else {
-                auto di = sol->demand[*j]-sol->demand[*i], dj = sol->demand[*i]-sol->demand[*j];
+                auto di = sol->data->demand[*j]-sol->data->demand[*i], dj = sol->data->demand[*i]-sol->data->demand[*j];
                 if constexpr (setMode) {
                     sol->subcapacity[ci] += di;
                     sol->subcapacity[cj] += dj;
@@ -99,7 +99,7 @@ namespace CVRPMH {
                 double d = swap_cost(sol, i, j);
                 if (d < delta && *i != CVRPSolution::route_start && *j != CVRPSolution::route_start) {
                     auto dc = swap_dcap<false>(sol, i, j);
-                    if (dc.first > sol->maxcapacity || dc.second > sol->maxcapacity) continue;
+                    if (dc.first > sol->data->maxcapacity || dc.second > sol->data->maxcapacity) continue;
                     bi = i;
                     bj = j;
                     delta = d;
@@ -156,7 +156,7 @@ namespace CVRPMH {
             else {
                 int dcap = 0;
                 for (size_t i = 0; i < len; i++) {
-                    dcap += sol->demand[*(o+i)];
+                    dcap += sol->data->demand[*(o+i)];
                 }
                 return make_pair(sol->subcapacity[co] - dcap, sol->subcapacity[cn] + dcap);
             }
@@ -203,7 +203,7 @@ namespace CVRPMH {
                 if (*n == CVRPSolution::route_start && *(n-1) != CVRPSolution::route_start) continue;
                 double d = reinsertion_cost(sol, i, len, n);
                 if (d < delta &&
-                    reinsertion_dcap(sol, i, len, n).second <= sol->maxcapacity) {
+                    reinsertion_dcap(sol, i, len, n).second <= sol->data->maxcapacity) {
                     bi = i;
                     bn = n;
                     delta = d;

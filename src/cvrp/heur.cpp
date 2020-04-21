@@ -26,14 +26,14 @@ namespace CVRPMH {
 
 
     CVRPW_BI_RVND_DB::Solution CVRPW_BI_RVND_DB::construct() {
-        return BestInsertionConstructor(inst).construct();
+        return BestInsertionConstructor(inst, data).construct();
     }
 
     CVRPSolution doubleBridge(CVRPSolution* sol) {
         CVRPSolution r;
         sol->updateRoutes();
         r.reserve(sol->size());
-        r.cpy(*sol);
+        r.copy(*sol, true);
         for (auto s : sol->getRoutes()) {
             if (s.size() < 8) {
                 r.insert(r.end(), s.begin(), s.end()-1);
@@ -70,7 +70,7 @@ namespace CVRPMH {
 
         r.update_cost();
         r.updateRoutes();
-        assert(r.size() == r.dimension + r.vehicles);
+        assert(r.size() == r.data->dimension + r.data->vehicles);
         return r;
     }
 
@@ -131,7 +131,7 @@ namespace CVRPMH {
                 neighs.erase(neighs.it(ind));
             }
         }
-        assert(candidate->size() == candidate->dimension + candidate->vehicles);
+        assert(candidate->size() == candidate->data->dimension + candidate->data->vehicles);
     }
 
     void rvnd(CVRPSolution* candidate) {
@@ -154,7 +154,8 @@ namespace CVRPMH {
         pool = &pq;
         #endif
 
-        CVRPW_BI_RVND_DB::Solution r = TSPMH::gils<CVRPW_BI_RVND_DB>(50, d >= 150 ? d/2 : d, CVRPW_BI_RVND_DB(inst.get()));
+        auto wrapper = CVRPW_BI_RVND_DB(inst.get());
+        CVRPW_BI_RVND_DB::Solution r = TSPMH::gils<CVRPW_BI_RVND_DB>(50, d >= 150 ? d/2 : d, wrapper);
 
         #ifdef CVRPPOOL_ENABLED
         // #ifndef NOTDEBUG
@@ -176,6 +177,7 @@ namespace CVRPMH {
         r.updateRoutes();
         #endif
         
+        r.destroydata = true;
         return r;
     }
 }
