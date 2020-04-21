@@ -13,14 +13,19 @@ GiantTour::GiantTour(CVRPMH::CVRPSolution& source) {
 
 CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
     CVRPMH::CVRPSolution ret;
-    ret.cpy(data_base, false);
+    ret.copy(data_base, false);
+    ret.isSubRoute = false;
+    ret.subroutes.resize(ret.data->vehicles);
+    ret.subcapacity.resize(ret.data->vehicles);
+    ret.resize(ret.data->vehicles + ret.data->dimension);
 
     // https://w1.cirrelt.ca/~vidalt/presentations/Vidal-Linear-Split.pdf :: 8
-    assert(size_t(ret.dimension) == tour.size());
+    assert(size_t(ret.data->dimension) == tour.size());
     assert(tour[0] == CVRPMH::CVRPSolution::route_start);
 
-    auto n = ret.dimension-1;
-    uint pred[ret.dimension] = {0};
+    const auto n = ret.data->dimension-1;
+    const auto q = ret.data->maxcapacity;
+    uint pred[ret.data->dimension] = {0};
     vector<double> p(tour.size(), INFINITYLF); // 3
     p[0] = 0; // 1
 
@@ -29,14 +34,14 @@ CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
         int load = 0; // 5
         double cost = 0;
 
-        while (j <= n && load + ret.demand[tour[j]] <= ret.maxcapacity) { // 7
-            load += ret.demand[tour[j]]; // 8
+        while (j <= n && load + ret.data->demand[tour[j]] <= q) { // 7
+            load += ret.data->demand[tour[j]]; // 8
             if (j == t+1) // 9
-                cost = ret.matrizAdj[0][tour[j]]; // 10
+                cost = ret.data->matrizAdj[0][tour[j]]; // 10
             else // 11
-                cost += ret.matrizAdj[tour[j-1]][tour[j]]; // 12
+                cost += ret.data->matrizAdj[tour[j-1]][tour[j]]; // 12
 
-            auto minor = p[t] + cost + ret.matrizAdj[tour[j]][0];
+            auto minor = p[t] + cost + ret.data->matrizAdj[tour[j]][0];
             if (minor < p[j]) { // 13
                 p[j] = minor; // 14
                 pred[j] = t; // 15
@@ -51,7 +56,7 @@ CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
     // }
     // cout << endl;
     
-    size_t inspos = ret.size()-1, predcur = ret.dimension-1, insertzero = predcur;
+    size_t inspos = ret.size()-1, predcur = ret.data->dimension-1, insertzero = predcur;
     for (; inspos > 0; inspos--) {
         if (predcur == insertzero) {
             ret[inspos] = 0;

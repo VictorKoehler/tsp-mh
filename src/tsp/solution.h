@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "neigh.h"
-
+#include "contextdata.h"
 
 namespace TSPMH {
 
@@ -17,29 +17,32 @@ namespace TSPMH {
 
     class TSPSolution : public std::vector<int> {
     public:
-        static const uint route_start = 0;
-        uint dimension;
-        double cost, **matrizAdj;
+        bool destroydata;
+        static const uint route_start = TSPContextProblemData::route_start;
+        double cost;
+        TSPContextProblemData *data;
 
-        TSPSolution() {}
+        TSPSolution() : destroydata(false) {}
 
-        TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
+        TSPSolution(TSPContextProblemData* data) : vector<int>(2), cost(0), data(data), destroydata(false) {
             this->at(route_start) = this->at(route_start) = 0;
-            this->reserve(size_t(d));
+            this->reserve(size_t(data->dimension));
         }
 
-        TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
-            dimension = obj.dimension;
+        TSPSolution(const TSPSolution& obj) : vector<int>(obj), destroydata(false) {
+            data = obj.data;
             cost = obj.cost;
-            matrizAdj = obj.matrizAdj;
         }
 
         TSPSolution& operator=(const TSPSolution& t) {
             std::vector<int>::operator=(t);
-            dimension = t.dimension;
             cost = t.cost;
-            matrizAdj = t.matrizAdj;
+            data = t.data;
             return *this;
+        }
+
+        ~TSPSolution() {
+            if (destroydata) delete data;
         }
 
 
@@ -68,7 +71,7 @@ namespace TSPMH {
         }
 
         inline double insertion_cost(uint n, uint i, uint j) const {
-            return matrizAdj[i][n] + matrizAdj[n][j] - matrizAdj[i][j];
+            return data->matrizAdj[i][n] + data->matrizAdj[n][j] - data->matrizAdj[i][j];
         }
 
         inline double insertion_cost(uint n, const vecit& p) const {
@@ -76,8 +79,8 @@ namespace TSPMH {
         }
 
         inline double remotion_cost(const vecit& i) const {
-            return matrizAdj[*(i - 1)][*(i + 1)] - matrizAdj[*(i - 1)][*i] -
-                matrizAdj[*i][*(i - 1)];
+            return data->matrizAdj[*(i - 1)][*(i + 1)] - data->matrizAdj[*(i - 1)][*i] -
+                data->matrizAdj[*i][*(i - 1)];
         }
 
         inline double reinsertion_cost(const vecit& i, const vecit& p) const {
@@ -87,8 +90,8 @@ namespace TSPMH {
         double update_cost() {
             double ncost = 0;
             for (auto it = begin(); it != end() - 1; it++) {
-                assert(matrizAdj[*it][*(it + 1)] == matrizAdj[*(it + 1)][*it]);
-                ncost += matrizAdj[*it][*(it + 1)];
+                assert(data->matrizAdj[*it][*(it + 1)] == data->matrizAdj[*(it + 1)][*it]);
+                ncost += data->matrizAdj[*it][*(it + 1)];
             }
             cost = ncost;
             return ncost;
@@ -97,7 +100,7 @@ namespace TSPMH {
         /**
          * If this represents a valid solution.
          */
-        inline bool completed() { return dimension + 1 == uint(size()); }
+        inline bool completed() { return data->dimension + 1 == uint(size()); }
 
 
         void printSolution() {
@@ -117,7 +120,7 @@ namespace TSPMH {
 
         StackedTSPSolution(const StackedTSPSolution& obj) : TSPSolution(obj) { }
 
-        StackedTSPSolution(uint d, double** m) : TSPSolution(d, m) { }
+        StackedTSPSolution(TSPContextProblemData* data) : TSPSolution(data) { }
 
         inline double push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove> n) {
             n->apply(this);

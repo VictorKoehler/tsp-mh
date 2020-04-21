@@ -43,6 +43,7 @@ namespace LegacyCVRP {
             delete[] edges_weight;
             delete[] vehicles_paths;
             delete[] demand;
+            delete[] path;
         }
     };
 

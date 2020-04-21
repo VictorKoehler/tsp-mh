@@ -3,7 +3,7 @@
 namespace TSPMH {
 
     TSPSolution doubleBridge(TSPSolution* sol, TSPMH::vecit sbeg, TSPMH::vecit send, size_t ssize, double ncost) {
-        TSPSolution ret(sol->dimension, sol->matrizAdj);
+        TSPSolution ret(sol->data);
         ret.cost = ncost;
         ret.clear();
         ret.reserve(ssize);
@@ -20,8 +20,8 @@ namespace TSPMH {
         ret.insert(ret.end(), pos1, pos2); // 1
         ret.push_back(TSPSolution::route_start); // 4
 
-        ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
-        ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
+        ret.cost -= sol->data->matrizAdj[*apos1][*pos1] + sol->data->matrizAdj[*apos2][*pos2] + sol->data->matrizAdj[*apos3][*pos3] + sol->data->matrizAdj[*end2][*end1];
+        ret.cost += sol->data->matrizAdj[*apos1][*pos3] + sol->data->matrizAdj[*end2][*pos2] + sol->data->matrizAdj[*apos3][*pos1] + sol->data->matrizAdj[*apos2][*end1];
         if (ncost != 0)
             assert(ret.cost == ret.update_cost());
         assert(ret.size() == ssize);

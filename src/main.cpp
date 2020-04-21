@@ -42,7 +42,7 @@ int cvrp(int argc, char** argv) {
         TSPMH::tsp_nmcc_swap << " " << TSPMH::tsp_nmcc_reinsertion << " " << TSPMH::tsp_nmcc_twoopt << "\n";
     if (!a.checkSolution()) cout << "Invalid solution\n";
     cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
-    for (auto i : a) cout << " " << i << "(" << a.demand[i] << ")";
+    for (auto i : a) cout << " " << i << "(" << a.data->demand[i] << ")";
     cout << endl;
     return 0;
 }

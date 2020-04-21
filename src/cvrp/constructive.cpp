@@ -20,7 +20,7 @@ namespace CVRPMH {
 
     CVRPSolution GreedyDummyConstructor::construct() {
         LegacyCVRP::greedy_constructor(inst);
-        return CVRPSolution(inst);
+        return CVRPSolution(inst, data);
     }
 
     void bestinsertion_backup_model_sumup(TSPMH::TSPSolution& sol, vector<int>& candidatos) {
@@ -49,7 +49,7 @@ namespace CVRPMH {
     
     void reajusta_rotas(CVRPSolution& sol, vector<int>& faltantes) {
         
-        int rota_original_clientes[sol.dimension];
+        int rota_original_clientes[sol.data->dimension];
         int rotaind = -1;
         for (auto cliente : sol) {
             if (cliente != CVRPSolution::route_start) {
@@ -77,10 +77,10 @@ namespace CVRPMH {
         // Variável Mi
         // True se o cliente i está na mesma rota que foi designado originalmente
         ////////////////////////////////////////////////////////////////////////////
-        IloBoolVarArray m(env, sol.dimension);
+        IloBoolVarArray m(env, sol.data->dimension);
 
         // Adicao da variável M ao modelo
-        for (uint j = 1; j < sol.dimension; j++) {
+        for (uint j = 1; j < sol.data->dimension; j++) {
             char var[100];
             sprintf(var, "M(%d)", j);
             m[j].setName(var);
@@ -91,14 +91,14 @@ namespace CVRPMH {
         // Variável Cir
         // True se o cliente i está na rota r.
         ////////////////////////////////////////////////////////////////////////////
-        IloArray<IloBoolVarArray> c(env, sol.dimension);
-        for (uint i = 1; i < sol.dimension; ++i) {
-            c[i] = IloBoolVarArray(env, sol.vehicles);
+        IloArray<IloBoolVarArray> c(env, sol.data->dimension);
+        for (uint i = 1; i < sol.data->dimension; ++i) {
+            c[i] = IloBoolVarArray(env, sol.data->vehicles);
         }
 
         // Adicao da variável Cir ao modelo
-        for (uint i = 1; i < sol.dimension; i++) {
-            for (int r = 0; r < sol.vehicles; r++) {
+        for (uint i = 1; i < sol.data->dimension; i++) {
+            for (int r = 0; r < sol.data->vehicles; r++) {
                 char var[100];
                 sprintf(var, "c(%d,%d)", i, r);
                 c[i][r].setName(var);
@@ -113,17 +113,17 @@ namespace CVRPMH {
 
         // Restrição: Cada cliente aparece uma única vez na solução
         // Com exceção do depósito.
-        for (uint i = 1; i < sol.dimension; i++) {
+        for (uint i = 1; i < sol.data->dimension; i++) {
             modelo.add(IloSum(c[i]) == 1); // (I)
         }
 
         // Restrição: Cada rota tem sua capacidade.
-        for (int r = 0; r < sol.vehicles; r++) {
+        for (int r = 0; r < sol.data->vehicles; r++) {
             IloExpr temp(env);
-            for (uint i = 1; i < sol.dimension; i++) {
-                temp += sol.demand[i]*c[i][r];
+            for (uint i = 1; i < sol.data->dimension; i++) {
+                temp += sol.data->demand[i]*c[i][r];
             }
-            modelo.add(temp <= sol.maxcapacity); // (II)
+            modelo.add(temp <= sol.data->maxcapacity); // (II)
             temp.end();
         }
 
@@ -132,7 +132,7 @@ namespace CVRPMH {
         // Quando Mi for 1, Cir só pode ser 1.
         // Então, quando dizemos que r = rota original de i, fazendo Mi = 1 (problema de maximização),
         // forçamos que a rota escolhida seja a rota original. Quando Mi = 0, a rota pode ser qualquer coisa.
-        for (uint i = 1; i < sol.dimension; i++) {
+        for (uint i = 1; i < sol.data->dimension; i++) {
             if (rota_original_clientes[i] == -1) continue;
 
             modelo.add(c[i][rota_original_clientes[i]] >= m[i]); // (III)
@@ -154,19 +154,19 @@ namespace CVRPMH {
 
 
 
-        vector<IloNumArray> val_c(sol.dimension);
-        for (uint i = 1; i < sol.dimension; ++i) {
-            val_c[i] = IloNumArray(env, sol.vehicles);
+        vector<IloNumArray> val_c(sol.data->dimension);
+        for (uint i = 1; i < sol.data->dimension; ++i) {
+            val_c[i] = IloNumArray(env, sol.data->vehicles);
             cvrpModel.getValues(c[i], val_c[i]);
         }
 
         // Brand new copy, because we're iterating over original
         vector<int> newsol(1, 0);
 
-        for (int r = 0; r < sol.vehicles; r++) {
+        for (int r = 0; r < sol.data->vehicles; r++) {
             vector<int> newpushes;
             uint routesz = 0;
-            for (uint i = 1; i < sol.dimension; i++) {
+            for (uint i = 1; i < sol.data->dimension; i++) {
                 if (val_c[i][r] > 0.98) {
                     routesz++;
                     if (rota_original_clientes[i] != r)
@@ -174,7 +174,7 @@ namespace CVRPMH {
                 }
             }
 
-            TSPMH::TSPSolution newroute(routesz, sol.matrizAdj);
+            TSPMH::TSPSolution newroute(sol.data->getTSPPtr());
             for (auto o : sol.getRoute(r)) {
                 if (o != 0 && val_c[o][r] > 0.98) {
                     newroute.insert(newroute.end()-1, o);
@@ -193,9 +193,9 @@ namespace CVRPMH {
     }
 
     CVRPSolution BestInsertionConstructor::construct() {
-        CVRPSolution sol(inst, false);
-        sol.resize(sol.vehicles+1, 0);
-        vector<int> candidatos(sol.dimension - 1);
+        CVRPSolution sol(inst, data, false);
+        sol.resize(sol.data->vehicles+1, 0);
+        vector<int> candidatos(sol.data->dimension - 1);
         iota(candidatos.begin(), candidatos.end(), 1);
         random_shuffle(candidatos.begin(), candidatos.end());
 

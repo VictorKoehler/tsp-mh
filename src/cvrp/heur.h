@@ -10,8 +10,9 @@ namespace CVRPMH {
         typedef CVRPSolution Solution;
         
         LegacyCVRP::Instancia *inst;
+        CVRPContextProblemData *data;
 
-        CVRPW_BI_RVND_DB(LegacyCVRP::Instancia *inst) : inst(inst) { }
+        CVRPW_BI_RVND_DB(LegacyCVRP::Instancia *inst) : inst(inst), data(new CVRPContextProblemData(inst)) { }
 
         Solution construct();
 

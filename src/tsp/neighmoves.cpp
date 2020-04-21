@@ -2,7 +2,7 @@
 #include "neighmoves.h"
 
 
-#define mat sol->matrizAdj
+#define mat sol->data->matrizAdj
 #define it(i) begin() + i
 
 #ifdef vprintfen
