@@ -2,13 +2,24 @@
 #include "../cvrp/solution.h"
 #include "../tsp/solution.h"
 
-class GiantTour {
-    public:
-    std::vector<int> tour;
+namespace HGSADC {
 
-    GiantTour() {}
-    
-    GiantTour(CVRPMH::CVRPSolution& source);
+    class GiantTour {
+        public:
+        std::vector<int> tour;
+        CVRPMH::CVRPContextProblemData *data;
 
-    CVRPMH::CVRPSolution split_back(CVRPMH::CVRPSolution& data_base);
-};
+        GiantTour() {}
+        
+        GiantTour(CVRPMH::CVRPContextProblemData *data) : data(data) {}
+        
+        GiantTour(CVRPMH::CVRPSolution& source);
+
+        CVRPMH::CVRPSolution split_back();
+
+        CVRPMH::CVRPSolution split_back_bellman_restricted_viability();
+
+        CVRPMH::CVRPSolution split_back_bellman_penalized_viability(double wpen, int qmult = 2);
+    };
+
+}

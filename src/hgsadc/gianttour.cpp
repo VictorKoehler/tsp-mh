@@ -2,8 +2,10 @@
 #include "../global.h"
 
 using namespace std;
+using namespace HGSADC;
 
 GiantTour::GiantTour(CVRPMH::CVRPSolution& source) {
+    data = source.data;
     tour.push_back(CVRPMH::CVRPSolution::route_start);
     for (auto i : source) {
         if (i != CVRPMH::CVRPSolution::route_start)
@@ -11,10 +13,16 @@ GiantTour::GiantTour(CVRPMH::CVRPSolution& source) {
     }
 }
 
-CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
-    CVRPMH::CVRPSolution ret;
-    ret.copy(data_base, false);
-    ret.isSubRoute = false;
+CVRPMH::CVRPSolution GiantTour::split_back() {
+    return split_back_bellman_restricted_viability();
+}
+
+CVRPMH::CVRPSolution GiantTour::split_back_bellman_restricted_viability() {
+    return split_back_bellman_penalized_viability(0, 1);
+}
+
+CVRPMH::CVRPSolution GiantTour::split_back_bellman_penalized_viability(double wpen, int qmult) {
+    CVRPMH::CVRPSolution ret(data);
     ret.subroutes.resize(ret.data->vehicles);
     ret.subcapacity.resize(ret.data->vehicles);
     ret.resize(ret.data->vehicles + ret.data->dimension);
@@ -34,14 +42,14 @@ CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
         int load = 0; // 5
         double cost = 0;
 
-        while (j <= n && load + ret.data->demand[tour[j]] <= q) { // 7
+        while (j <= n && load + ret.data->demand[tour[j]] <= qmult*q) { // 7
             load += ret.data->demand[tour[j]]; // 8
             if (j == t+1) // 9
                 cost = ret.data->matrizAdj[0][tour[j]]; // 10
             else // 11
                 cost += ret.data->matrizAdj[tour[j-1]][tour[j]]; // 12
 
-            auto minor = p[t] + cost + ret.data->matrizAdj[tour[j]][0];
+            auto minor = p[t] + cost + ret.data->matrizAdj[tour[j]][0] + wpen*max(0, load-q);
             if (minor < p[j]) { // 13
                 p[j] = minor; // 14
                 pred[j] = t; // 15
@@ -66,7 +74,7 @@ CVRPMH::CVRPSolution GiantTour::split_back(CVRPMH::CVRPSolution& data_base) {
         }
     }
     ret[0] = 0;
-    ret.updateRoutes();
+    ret.updateRoutes(); // TODO: optimize
     ret.cost = p[p.size()-1];
 
     return ret;
