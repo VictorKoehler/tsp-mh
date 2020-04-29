@@ -17,10 +17,10 @@ namespace TSPMH {
 
     class TSPSolution : public std::vector<int> {
     public:
-        bool destroydata;
         static const uint route_start = TSPContextProblemData::route_start;
         double cost;
         TSPContextProblemData *data;
+        bool destroydata;
 
         TSPSolution() : destroydata(false) {}
 
