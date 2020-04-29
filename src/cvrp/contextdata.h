@@ -16,7 +16,7 @@ namespace CVRPMH {
         std::vector<int> demand;
 
         CVRPContextProblemData(uint d, double** m, int v, int mc, int* dem)
-            : TSPContextProblemData(d, m), vehicles(v), maxcapacity(mc), cleanup(false) {
+            : TSPContextProblemData(d, m), cleanup(false), vehicles(v), maxcapacity(mc) {
             if (dem != NULL)
                 demand.assign(dem, dem + d);
         }
@@ -28,7 +28,7 @@ namespace CVRPMH {
         CVRPContextProblemData(LegacyCVRP::Instancia* inst)
             : CVRPContextProblemData(inst->dimension, NULL, inst->vehicles, inst->capacity, inst->demand) {
                 matrizAdj = new double*[dimension];
-                for (int i = 0; i < dimension; ++i)
+                for (uint i = 0; i < dimension; ++i)
                     matrizAdj[i] = new double[dimension];
                 cleanup = true;
 
@@ -41,7 +41,7 @@ namespace CVRPMH {
         
         ~CVRPContextProblemData() {
             if (cleanup) {
-                for (int i = 0; i < dimension; ++i)
+                for (uint i = 0; i < dimension; ++i)
                     delete [] matrizAdj[i];
                 delete [] matrizAdj;
             }

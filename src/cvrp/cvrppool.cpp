@@ -106,7 +106,7 @@ namespace CVRPMH
 
         dprintf("Pool costs:");
         int i = 0;
-        for (auto s : pool) {
+        for (const auto& s : pool) {
             for (auto c : s.second) {
                 presente[i][c] = true;
             }
@@ -187,7 +187,7 @@ namespace CVRPMH
         IloNumArray xarr(env, sz);
         cvrpModel.getValues(x, xarr);
         i = 0;
-        for (auto s : pool) {
+        for (const auto& s : pool) {
             if (xarr[i++] > 0.98)
                 finalroute.insert(finalroute.end(), s.second.begin(), s.second.end()-1);
         }
