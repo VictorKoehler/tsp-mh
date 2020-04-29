@@ -9,9 +9,9 @@ namespace TSPMH {
         ret.reserve(ssize);
 
         int sz4 = ssize / 4;
-        auto apos1 = sbeg + (_random(sz4)), pos1 = apos1+1;
-        auto apos2 = pos1 + (_random(sz4)), pos2 = apos2+1;
-        auto apos3 = pos2 + (_random(sz4)), pos3 = apos3+1;
+        auto apos1 = sbeg + (pick_random(sz4)), pos1 = apos1+1;
+        auto apos2 = pos1 + (pick_random(sz4)), pos2 = apos2+1;
+        auto apos3 = pos2 + (pick_random(sz4)), pos3 = apos3+1;
         auto end1 =  send - 1, end2 = end1 - 1;
 
         ret.insert(ret.end(), sbeg, pos1); // 0

@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include "heur.h"
-#include <random>
 
 using namespace std;
 
@@ -17,20 +16,6 @@ using namespace std;
 
 namespace TSPMH {
 
-    minstd_rand simple_rand;
-
-    int _random(int excl_max) {
-        return int(simple_rand()) % excl_max;
-    }
-
-    int _random(int incl_min, int excl_max) {
-        return _random(excl_max - incl_min) + incl_min;
-    }
-
-    void _random_seed(uint_fast32_t s) {
-        simple_rand.seed(s);
-    }
-
     StackedTSPSolution BestInsertionConstructor::construct() {
         const auto data = &dataholder;
         StackedTSPSolution sol(data);
@@ -38,7 +23,7 @@ namespace TSPMH {
         iota(candidatos.begin(), candidatos.end(), 1);
 
         for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {
-            int r = _random(candidatos.size());
+            int r = pick_random(candidatos.size());
             sol.insert(sol.it(i), candidatos[r]);
             candidatos.erase(candidatos.it(r));
         }
@@ -48,7 +33,7 @@ namespace TSPMH {
             set< tuple<double, size_t, size_t> > custoInsercao;
             size_t curr_sz = sol.size()-1;
             int maxtamp = floor(double(curr_sz*candidatos.size())*INITIAL_SUBTOUR_ALFA);
-            size_t choose = size_t(_random(maxtamp));
+            size_t choose = size_t(pick_random(maxtamp));
 
             for (size_t pos = 1; pos < sol.size(); pos++) {
                 for (size_t c = 0; c < candidatos.size(); c++) {

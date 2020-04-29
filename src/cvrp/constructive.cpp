@@ -30,7 +30,7 @@ namespace CVRPMH {
             set< tuple<double, size_t, size_t> > custoInsercao;
             size_t curr_sz = sol.size()-1;
             int maxtamp = floor(double(curr_sz*candidatos.size())*INITIAL_SUBTOUR_ALFA);
-            size_t choose = size_t(TSPMH::_random(maxtamp));
+            size_t choose = size_t(pick_random(maxtamp));
 
             for (size_t pos = 1; pos < sol.size(); pos++) {
                 for (size_t c = 0; c < candidatos.size(); c++) {
@@ -202,7 +202,7 @@ namespace CVRPMH {
         for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {
             int r;
             do {
-                r = TSPMH::_random(candidatos.size());
+                r = pick_random(candidatos.size());
             } while (sol.insertion_cost(candidatos[r], i) == INFINITYLF);
             sol.insert_candidate(candidatos[r], i);
             candidatos.erase(candidatos.it(r));
@@ -215,7 +215,7 @@ namespace CVRPMH {
             set< tuple<double, size_t, size_t> > custoInsercao;
             size_t curr_sz = sol.size()-1;
             int maxtamp = floor(double(curr_sz*candidatos.size())*INITIAL_SUBTOUR_ALFA);
-            size_t choose = size_t(TSPMH::_random(maxtamp));
+            size_t choose = size_t(pick_random(maxtamp));
 
             for (size_t pos = 1; pos < sol.size(); pos++) {
                 for (size_t c = 0; c < candidatos.size(); c++) {

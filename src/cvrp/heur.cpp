@@ -112,7 +112,7 @@ namespace CVRPMH {
         vector<int> neighs = { 0, 1, 2, 3 };
 
         while (!neighs.empty()) { // s := rvnd
-            int ind = TSPMH::_random(neighs.size());
+            int ind = pick_random(neighs.size());
             MovementResult mr;
             switch (neighs[ind]) {
                 case 0: mr = SwapMove::swap_best(candidate); break;

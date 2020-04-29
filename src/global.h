@@ -30,4 +30,10 @@
 
 const double INFINITYLF = std::numeric_limits<double>::infinity();
 
+int pick_random(int excl_max);
+
+int pick_random(int incl_min, int excl_max);
+
+void set_random_seed(uint_fast32_t s);
+
 #endif

@@ -11,13 +11,9 @@ using namespace std;
 namespace CVRPMH
 {
 
-    inline int _random(int excl_max) {
-        return rand() % excl_max;
-    }
-
     inline bool shouldInsert(size_t size, double cost, CVRPPool* p) {
         if (p->lim != -1 && p->pool.size() >= size_t(p->lim)) {
-            int i = _random(int(p->pool.size()));
+            int i = pick_random(int(p->pool.size()));
             auto t = p->pool.begin();
             while (i--) t++;
             auto dd = t->first;

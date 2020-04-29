@@ -34,7 +34,7 @@ namespace TSPMH {
 
         while (!neighs.empty()) { // s := rvnd
             double c = candidate->cost;
-            int ind = _random(neighs.size());
+            int ind = pick_random(neighs.size());
             switch (neighs[ind]) {
                 case 0: SwapMove::swap_best(candidate, false); break;
                 case 1: TwoOptMove::twoopt_best(candidate, false); break;

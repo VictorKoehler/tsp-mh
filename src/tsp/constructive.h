@@ -5,12 +5,6 @@
 
 namespace TSPMH {
 
-    int _random(int excl_max);
-
-    int _random(int incl_min, int excl_max);
-
-    void _random_seed(uint_fast32_t s);
-
     template <typename T>
     class TSPSolutionConstructor {
         public:
