@@ -18,7 +18,7 @@ namespace CVRPMH {
 
         void apply(TSPMH::TSPSolution *sol) override;
         void undo(TSPMH::TSPSolution *sol) override;
-        void best(TSPMH::TSPSolution *sol, bool auto_push) override {
+        void best(TSPMH::TSPSolution *sol, bool) override {
             swap_best(static_cast<CVRPSolution*>(sol));
         };
 
@@ -37,7 +37,7 @@ namespace CVRPMH {
 
         void apply(TSPMH::TSPSolution *sol) override;
         void undo(TSPMH::TSPSolution *sol) override;
-        void best(TSPMH::TSPSolution *sol, bool auto_push) override {
+        void best(TSPMH::TSPSolution *sol, bool) override {
             reinsertion_best(static_cast<CVRPSolution*>(sol), len);
         };
 

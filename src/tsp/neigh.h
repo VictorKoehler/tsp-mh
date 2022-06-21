@@ -8,9 +8,9 @@ namespace TSPMH {
     class TSPSolution;
     class NeighborhoodMove {
         public:
-        virtual void apply(TSPSolution *sol) {};
-        virtual void undo(TSPSolution *sol) {};
-        virtual void best(TSPSolution *sol, bool auto_push) {};
+        virtual void apply(TSPSolution *) {};
+        virtual void undo(TSPSolution *) {};
+        virtual void best(TSPSolution *, bool) {};
         virtual ~NeighborhoodMove() {}
     };
     

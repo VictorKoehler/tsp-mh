@@ -23,7 +23,7 @@ namespace LegacyCVRP {
         bool visited[inst->dimension] = {false};
         int vehicles_paths[inst->vehicles + 1] = {0};
         
-        for (int i = 0; i < inst->path_len; i++) {
+        for (uint i = 0; i < inst->path_len; i++) {
             inst->path[i] = deposit;
         }
 

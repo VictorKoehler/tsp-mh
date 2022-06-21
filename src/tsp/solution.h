@@ -47,7 +47,7 @@ namespace TSPMH {
 
 
         virtual int &at(std::size_t __n) { return std::vector<int>::at(__n); }
-        virtual const int operator[](std::size_t index) const noexcept { return std::vector<int>::operator[](index); }
+        virtual int operator[](std::size_t index) const noexcept { return std::vector<int>::operator[](index); }
         virtual int& operator[](std::size_t index) noexcept { return std::vector<int>::operator[](index); }
         virtual vecit begin() noexcept { return std::vector<int>::begin(); }
         virtual vecit end() noexcept { return std::vector<int>::end(); }

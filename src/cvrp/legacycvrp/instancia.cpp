@@ -66,38 +66,38 @@ namespace LegacyCVRP {
 
     Instancia *lerInstancia(FILE *arquivo, char *nome)
     {
-        int d, v, c;
-        fscanf(arquivo, "NAME: %s\n", nome);
-        fscanf(arquivo, "DIMENSION: %d\n", &d);
-        fscanf(arquivo, "VEHICLES: %d\n", &v);
-        fscanf(arquivo, "CAPACITY: %d\n", &c);
+        int d, v, c, _t;
+        _t = fscanf(arquivo, "NAME: %s\n", nome);
+        _t = fscanf(arquivo, "DIMENSION: %d\n", &d);
+        _t = fscanf(arquivo, "VEHICLES: %d\n", &v);
+        _t = fscanf(arquivo, "CAPACITY: %d\n", &c);
         Instancia *inst = new Instancia(d, v, c);
 
         //int sumdem = 0;
 
-        fscanf(arquivo, "DEMAND_SECTION:\n");
+        _t = fscanf(arquivo, "DEMAND_SECTION:\n");
         for (int i = 0, ind; i < d; i++) //{
-            fscanf(arquivo, "%d %d", &ind, &inst->demand[i]);
+            _t = fscanf(arquivo, "%d %d", &ind, &inst->demand[i]);
             //sumdem += inst->demand[i];
         //}
 
         char ops[30];
-        fscanf(arquivo, "\n%s\n", ops);
+        _t = fscanf(arquivo, "\n%s\n", ops);
         std::string opsstr(ops);
         
         //printf("%d*%d = %d %d\n", c, v, v*c, sumdem);
 
         if (trim(opsstr) == "EDGE_WEIGHT_SECTION") {
-            //fscanf(arquivo, "\nEDGE_WEIGHT_SECTION\n");
+            //_t = fscanf(arquivo, "\nEDGE_WEIGHT_SECTION\n");
             for (int i = 0; i < d; i++)
                 for (int j = 0; j < d; j++)
-                    fscanf(arquivo, "%d", &inst->edges_weight[i][j]);
+                    _t = fscanf(arquivo, "%d", &inst->edges_weight[i][j]);
         } else {
             int coordx[d], coordy[d], p;
-            //fscanf(arquivo, "\nNODE_COORD_SECTION:n");
+            //_t = fscanf(arquivo, "\nNODE_COORD_SECTION:n");
             for (int i = 0; i < d; i++)
             {
-                fscanf(arquivo, "%d %d %d", &p, &coordx[i], &coordy[i]);
+                _t = fscanf(arquivo, "%d %d %d", &p, &coordx[i], &coordy[i]);
                 // if (p != i) {
                 //     printf("UNEXPECTED INPUT!");
                 //     exit(2);
@@ -112,6 +112,7 @@ namespace LegacyCVRP {
                 inst->edges_weight[i][i] = 0;
             }
         }
+        (void)_t; // do nothing with this bloody thing
 
         return inst;
     }

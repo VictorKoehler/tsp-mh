@@ -118,7 +118,7 @@ namespace CVRPMH {
 
         TSPMH::vecit begin() noexcept override { return b(); }
         TSPMH::vecit end() noexcept override   { return e(); }
-        const int operator[](std::size_t index) const noexcept override { return b()[index]; }
+        int operator[](std::size_t index) const noexcept override { return b()[index]; }
         int& operator[](std::size_t index) noexcept override { return b()[index]; }
         int &at(std::size_t index) override { return b()[index]; }
         void push_back(int x) override { src->insert(e(), x); }
