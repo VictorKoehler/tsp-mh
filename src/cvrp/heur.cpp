@@ -150,7 +150,7 @@ namespace CVRPMH {
         const int d = inst->dimension;
 
         #ifdef CVRPPOOL_ENABLED
-        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension);
+        CVRPMH::CVRPPool pq(inst->vehicles, inst->dimension, 16384);
         pool = &pq;
         #endif
 

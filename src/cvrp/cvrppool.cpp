@@ -97,14 +97,15 @@ namespace CVRPMH
 
         #ifndef DISABLE_CPLEX
         size_t sz = pool.size();
-        bool presente[sz][nclient] = {false};
+        // bool presente[sz][nclient] = {false};
+        std::vector< std::vector<bool> > presente(nclient, std::vector<bool>(sz, false));
         double custos[sz];
 
         dprintf("Pool costs:");
         int i = 0;
         for (const auto& s : pool) {
             for (auto c : s.second) {
-                presente[i][c] = true;
+                presente[c][i] = true;
             }
             ifdebug(VectorHash v);
             dprintf(" %.0lf(%lu)", s.first, v(s));
@@ -154,7 +155,7 @@ namespace CVRPMH
         for (int c = 1; c < nclient; ++c) {
             IloExpr temp(env); // Se o cliente está na subrota...
             for (size_t r = 0; r < sz; r++) {
-                temp += presente[r][c]*x[r];
+                temp += presente[c][r]*x[r];
             }
             modelo.add(temp == 1); // 5.24
             temp.end();
