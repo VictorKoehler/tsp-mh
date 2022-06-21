@@ -18,7 +18,7 @@ namespace LegacyCVRP {
 
 
     int greedy_constructor(Instancia *inst) {
-        int max_path = inst->path_len;
+        // int max_path = inst->path_len;
         int visited_count = 1, vehicle_ind = 1, totalCost = 0;
         bool visited[inst->dimension] = {false};
         int vehicles_paths[inst->vehicles + 1] = {0};

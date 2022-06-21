@@ -95,7 +95,10 @@ namespace TSPMH {
     }
 
     inline double twoopt_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
-        const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
+        #ifndef NDEBUG
+        const int prej = *(j - 1), posi = *(i + 1);
+        #endif
+        const int posj = *(j + 1), prei = *(i - 1);
         assert(posi != *j);
         assert(mat[prei][*j] == mat[*j][prei] && mat[*j][posj] == mat[posj][*j]);
         assert(mat[prej][*i] == mat[*i][prej] && mat[*i][posi] == mat[posi][*i]);

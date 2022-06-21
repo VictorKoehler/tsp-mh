@@ -80,13 +80,13 @@ namespace CVRPMH {
 
 
 
-    void SwapMove::apply(TSPSolution *sol) {
+    void SwapMove::apply(TSPSolution *) {
         // auto i = sol->it(a), j = sol->it(b);
         // auto s = static_cast<CVRPSolution*>(sol);
         // swap_apply(s, i, j, swap_cost(s, i, j));
     }
 
-    void SwapMove::undo(TSPSolution *sol) {
+    void SwapMove::undo(TSPSolution *) {
         // apply(sol);
     }
 
@@ -164,11 +164,11 @@ namespace CVRPMH {
     }
 
 
-    void ReinsertionMove::apply(TSPSolution *sol) {
+    void ReinsertionMove::apply(TSPSolution *) {
         // reinsertion_apply(static_cast<CVRPSolution*>(sol), opos, len, npos, reinsertion_cost(sol, opos, len, npos));
     }
 
-    void ReinsertionMove::undo(TSPSolution *sol) {
+    void ReinsertionMove::undo(TSPSolution *) {
         // int t = opos;
         // opos = npos;
         // npos = t;
@@ -188,17 +188,17 @@ namespace CVRPMH {
                 i = 0;
             }
         }
-        size_t icc=0, jcc, szd = sol->size(); // TODO: R
+        // size_t icc=0, jcc, szd = sol->size(); // TODO: R
         for (auto i = bg; i < end_max; i++) {
             auto maxi = i + len;
             if (*(maxi-1) == CVRPSolution::route_start) {
                 i += (len - 1);
                 continue;
             }
-            icc = distance(sol->begin(), i);
+            // icc = distance(sol->begin(), i);
             //if (*(i-1) == CVRPSolution::route_start || *maxi == CVRPSolution::route_start) continue;
             for (auto n = sol->begin() + 1; n != sol->end() - 1; n++) {
-                jcc = distance(sol->begin(), n);
+                // jcc = distance(sol->begin(), n);
                 if (i <= n && n <= maxi) continue;
                 if (*n == CVRPSolution::route_start && *(n-1) != CVRPSolution::route_start) continue;
                 double d = reinsertion_cost(sol, i, len, n);
