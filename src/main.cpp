@@ -50,7 +50,7 @@ int cvrp(int argc, char** argv) {
 
 
 int main(int argc, char** argv) {
-    TSPMH::_random_seed(RSEED);
+    set_random_seed(RSEED);
 
     ifdebug(printf("WARNING: DEBUG ENABLED!\n"));
     assert(printf("WARNING: ASSERTIVES ENABLED!\n") >= 0);
