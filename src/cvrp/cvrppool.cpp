@@ -90,14 +90,16 @@ namespace CVRPMH
     }
     #endif
     
-    pair<vector<int>, double> CVRPPool::commit() {
+    pair<vector<int>, double> CVRPPool::commit(double timeLimit) {
         #ifdef PPEA
 
         #endif
 
         #ifndef DISABLE_CPLEX
+        try {
         size_t sz = pool.size();
         // bool presente[sz][nclient] = {false};
+        cout << "Commiting pool of solutions of size " << sz << "\n";
         std::vector< std::vector<bool> > presente(nclient, std::vector<bool>(sz, false));
         double custos[sz];
 
@@ -171,12 +173,13 @@ namespace CVRPMH
 
         IloNum startTime;
         startTime = cvrpModel.getTime();
+        if (timeLimit > 0.0) cvrpModel.setParam(IloCplex::Param::TimeLimit, timeLimit);
         cvrpModel.solve();
 
+        cout << "TIME ELAPSED: " << (cvrpModel.getTime()-startTime) << endl << endl << "-----" << endl;
         cout << "STATUS: " <<  cvrpModel.getCplexStatus() << endl;
         cout << "BEST: " <<  cvrpModel.getBestObjValue() << endl;
         cout << "OBJ VALUE: " <<  cvrpModel.getObjValue() << endl;
-        cout << "TIME ELAPSED: " << (cvrpModel.getTime()-startTime) << endl << endl << "-----" << endl;
 
         double finalcost = cvrpModel.getBestObjValue();
         vector<int> finalroute;
@@ -192,9 +195,12 @@ namespace CVRPMH
         
         env.end();
         return make_pair(finalroute, finalcost);
+        } catch (IloCplex::Exception& e) {
+            std::cerr << "CPLEX Exception raised. Details: " << e;
+        }
 
-        #else
-        printf("Solutions present: %ld / %d\n", pool.size(), inserted);
         #endif
+        // printf("Solutions present: %ld / %d\n", pool.size(), inserted);
+        return make_pair(vector<int>(), -1);
     }
 }

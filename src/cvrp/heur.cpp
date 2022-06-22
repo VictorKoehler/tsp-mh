@@ -171,10 +171,13 @@ namespace CVRPMH {
         // cout << "\n";
         // #endif
 
-        auto p = pq.commit().first;
-        r.assign(p.begin(), p.end());
-        r.update_cost();
-        r.updateRoutes();
+        auto p = pq.commit(600);
+        if (p.second != -1 && p.second < r.cost) {
+            std::cout << "MIP found a better solution: " << p.second << "\n";
+            r.assign(p.first.begin(), p.first.end());
+            r.update_cost();
+            r.updateRoutes();
+        }
         #endif
         
         r.destroydata = true;

@@ -40,7 +40,7 @@ namespace CVRPMH
 
         void insert(std::vector<int> subroute, double cost);
 
-        std::pair<std::vector<int>, double> commit();
+        std::pair<std::vector<int>, double> commit(double timeLimit=-1.0);
     };
     
 }
