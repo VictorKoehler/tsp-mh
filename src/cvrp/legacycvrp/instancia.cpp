@@ -2,6 +2,10 @@
 #include <random>
 #include <chrono>
 #include <cmath>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 namespace LegacyCVRP {
     
@@ -62,6 +66,88 @@ namespace LegacyCVRP {
     inline std::string& trim(std::string& s, const char* t = ws)
     {
         return ltrim(rtrim(s, t), t);
+    }
+
+    inline Instancia *new_instancia(const std::string& iname, int d, int v, int c) {
+        if (v == -1 && iname.rfind("-k") != iname.npos) {
+            v = std::stoi(iname.substr(iname.rfind("-k")+2));
+        }
+        if (d == -1 || c == -1 || v == -1) {
+            std::cerr << "Instance file did not specify enough data: " << d << " " << v << " " << c << "\n";
+            throw std::runtime_error("Instance file did not specify enough data.");
+        }
+        return new Instancia(d, v, c);
+    }
+
+    Instancia *lerInstancia(const std::string& arquivo) {
+        std::ifstream infile;
+        infile.open(arquivo);
+        if (!infile.is_open()) {
+            throw std::runtime_error("Could not open file '" + arquivo + "'.");
+        }
+
+        std::string iname;
+        int d=-1, v=-1, c=-1;
+        Instancia *inst = nullptr;
+
+        while (infile.good()) {
+            std::string buff;
+            std::getline(infile, buff);
+            trim(buff);
+            if (buff.empty()) continue;
+
+            auto hpos = buff.find(':');
+            std::string h = buff.substr(0, hpos), tail = buff.substr(hpos == buff.npos ? buff.size() : hpos+1);
+            trim(h);
+            trim(tail);
+
+            if (h == "NAME") iname = tail;
+            else if (h == "DIMENSION") d = std::stoi(tail);
+            else if (h == "VEHICLES") v = std::stoi(tail);
+            else if (h == "CAPACITY") c = std::stoi(tail);
+            else if (h == "DEMAND_SECTION") {
+                if (inst == nullptr) inst = new_instancia(iname, d, v, c);
+                for (int i = 0, p=0, ind; i < d; i++) {
+                    infile >> ind >> inst->demand[i];
+                    if (i == 0 && ind == 1) p = 1;
+                    if (ind-p != i) throw std::runtime_error("Demand section must be from 1 to D: "+std::to_string(i+p)+"th parsing is "+std::to_string(ind));
+                }
+            } else if (h == "EDGE_WEIGHT_SECTION") {
+                if (inst == nullptr) inst = new_instancia(iname, d, v, c);
+                for (int i = 0; i < d; i++)
+                    for (int j = 0; j < d; j++)
+                        infile >> inst->edges_weight[i][j];
+            } else if (h == "NODE_COORD_SECTION") {
+                if (inst == nullptr) inst = new_instancia(iname, d, v, c);
+                int coordx[d], coordy[d], p;
+                for (int i = 0; i < d; i++)
+                {
+                    infile >> p >> coordx[i] >> coordy[i];
+                    // if (p != i) {
+                    //     printf("UNEXPECTED INPUT!");
+                    //     exit(2);
+                    // }
+                    for (int j = 0; j < i; j++) {
+                        int dx = coordx[i] - coordx[j];
+                        int dy = coordy[i] - coordy[j];
+                        int dist = (int)round(sqrt(dx*dx+dy*dy));
+                        inst->edges_weight[i][j] = dist;
+                        inst->edges_weight[j][i] = dist;
+                    }
+                    inst->edges_weight[i][i] = 0;
+                }
+            } else if (h == "DEPOT_SECTION") {
+                int d;
+                while (infile >> d) {
+                    if (d == -1) break;
+                    else if (d != 1) throw std::runtime_error("Setting a custom depot id is not supported: " + std::to_string(d));
+                }
+            } else if (h != "COMMENT" && h != "TYPE" && h != "EDGE_WEIGHT_TYPE" && h != "EOF") {
+                throw std::runtime_error("Unrecognized option: " + buff);
+            }
+        }
+
+        return inst;
     }
 
     Instancia *lerInstancia(FILE *arquivo, char *nome)

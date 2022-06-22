@@ -2,6 +2,7 @@
 #define __LEGACYCVRP_INST__
 
 #include <cstdio>
+#include <string>
 
 namespace LegacyCVRP {
     
@@ -24,6 +25,7 @@ namespace LegacyCVRP {
 
         Instancia(int d, int v, int c)
         {
+            printf("%d %d %d\n", d, v, c);
             dimension = d;
             vehicles = v;
             capacity = c;
@@ -50,6 +52,7 @@ namespace LegacyCVRP {
     void reset_vehicles_paths(Instancia *inst);
 
     Instancia *lerInstancia(FILE *arquivo, char *nome);
+    Instancia *lerInstancia(const std::string& arquivo);
 
 
 

@@ -37,10 +37,9 @@ int tsp(int argc, char** argv) {
 
 
 int cvrp(int argc, char** argv) {
-    char nome[100];
     if (argc < 2) throw std::runtime_error("You must specify a file input");
     TimePoint start;
-    auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(fopen(argv[1], "r"), nome)));
+    auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(std::string(argv[1]))));
     cout << CVRPMH::cvrp_nmcc_swap << " " << CVRPMH::cvrp_nmcc_reinsertion << " " <<
         TSPMH::tsp_nmcc_swap << " " << TSPMH::tsp_nmcc_reinsertion << " " << TSPMH::tsp_nmcc_twoopt << "\n";
     if (!a.checkSolution()) cout << "Invalid solution\n";
