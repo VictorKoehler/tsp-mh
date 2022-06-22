@@ -7,6 +7,7 @@
 #include "tsp/neighmoves.h"
 #include "cvrp/heur.h"
 #include "cvrp/neighmoves.h"
+#include "Clock.hpp"
 
 using namespace std;
 
@@ -38,10 +39,12 @@ int tsp(int argc, char** argv) {
 int cvrp(int argc, char** argv) {
     char nome[100];
     if (argc < 2) throw std::runtime_error("You must specify a file input");
+    TimePoint start;
     auto a = CVRPMH::gils_rvnd(std::unique_ptr<LegacyCVRP::Instancia>(LegacyCVRP::lerInstancia(fopen(argv[1], "r"), nome)));
     cout << CVRPMH::cvrp_nmcc_swap << " " << CVRPMH::cvrp_nmcc_reinsertion << " " <<
         TSPMH::tsp_nmcc_swap << " " << TSPMH::tsp_nmcc_reinsertion << " " << TSPMH::tsp_nmcc_twoopt << "\n";
     if (!a.checkSolution()) cout << "Invalid solution\n";
+    cout << "TIME: " << start.diff_seconds() << " seconds\n";
     cout << "COST: " << a.cost << "\nSEED: " << RSEED << "\nROUTE:";
     for (auto i : a) cout << " " << i << "(" << a.data->demand[i] << ")";
     cout << endl;
