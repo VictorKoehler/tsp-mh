@@ -3,7 +3,7 @@
 #include "tspneighmoves.h"
 
 
-#define mat sol->matrizAdj
+#define mat sol->data
 #define it(i) begin() + i
 
 #ifdef vprintfen
@@ -17,23 +17,23 @@ namespace TSPMH {
 
     const double INFINITYLF = std::numeric_limits<double>::infinity();
 
-    inline void swap_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+    inline void swap_apply(StackedTSPSolution *sol, vecit &i, vecit &j, double delta) {
         sol->cost += delta;
         int tmpi = *i;
         *i = *j;
         *j = tmpi;
     }
 
-    inline double swap_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
+    inline double swap_cost(StackedTSPSolution *sol, const vecit &i, const vecit &j) {
         const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
         if (posi == *j) {
-            return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
+            return mat(prei, *j) + mat(*i, posj) - mat(prei, *i) - mat(*j, posj);
         }
-        return mat[prej][*i] + mat[*i][posj] + mat[prei][*j] + mat[*j][posi]
-            - (mat[prej][*j] + mat[*j][posj] + mat[prei][*i] + mat[*i][posi]);
+        return mat(prej, *i) + mat(*i, posj) + mat(prei, *j) + mat(*j, posi)
+            - (mat(prej, *j) + mat(*j, posj) + mat(prei, *i) + mat(*i, posi));
     }
 
-    inline double swap_cost(TSPSolution *sol, int o, int p) {
+    inline double swap_cost(StackedTSPSolution *sol, int o, int p) {
         auto i = sol->it(o), j = sol->it(p);
         if (o > p) return swap_cost(sol, j, i);
         else       return swap_cost(sol, i, j);
@@ -41,16 +41,16 @@ namespace TSPMH {
 
 
 
-    void SwapMove::apply(TSPSolution *sol) {
+    void SwapMove::apply(StackedTSPSolution *sol) {
         auto i = sol->it(a), j = sol->it(b);
         swap_apply(sol, i, j, swap_cost(sol, i, j));
     }
 
-    void SwapMove::undo(TSPSolution *sol) {
+    void SwapMove::undo(StackedTSPSolution *sol) {
         apply(sol);
     }
 
-    double SwapMove::swap_best(TSPSolution *sol, bool auto_push) {
+    double SwapMove::swap_best(StackedTSPSolution *sol, bool auto_push) {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1;
@@ -86,36 +86,36 @@ namespace TSPMH {
 
 
 
-    inline void twoopt_apply(TSPSolution *sol, vecit &i, vecit &j, double delta) {
+    inline void twoopt_apply(StackedTSPSolution *sol, vecit &i, vecit &j, double delta) {
         sol->cost += delta;
         std::reverse(i, j+1);
     }
 
-    inline double twoopt_cost(TSPSolution *sol, const vecit &i, const vecit &j) {
+    inline double twoopt_cost(StackedTSPSolution *sol, const vecit &i, const vecit &j) {
         const int prej = *(j - 1), posj = *(j + 1), prei = *(i - 1), posi = *(i + 1);
         assert(posi != *j);
-        assert(mat[prei][*j] == mat[*j][prei] && mat[*j][posj] == mat[posj][*j]);
-        assert(mat[prej][*i] == mat[*i][prej] && mat[*i][posi] == mat[posi][*i]);
-        return mat[prei][*j] + mat[*i][posj] - mat[prei][*i] - mat[*j][posj];
+        assert(mat(prei, *j) == mat(*j, prei) && mat(*j, posj) == mat(posj, *j));
+        assert(mat(prej, *i) == mat(*i, prej) && mat(*i, posi) == mat(posi, *i));
+        return mat(prei, *j) + mat(*i, posj) - mat(prei, *i) - mat(*j, posj);
     }
 
-    inline double twoopt_cost(TSPSolution *sol, int o, int p) {
+    inline double twoopt_cost(StackedTSPSolution *sol, int o, int p) {
         auto i = sol->it(o), j = sol->it(p);
         if (o > p) return twoopt_cost(sol, j, i);
         else       return twoopt_cost(sol, i, j);
     }
 
 
-    void TwoOptMove::apply(TSPSolution *sol) {
+    void TwoOptMove::apply(StackedTSPSolution *sol) {
         auto i = sol->it(a), j = sol->it(b);
         twoopt_apply(sol, i, j, twoopt_cost(sol, i, j));
     }
 
-    void TwoOptMove::undo(TSPSolution *sol) {
+    void TwoOptMove::undo(StackedTSPSolution *sol) {
         apply(sol);
     }
 
-    double TwoOptMove::twoopt_best(TSPSolution *sol, bool auto_push) {
+    double TwoOptMove::twoopt_best(StackedTSPSolution *sol, bool auto_push) {
         double delta = INFINITYLF;
         vecit bi, bj;
         auto end = sol->end() - 1, end2 = end - 1;
@@ -152,7 +152,7 @@ namespace TSPMH {
 
 
 
-    inline void reinsertion_apply(TSPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
+    inline void reinsertion_apply(StackedTSPSolution *sol, size_t opos, size_t len, size_t npos, double delta) {
         sol->cost += delta;
         //std::cout << "Reinserting [" << opos << "..(" << len << ")] to " << npos << " with delta=" << delta << std::endl;
         std::vector<int> cpy(sol->it(opos), sol->it(opos + len));
@@ -161,24 +161,24 @@ namespace TSPMH {
         sol->insert(sol->it(npos - dlen), cpy.begin(), cpy.end());
     }
 
-    inline double reinsertion_cost(TSPSolution *sol, const vecit &o, size_t len, const vecit &n) {
+    inline double reinsertion_cost(StackedTSPSolution *sol, const vecit &o, size_t len, const vecit &n) {
         const int preo = *(o - 1), poso = *(o + len), pren = *(n - 1), posn = *n,
                 bego = *o, endo = *(o + (len - 1));
-        return mat[preo][poso] + mat[pren][bego] + mat[endo][posn]
-            - (mat[preo][bego] + mat[endo][poso] + mat[pren][posn]);
+        return mat(preo, poso) + mat(pren, bego) + mat(endo, posn)
+            - (mat(preo, bego) + mat(endo, poso) + mat(pren, posn));
     }
 
-    inline double reinsertion_cost(TSPSolution *sol, size_t opos, size_t len, size_t npos) {
+    inline double reinsertion_cost(StackedTSPSolution *sol, size_t opos, size_t len, size_t npos) {
         auto o = sol->it(opos), n = sol->it(npos);
         return reinsertion_cost(sol, o, len, n);
     }
 
 
-    void ReinsertionMove::apply(TSPSolution *sol) {
+    void ReinsertionMove::apply(StackedTSPSolution *sol) {
         reinsertion_apply(sol, opos, len, npos, reinsertion_cost(sol, opos, len, npos));
     }
 
-    void ReinsertionMove::undo(TSPSolution *sol) {
+    void ReinsertionMove::undo(StackedTSPSolution *sol) {
         int t = opos;
         opos = npos;
         npos = t;
@@ -188,7 +188,7 @@ namespace TSPMH {
         apply(sol);
     }
 
-    double ReinsertionMove::reinsertion_best(TSPSolution *sol, size_t len, bool auto_push) {
+    double ReinsertionMove::reinsertion_best(StackedTSPSolution *sol, size_t len, bool auto_push) {
         double delta = INFINITYLF;
         vecit bi, bn;
         auto end_max = sol->end() - len;

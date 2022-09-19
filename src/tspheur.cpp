@@ -29,9 +29,9 @@ namespace TSPMH {
     }
 
 
-    TSPSolution solutionConstructor(uint dimension, double** matrizAdj) {
-        TSPSolution sol(dimension, matrizAdj);
-        vector<int> candidatos(dimension - 1);
+    StackedTSPSolution solutionConstructor(Data& data) {
+        StackedTSPSolution sol(data);
+        vector<int> candidatos(data.getDimension() - 1);
         iota(candidatos.begin(), candidatos.end(), 1);
 
         for (int i = 1; i <= INITIAL_SUBTOUR_SIZE; i++) {
@@ -64,8 +64,8 @@ namespace TSPMH {
         return sol;
     }
 
-    TSPSolution doubleBridge(TSPSolution* sol) {
-        TSPSolution ret(sol->dimension, sol->matrizAdj);
+    StackedTSPSolution doubleBridge(StackedTSPSolution* sol) {
+        StackedTSPSolution ret(sol->data);
         ret.cost = sol->cost;
         ret.clear();
         ret.reserve(sol->size());
@@ -80,26 +80,27 @@ namespace TSPMH {
         ret.insert(ret.end(), pos3, end1); // 3
         ret.insert(ret.end(), pos2, pos3); // 2
         ret.insert(ret.end(), pos1, pos2); // 1
-        ret.push_back(TSPSolution::route_start); // 4
+        ret.push_back(StackedTSPSolution::route_start); // 4
 
-        ret.cost -= sol->matrizAdj[*apos1][*pos1] + sol->matrizAdj[*apos2][*pos2] + sol->matrizAdj[*apos3][*pos3] + sol->matrizAdj[*end2][*end1];
-        ret.cost += sol->matrizAdj[*apos1][*pos3] + sol->matrizAdj[*end2][*pos2] + sol->matrizAdj[*apos3][*pos1] + sol->matrizAdj[*apos2][*end1];
+        ret.cost -= sol->data(*apos1, *pos1) + sol->data(*apos2, *pos2) + sol->data(*apos3, *pos3) + sol->data(*end2, *end1);
+        ret.cost += sol->data(*apos1, *pos3) + sol->data(*end2, *pos2) + sol->data(*apos3, *pos1) + sol->data(*apos2, *end1);
         assert(ret.cost == ret.update_cost());
 
         return ret;
     }
 
-    TSPSolution gils_rvnd(uint d, double **m) {
-        return gils_rvnd(d, m, 50, d >= 150 ? d/2 : d);
+    StackedTSPSolution gils_rvnd(Data& data) {
+        auto d = data.getDimension();
+        return gils_rvnd(data, 50, d >= 150 ? d/2 : d);
     }
 
-    TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils) {
-        TSPSolution best(d, m);
+    StackedTSPSolution gils_rvnd(Data& data, int Imax, int Iils) {
+        StackedTSPSolution best(data);
         best.cost = INFINITYLF;
 
         for (int i = 0; i < Imax; i++) {
-            TSPSolution bestCandidate = solutionConstructor(d, m); // s'
-            TSPSolution candidate = bestCandidate; // s
+            StackedTSPSolution bestCandidate = solutionConstructor(data); // s'
+            StackedTSPSolution candidate = bestCandidate; // s
             dprintf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
 
             int ccrvnd = 0;

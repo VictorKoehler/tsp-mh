@@ -4,11 +4,11 @@
 
 namespace TSPMH {
 
-    TSPSolution solutionConstructor(uint dimension, double** matrizAdj);
+    StackedTSPSolution solutionConstructor(Data& data);
 
-    TSPSolution doubleBridge(TSPSolution* sol);
+    StackedTSPSolution doubleBridge(StackedTSPSolution* sol);
 
-    TSPSolution gils_rvnd(uint d, double **m);
-    TSPSolution gils_rvnd(uint d, double **m, int Imax, int Iils);
+    StackedTSPSolution gils_rvnd(Data& data);
+    StackedTSPSolution gils_rvnd(Data& data, int Imax, int Iils);
 
 }

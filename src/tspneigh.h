@@ -11,12 +11,12 @@
 
 namespace TSPMH {
 
-    class TSPSolution;
+    class StackedTSPSolution;
     class NeighborhoodMove {
         public:
-        virtual void apply(TSPSolution *sol) {};
-        virtual void undo(TSPSolution *sol) {};
-        virtual void best(TSPSolution *sol, bool auto_push) {};
+        virtual void apply(StackedTSPSolution *sol) {};
+        virtual void undo(StackedTSPSolution *sol) {};
+        virtual void best(StackedTSPSolution *sol, bool auto_push) {};
         virtual ~NeighborhoodMove() {}
     };
     

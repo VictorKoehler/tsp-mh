@@ -12,15 +12,15 @@ namespace TSPMH {
         SwapMove() {}
         SwapMove(const int i, const int j) : a(i < j ? i : j), b(i < j ? j : i) { }
 
-        void apply(TSPSolution *sol) override;
-        void undo(TSPSolution *sol) override;
-        void best(TSPSolution *sol, bool auto_push) override {
+        void apply(StackedTSPSolution *sol) override;
+        void undo(StackedTSPSolution *sol) override;
+        void best(StackedTSPSolution *sol, bool auto_push) override {
             swap_best(sol, auto_push);
         };
 
         ~SwapMove() override {}
 
-        static double swap_best(TSPSolution *sol, bool auto_push);
+        static double swap_best(StackedTSPSolution *sol, bool auto_push);
     };
 
 
@@ -31,15 +31,15 @@ namespace TSPMH {
         TwoOptMove() {}
         TwoOptMove(const int i, const int j) : a(i < j ? i : j), b(i < j ? j : i) { }
 
-        void apply(TSPSolution *sol) override;
-        void undo(TSPSolution *sol) override;
-        void best(TSPSolution *sol, bool auto_push) override {
+        void apply(StackedTSPSolution *sol) override;
+        void undo(StackedTSPSolution *sol) override;
+        void best(StackedTSPSolution *sol, bool auto_push) override {
             twoopt_best(sol, auto_push);
         };
 
         ~TwoOptMove() override {}
 
-        static double twoopt_best(TSPSolution *sol, bool auto_push);
+        static double twoopt_best(StackedTSPSolution *sol, bool auto_push);
     };
 
 
@@ -50,15 +50,15 @@ namespace TSPMH {
         ReinsertionMove(const int len) : len(len) {}
         ReinsertionMove(const int opos, const int len, const int npos) : opos(opos), len(len), npos(npos) { }
 
-        void apply(TSPSolution *sol) override;
-        void undo(TSPSolution *sol) override;
-        void best(TSPSolution *sol, bool auto_push) override {
+        void apply(StackedTSPSolution *sol) override;
+        void undo(StackedTSPSolution *sol) override;
+        void best(StackedTSPSolution *sol, bool auto_push) override {
             reinsertion_best(sol, len, auto_push);
         };
 
         ~ReinsertionMove() override {}
 
-        static double reinsertion_best(TSPSolution *sol, size_t len, bool auto_push);
+        static double reinsertion_best(StackedTSPSolution *sol, size_t len, bool auto_push);
     };
 
 }

@@ -22,16 +22,17 @@ int main(int argc, char** argv) {
         upper_bound = atoi(argv[2]);
     }
 
-	unique_ptr<Data> data(new Data(argc, argv[1]));
-	data->readData();
+	// unique_ptr<Data> data(new Data(argc, argv[1]));
+	Data data(argc, argv[1]);
+	data.readData();
 
     if (upper_bound == BranchAndBound::INT_HIGH) {
-        auto a = TSPMH::gils_rvnd(data->getDimension(), data->getMatrixCost(), 1, 10);
+        auto a = TSPMH::gils_rvnd(data, 1, 10);
         upper_bound = int(a.cost) + 5; // safety margin
         printf("Choosen upperbound by heurist: %d\n", upper_bound);
     }
 
-    auto bab = TSPBaB::solveTSPBab(data->getDimension(), data->getMatrixCost(), upper_bound);
+    auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
     cout << "Prohibited arcs:";
     for (auto a : bab->arcs) {
         cout << " " << a.first << "," << a.second;

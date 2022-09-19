@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "tspneigh.h"
-
+#include "data.h"
 
 namespace TSPMH {
 
@@ -19,25 +19,21 @@ namespace TSPMH {
     class TSPSolution : public std::vector<int> {
     public:
         static const uint route_start = 0;
-        uint dimension;
-        double cost, **matrizAdj;
-        std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+        double cost;
+        Data& data;
 
-        TSPSolution(const TSPSolution& obj) : vector<int>(obj) {
-            dimension = obj.dimension;
-            cost = obj.cost;
-            matrizAdj = obj.matrizAdj;
+        TSPSolution(Data& data) : vector<int>(2), cost(0), data(data) {
+            this->at(route_start) = this->at(route_start) = 0;
+            this->reserve(size_t(data.getDimension()));
         }
 
-        TSPSolution(uint d, double** m) : vector<int>(2), dimension(d), cost(0), matrizAdj(m) {
-            this->at(route_start) = this->at(route_start) = 0;
+        TSPSolution(const TSPSolution& obj) : vector<int>(obj), data(obj.data) {
+            cost = obj.cost;
         }
 
         TSPSolution& operator=(const TSPSolution& t) {
             std::vector<int>::operator=(t);
-            dimension = t.dimension;
             cost = t.cost;
-            matrizAdj = t.matrizAdj;
             return *this;
         }
 
@@ -53,7 +49,7 @@ namespace TSPMH {
         }
 
         inline double insertion_cost(uint n, uint i, uint j) const {
-            return matrizAdj[i][n] + matrizAdj[n][j] - matrizAdj[i][j];
+            return data(i, n) + data(n, j) - data(i, j);
         }
 
         inline double insertion_cost(uint n, const vecit& p) const {
@@ -61,8 +57,8 @@ namespace TSPMH {
         }
 
         inline double remotion_cost(const vecit& i) const {
-            return matrizAdj[*(i - 1)][*(i + 1)] - matrizAdj[*(i - 1)][*i] -
-                matrizAdj[*i][*(i - 1)];
+            return data(*(i - 1), *(i + 1)) - data(*(i - 1), *i) -
+                data(*i, *(i - 1));
         }
 
         inline double reinsertion_cost(const vecit& i, const vecit& p) const {
@@ -72,8 +68,8 @@ namespace TSPMH {
         double update_cost() {
             double ncost = 0;
             for (auto it = begin(); it != end() - 1; it++) {
-                assert(matrizAdj[*it][*(it + 1)] == matrizAdj[*(it + 1)][*it]);
-                ncost += matrizAdj[*it][*(it + 1)];
+                assert(data(*it, *(it + 1)) == data(*(it + 1), *it));
+                ncost += data(*it, *(it + 1));
             }
             cost = ncost;
             return ncost;
@@ -82,9 +78,32 @@ namespace TSPMH {
         /**
          * If this represents a valid solution.
          */
-        inline bool completed() { return dimension + 1 == uint(size()); }
+        inline bool completed() { return data.getDimension() + 1 == int(size()); }
 
+        void printSolution() {
+            double d = cost;
+            std::cout << "Solution (" << d << "/" << update_cost() << "):";
+            // cout << "Solution:";
+            for (auto e : *this) {
+                std::cout << " " << e;
+            }
+            std::cout << std::endl;
+        }
+    };
 
+    class StackedTSPSolution : public TSPSolution {
+        public:
+        std::stack<std::unique_ptr<NeighborhoodMove> > neighmoves;
+
+        StackedTSPSolution(const StackedTSPSolution& obj) : TSPSolution(obj) { }
+
+        StackedTSPSolution(Data& data) : TSPSolution(data) { }
+
+        StackedTSPSolution& operator=(const StackedTSPSolution& t) {
+            TSPSolution::operator=(t);
+            reset_NeighborhoodMove();
+            return *this;
+        }
 
         inline double push_NeighborhoodMove(std::unique_ptr<NeighborhoodMove> n) {
             n->apply(this);
@@ -104,16 +123,6 @@ namespace TSPMH {
 
         inline void reset_NeighborhoodMove() {
             while (!neighmoves.empty()) neighmoves.pop();
-        }
-
-        void printSolution() {
-            double d = cost;
-            std::cout << "Solution (" << d << "/" << update_cost() << "):";
-            // cout << "Solution:";
-            for (auto e : *this) {
-                std::cout << " " << e;
-            }
-            std::cout << std::endl;
         }
     };
 
