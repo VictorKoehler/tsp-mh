@@ -14,9 +14,9 @@ namespace TSPMH {
     class StackedTSPSolution;
     class NeighborhoodMove {
         public:
-        virtual void apply(StackedTSPSolution *sol) {};
-        virtual void undo(StackedTSPSolution *sol) {};
-        virtual void best(StackedTSPSolution *sol, bool auto_push) {};
+        virtual void apply(StackedTSPSolution *) {};
+        virtual void undo(StackedTSPSolution *) {};
+        virtual void best(StackedTSPSolution *, [[maybe_unused]] bool auto_push) {};
         virtual ~NeighborhoodMove() {}
     };
     
