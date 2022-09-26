@@ -20,9 +20,9 @@ namespace TSPMH {
     public:
         static const uint route_start = 0;
         double cost;
-        Data& data;
+        const Data& data;
 
-        TSPSolution(Data& data) : vector<int>(2), cost(0), data(data) {
+        TSPSolution(const Data& data) : vector<int>(2), cost(0), data(data) {
             this->at(route_start) = this->at(route_start) = 0;
             this->reserve(size_t(data.getDimension()));
         }
@@ -97,7 +97,7 @@ namespace TSPMH {
 
         StackedTSPSolution(const StackedTSPSolution& obj) : TSPSolution(obj) { }
 
-        StackedTSPSolution(Data& data) : TSPSolution(data) { }
+        StackedTSPSolution(const Data& data) : TSPSolution(data) { }
 
         StackedTSPSolution& operator=(const StackedTSPSolution& t) {
             TSPSolution::operator=(t);
