@@ -7,7 +7,7 @@
 #define it(i) begin() + i
 
 #ifdef vprintfen
-#define vprintf dprintf
+#define vprintf dbgprintf
 #else
 #define vprintf(...)
 #endif

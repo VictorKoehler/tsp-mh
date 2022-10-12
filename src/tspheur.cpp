@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 
+#include "global.h"
 #include "tspheur.h"
 
 using namespace std;
@@ -101,7 +102,7 @@ namespace TSPMH {
         for (int i = 0; i < Imax; i++) {
             StackedTSPSolution bestCandidate = solutionConstructor(data); // s'
             StackedTSPSolution candidate = bestCandidate; // s
-            dprintf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
+            dbgprintf("GILS-RVND loop #%d of %d, started with cost %lf. Best know: %lf\n", i, Imax, candidate.cost, best.cost);
 
             int ccrvnd = 0;
             for (int j = 0; j < Iils; j++, ccrvnd++) {
@@ -123,7 +124,7 @@ namespace TSPMH {
                 }
 
                 if (candidate.cost < bestCandidate.cost) { // s < s'
-                    dprintf("RVND loop #%d, new cost update: %lf\n", ccrvnd, candidate.cost);
+                    dbgprintf("RVND loop #%d, new cost update: %lf\n", ccrvnd, candidate.cost);
                     assert(candidate.cost == candidate.update_cost());
                     bestCandidate = candidate; // s' := s
                     j = 0;
@@ -134,7 +135,7 @@ namespace TSPMH {
             if (bestCandidate.cost < best.cost) {
                 best = bestCandidate;
                 assert(bestCandidate.cost == bestCandidate.update_cost());
-                dprintf("GILS-RVND loop #%d of %d, with %d iterations updated cost to %lf\n", i, Imax, ccrvnd, best.cost);
+                dbgprintf("GILS-RVND loop #%d of %d, with %d iterations updated cost to %lf\n", i, Imax, ccrvnd, best.cost);
             }
         }
 

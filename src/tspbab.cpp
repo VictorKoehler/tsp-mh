@@ -1,20 +1,12 @@
 #include "tspbab.h"
 #include <assert.h>
+#include "global.h"
 
 using namespace BranchAndBound;
 using namespace std;
 
 
 #define it(i) begin() + (i)
-
-#ifndef NDEBUG
-#define dprintf(...) printf(__VA_ARGS__)
-#define DEBUGSTATMENT(a) a
-#else
-#define dprintf(...)
-#define DEBUGSTATMENT(a)
-#endif
-
 
 namespace TSPBaB {
 
@@ -117,7 +109,7 @@ namespace TSPBaB {
             // Restore the k arc
             tree->costMatrix[a.first][a.second] = deleted_arc;
         }
-        dprintf("  Branches=%d;  Leafs=%d\n", cc_branches, cc_leafs);
+        dbgprintf("  Branches=%d;  Leafs=%d\n", cc_branches, cc_leafs);
 
         // Unblock arcs
         for (size_t i = 0; i < arcs.size(); i++) {
