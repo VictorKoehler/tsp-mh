@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     // TSPBaB::LagrangianTSP lag(data);
     // lag.optimize(148, 1, 10);
     // auto lags = lag.extract_solution();
-    auto lags = TSPBaB::LagrangianTSP::optimize_and_extract_solution(data, 10906, 1, 50);
+    auto lags = TSPBaB::LagrangianTSP::optimize_and_extract_solution(data, upper_bound+0.1, 1, 100, 5);
     if (lags.has_value()) {
         lags.value().printSolution();
     } else {
