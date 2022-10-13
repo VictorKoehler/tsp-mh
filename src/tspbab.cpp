@@ -10,24 +10,46 @@ using namespace std;
 
 namespace TSPBaB {
 
-    inline TSPNode* hung_subt_dec(BranchAndBound::Tree* tree) {
+    #define __copymatrix(src, dst, dimx, dimy) \
+    for (uint i = 0; i < dimx; i++) { \
+        for (uint j = 0; j < dimy; j++) { \
+            dst[i][j] = src[i][j]; \
+        } \
+    }
+
+    HungarianBaBTree::HungarianBaBTree(int d, double **m, int upper) : BranchAndBound::Tree(upper), dimension(d) {
+        hungarian_init(&hp, m, d, d, HUNGARIAN_MODE_MINIMIZE_COST);
+        costMatrix = hp.cost;
+        assignmentMatrix = hp.assignment;
+    }
+
+    HungarianBaBTree::~HungarianBaBTree() {
+        costMatrix = NULL;
+        assignmentMatrix = NULL;
+        hungarian_free(&hp);
+    }
+
+    TSPNode* HungarianBaBTree::hung_subt_dec() {
         // Then we solve the Hungarian Problem.
         //hungarian_print_costmatrix(&tree->hp);
-        double lb = tree->solve_hungarian_problem();
+        int bkpMatrix[dimension][dimension];
+        __copymatrix(hp.cost, bkpMatrix, dimension, dimension);
+        double lb = hungarian_solve(&hp);
+        __copymatrix(bkpMatrix, hp.cost, dimension, dimension);
 
         // Throw away if this solution has a bad lower_bound.
-        if (lb >= tree->upper_bound) return NULL;
+        if (lb >= this->upper_bound) return NULL;
 
         // We swap tmp0 with tmp1, so we don't need to copy every time we find a good subtour.
-        vector<int> tmp0(tree->dimension + 1), tmp1(tree->dimension + 1), *choosen = &tmp0, *bkp = &tmp1;
+        vector<int> tmp0(this->dimension + 1), tmp1(this->dimension + 1), *choosen = &tmp0, *bkp = &tmp1;
         uint choosensz = INT_HIGH, visitedcount = 0;
-        bool visited[tree->dimension] = { false };
+        bool visited[this->dimension] = { false };
 
         // We look for every subtour
-        while (visitedcount != tree->dimension) {
+        while (visitedcount != this->dimension) {
             uint s, i, ciclecount = 0; // s is the subtour start, i is the i-th position.
             for (s = 0; visited[s]; s++) {
-                assert(s != tree->dimension); // Should never happen, because of while statement.
+                assert(s != this->dimension); // Should never happen, because of while statement.
             }
             i = s;
             (*bkp)[ciclecount++] = i; // We start from the start.
@@ -35,8 +57,8 @@ namespace TSPBaB {
 
             do {
                 uint c;
-                for (c = 0; tree->assignmentMatrix[i][c] == 0; c++) {
-                    assert(c != tree->dimension); // Should never happen, because of the correctness of the algorithm
+                for (c = 0; this->assignmentMatrix[i][c] == 0; c++) {
+                    assert(c != this->dimension); // Should never happen, because of the correctness of the algorithm
                 }
                 (*bkp)[ciclecount++] = c;
                 visitedcount++;
@@ -54,14 +76,14 @@ namespace TSPBaB {
             }
         }
 
-        assert(choosensz <= tree->dimension + 1);
+        assert(choosensz <= this->dimension + 1);
         choosen->resize(choosensz); // Truncate the vector
         TSPNode* child = new TSPNode(lb);
         child->subtour = *choosen; // Now we copy
         return child;
     }
 
-    void TSPNode::solve(Tree* tree) {
+    void TSPNode::solve(HungarianBaBTree* tree) {
         #ifndef NDEBUG
         printf("TSPNode::solve - Lower_bound=%d;  Height=%lu;  Subtour Arcs=%lu;", this->lower_bound, arcs.size(), subtour.size());
         int cc_branches = 0, cc_leafs = 0;
@@ -88,7 +110,7 @@ namespace TSPBaB {
             // }
             // cout << a.first << "," << a.second << "\n";
 
-            TSPNode* child = hung_subt_dec(tree);
+            TSPNode* child = tree->hung_subt_dec();
             if (child != NULL) {
                 child->arcs = arcs;
                 child->arcs.push_back(a);
@@ -118,14 +140,17 @@ namespace TSPBaB {
         }
     }
 
-
-    shared_ptr<TSPNode> solveTSPBab(int dimension, double **matrix, int upper_bound) {
-        Tree tree(dimension, matrix, upper_bound);
-        auto root = hung_subt_dec(&tree);
+    shared_ptr<TSPNode> TSPNode::solveTSPBab(int dimension, double **matrix, int upper_bound) {
+        HungarianBaBTree tree(dimension, matrix, upper_bound);
+        auto root = tree.hung_subt_dec();
         if (uint(root->subtour.size()) == dimension + 1u) {
             return shared_ptr<TSPNode>(root);
         }
         else tree.solve(NodePtr(root));
         return dynamic_pointer_cast<TSPNode>(tree.best_node);
+    }
+
+    shared_ptr<TSPNode> solveTSPBab(int dimension, double **matrix, int upper_bound) {
+        return TSPNode::solveTSPBab(dimension, matrix, upper_bound);
     }
 }

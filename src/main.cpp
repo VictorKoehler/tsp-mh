@@ -17,7 +17,7 @@ void realignData();
 int main(int argc, char** argv) {
     srand(RSEED);
 
-    int upper_bound = BranchAndBound::INT_HIGH;
+    int upper_bound = TSPBaB::INT_HIGH;
     if (argc == 3) {
         argc--;
         upper_bound = atoi(argv[2]);
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     // exit(1);
 
 
-    if (upper_bound == BranchAndBound::INT_HIGH) {
+    if (upper_bound == TSPBaB::INT_HIGH) {
         auto a = TSPMH::gils_rvnd(data, 1, 10);
         upper_bound = int(a.cost) + 5; // safety margin
         printf("Choosen upperbound by heurist: %d\n", upper_bound);
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     } else {
         std::cout << "LAGRANGIAN DID NOT YIELD A VALID SOLUTION!\n";
     }
-    exit(1);
+    // exit(1);
 
     auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
     cout << "Prohibited arcs:";
