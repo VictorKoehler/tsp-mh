@@ -6,16 +6,27 @@
 #include "prim.h"
 #include "matrix.h"
 
-
 #define cost(i, j) (i == cost_matrix.size() ? data(i, j) - u[i] - u[j] : cost_matrix(i, j))
 
 
 namespace TSPBaB {
     LagrangianTSP::LagrangianTSP(const Data& data) : data(data), best_u(data.getDimension(), 0) { }
 
-    LagrangianTSP::LagrangianTSP(const LagrangianTSP& parent) : data(parent.data), best_u(parent.best_u) {
+    LagrangianTSP::LagrangianTSP(const LagrangianTSP& parent) : data(parent.data), disabled_arcs(parent.disabled_arcs), best_u(parent.best_u) { }
+
+    void LagrangianTSP::disable_arc(int i, int j) {
+        disabled_arcs.emplace(i, j);
     }
 
+    void LagrangianTSP::disable_edge(int i, int j) {
+        disable_arc(i, j);
+        disable_arc(j, i);
+    }
+
+    bool LagrangianTSP::is_arc_disabled(int i, int j) {
+        return disabled_arcs.find(std::make_pair(i, j)) != disabled_arcs.end();
+    }
+    
     double LagrangianTSP::optimize(double ub, double epsilon_k, int max_iter, int max_iter_without_improv) {
         Simple2DMatrix<double> cost_matrix(data.getDimension()-1);
         std::vector<double> u;
@@ -30,7 +41,7 @@ namespace TSPBaB {
         for (int iter = 1, iter_wo_improv = 0; iter <= max_iter && iter_wo_improv <= max_iter_without_improv; iter++) {
             for (int i = 0; i < cost_matrix.size(); i++) // last is left out
                 for (int j = 0; j < cost_matrix.size(); j++) // last is left out
-                    cost_matrix(i, j) = data(i, j) - u[i] - u[j];
+                    cost_matrix(i, j) = is_arc_disabled(i, j) ? std::numeric_limits<double>::max() : data(i, j) - u[i] - u[j];
             
             onetree = prims_algorithm(cost_matrix);
 
