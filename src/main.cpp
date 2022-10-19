@@ -54,16 +54,16 @@ int main(int argc, char** argv) {
 
     if (upper_bound == TSPBaB::INT_HIGH) {
         auto a = TSPMH::gils_rvnd(data, 1, 10);
-        upper_bound = int(a.cost) + 5; // safety margin
+        upper_bound = int(a.cost); // safety margin
         printf("Choosen upperbound by heurist: %d\n", upper_bound);
     }
 
-    // TSPBaB::LagrangianTSP lag(data);
-    // lag.optimize(148, 1, 10);
-    // auto lags = lag.extract_solution();
-    auto lags = TSPBaB::LagrangianTSP::optimize_and_extract_solution(data, upper_bound+0.1, 1, 100, 5);
+    auto lag = TSPLagrangian::LagrangianTSP(data);
+    lag.optimize(upper_bound, 1, 100, 5);
+    auto lags = lag.extract_solution();
     if (lags.has_value()) {
         lags.value().printSolution();
+        std::cout << "\n\n";
     } else {
         std::cout << "LAGRANGIAN DID NOT YIELD A VALID SOLUTION!\n";
     }

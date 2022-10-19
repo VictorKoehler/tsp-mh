@@ -6,13 +6,11 @@
 #include "prim.h"
 #include "matrix.h"
 
-#define cost(i, j) (i == cost_matrix.size() ? data(i, j) - u[i] - u[j] : cost_matrix(i, j))
+namespace TSPLagrangian {
+    LagrangianTSP::LagrangianTSP(const Data& data) : data(data), best_u(data.getDimension(), 0), best_lb(0) { }
 
-
-namespace TSPBaB {
-    LagrangianTSP::LagrangianTSP(const Data& data) : data(data), best_u(data.getDimension(), 0) { }
-
-    LagrangianTSP::LagrangianTSP(const LagrangianTSP& parent) : data(parent.data), disabled_arcs(parent.disabled_arcs), best_u(parent.best_u) { }
+    LagrangianTSP::LagrangianTSP(const LagrangianTSP& parent)
+     : data(parent.data), disabled_arcs(parent.disabled_arcs), best_u(parent.best_u), best_lb(parent.best_lb) { }
 
     void LagrangianTSP::disable_arc(int i, int j) {
         disabled_arcs.emplace(i, j);
@@ -23,41 +21,69 @@ namespace TSPBaB {
         disable_arc(j, i);
     }
 
-    bool LagrangianTSP::is_arc_disabled(int i, int j) {
+    bool LagrangianTSP::is_arc_disabled(int i, int j) const {
         return disabled_arcs.find(std::make_pair(i, j)) != disabled_arcs.end();
     }
+
+    template<bool zero_disabled>
+    struct Auxiliary2DCostMatrix {
+        const LagrangianTSP& tsp;
+        const std::vector<double>& u;
+
+        Auxiliary2DCostMatrix(const LagrangianTSP& tsp, const std::vector<double>& u) : tsp(tsp), u(u) {}
+        inline int size() const { return tsp.getData().getDimension(); }
+        inline double operator()(int i, int j) const {
+            if constexpr (zero_disabled) {
+                if (i == 0 || j == 0) return std::numeric_limits<double>::max();
+            }
+            assert(tsp.getData()(i, j) == tsp.getData()(j, i));
+            return tsp.is_arc_disabled(i, j) ? std::numeric_limits<double>::max() : tsp.getData()(i, j) - u[i] - u[j];
+        }
+    };
     
     double LagrangianTSP::optimize(double ub, double epsilon_k, int max_iter, int max_iter_without_improv) {
-        Simple2DMatrix<double> cost_matrix(data.getDimension()-1);
+        // Simple2DMatrix<double> cost_matrix(data.getDimension()-1);
         std::vector<double> u;
         GraphEdges onetree;
 
         best_lb = -std::numeric_limits<double>::infinity();
         u.swap(best_u);
 
+        if (Verbosity >= 2) {
+            double su = 0;
+            for (const auto ui : u) su += ui;
+            std::cout << "LAGRANGIAN OPTIMIZATION: " << max_iter << " maximum iterations, " << max_iter_without_improv << " without improvements, ub="
+                        << ub << ", e_k=" << epsilon_k << ", sum(u)=" << su << "\n";
+        }
+
         if (max_iter == -1) max_iter = std::numeric_limits<int>::max();
         if (max_iter_without_improv == -1) max_iter_without_improv = std::numeric_limits<int>::max();
 
         for (int iter = 1, iter_wo_improv = 0; iter <= max_iter && iter_wo_improv <= max_iter_without_improv; iter++) {
-            for (int i = 0; i < cost_matrix.size(); i++) // last is left out
-                for (int j = 0; j < cost_matrix.size(); j++) // last is left out
-                    cost_matrix(i, j) = is_arc_disabled(i, j) ? std::numeric_limits<double>::max() : data(i, j) - u[i] - u[j];
+            // for (int i = 0; i < cost_matrix.size(); i++) // last is left out
+            //     for (int j = 0; j < cost_matrix.size(); j++) // last is left out
+            //         cost_matrix(i, j) = is_arc_disabled(i, j) ? std::numeric_limits<double>::max() : data(i, j) - u[i] - u[j];
             
-            onetree = prims_algorithm(cost_matrix);
+            const Auxiliary2DCostMatrix<true> cost_matrix(*this, u);
+            onetree = prims_algorithm(cost_matrix, 1);
+            assert(std::get<1>(onetree.back()) == 0);
+            onetree.pop_back();
+            assert(std::get<1>(onetree.back()) != 0);
 
-            int first_edge = 0, second_edge = 1, v = cost_matrix.size();
-            if (cost(v, first_edge) > cost(v, second_edge))
+            const Auxiliary2DCostMatrix<false> cost(*this, u);
+            int first_edge = 1, second_edge = 2, locked_vert = 0;
+            if (cost(locked_vert, first_edge) > cost(locked_vert, second_edge))
                 std::swap(first_edge, second_edge);
             
-            for (int w = 2; w < cost_matrix.size(); w++) {// connects last
-                if (cost(v, w) < cost(v, second_edge)) {
+            for (int w = 3; w < cost.size(); w++) {// connects last
+                if (cost(locked_vert, w) < cost(locked_vert, second_edge)) {
                     second_edge = w;
-                    if (cost(v, w) < cost(v, first_edge))
+                    if (cost(locked_vert, w) < cost(locked_vert, first_edge))
                         std::swap(first_edge, second_edge);
                 }
             }
-            onetree.emplace_back(v, first_edge);
-            onetree.emplace_back(v, second_edge);
+            onetree.emplace_back(locked_vert, first_edge);
+            onetree.emplace_back(locked_vert, second_edge);
 
             double nz = 0;
             for (const auto ui : u) nz += ui;
@@ -71,32 +97,36 @@ namespace TSPBaB {
                 sg[v2]--;
             }
             // std::cout << "\n";
-            if (nz > best_lb) {
-                best_lb = nz;
-                best_u = u;
-                best_onetree.swap(onetree);
-                iter_wo_improv = 0;
-            } else {
-                iter_wo_improv++;
-            }
 
 
             int sg_norm = 0;
             for (const auto sg_i : sg) sg_norm += sg_i*sg_i;
-            if (sg_norm == 0) return nz;
+
             double mi = epsilon_k*(ub-nz)/double(sg_norm);
 
-            if (Verbosity >= 0) {
-                std::cout << "LAGR: " << iter << "º iteration, z'=" << nz << ", mi=" << mi
+            if (Verbosity >= 4) {
+                std::cout << "LAGR: " << iter << ", z'=" << nz << ", mi=" << mi
                           << ", e_k=" << epsilon_k << ", |sg'|=" << sg_norm;
-                if (Verbosity >= 3) {
+                if (Verbosity >= 5) {
                     std::cout << ", sg'=[";
                     std::copy(sg.begin(), sg.end(), std::ostream_iterator<int>(std::cout, " "));
                     std::cout << "], u'=[";
                     std::copy(u.begin(), u.end(), std::ostream_iterator<double>(std::cout, " "));
                     std::cout << "]";
                 }
-                std::cout << (iter_wo_improv == 0 ? " *\n" : "\n");
+                std::cout << (nz > best_lb ? " *\n" : "\n");
+            }
+
+            if (nz > best_lb) {
+                best_lb = nz;
+                best_u = u;
+                best_onetree.swap(onetree);
+                if (sg_norm == 0) return nz;
+                iter_wo_improv = 0;
+            } else if (sg_norm == 0) {
+                throw std::runtime_error("OLA!");
+            } else {
+                iter_wo_improv++;
             }
 
             for (size_t i = 0; i < u.size(); i++) u[i] += mi*double(sg[i]);
@@ -105,11 +135,16 @@ namespace TSPBaB {
     }
 
     std::optional<TSPMH::TSPSolution> LagrangianTSP::extract_solution() const {
-        return extract_solution(data);
+        std::vector< std::vector<int> > adj_list(data.getDimension());
+        return extract_solution(adj_list);
     }
 
-    std::optional<TSPMH::TSPSolution> LagrangianTSP::extract_solution(const Data& dp, int start) const {
-        std::vector< std::vector<int> > adj_list(data.getDimension());
+    std::optional<TSPMH::TSPSolution> LagrangianTSP::extract_solution(std::vector< std::vector<int> >& adj_list) const {
+        return extract_solution(getData(), adj_list, 0);
+    }
+
+    std::optional<TSPMH::TSPSolution> LagrangianTSP::extract_solution(const Data& dp, std::vector< std::vector<int> >& adj_list, int start) const {
+        if (best_onetree.empty()) throw std::runtime_error("Not optimized");
         for (const auto [v1, v2] : best_onetree) {
             adj_list[v1].push_back(v2);
             adj_list[v2].push_back(v1);
@@ -155,13 +190,4 @@ namespace TSPBaB {
         }
     }
 
-
-    std::optional<TSPMH::TSPSolution> LagrangianTSP::optimize_and_extract_solution(Data& data, double ub, double epsilon_k,
-            int max_iter, int max_iter_without_improv, int v0) {
-        swap_data_vertices(data, v0, data.getDimension()-1);
-        LagrangianTSP ltsp(data);
-        ltsp.optimize(ub, epsilon_k, max_iter, max_iter_without_improv);
-        swap_data_vertices(data, v0, data.getDimension()-1);
-        return ltsp.extract_solution(data, data.getDimension()-1);
-    }
 }

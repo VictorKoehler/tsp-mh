@@ -6,9 +6,9 @@
 #include <tuple>
 #include <type_traits>
 
-namespace TSPBaB {
+namespace TSPLagrangian {
     template<typename MatrixLike>
-    std::vector< std::tuple<int, int> > prims_algorithm(const MatrixLike& mat) {
+    std::vector< std::tuple<int, int> > prims_algorithm(const MatrixLike& mat, int start=0) {
         using P = std::tuple<double, int, int>;
 
         std::vector< std::tuple<int, int> > ret;
@@ -17,7 +17,7 @@ namespace TSPBaB {
         std::vector<bool> visited(s, false);
         std::priority_queue<P, std::vector<P>, std::greater<P>> q;
 
-        q.push(std::make_tuple(0, -1, 0));
+        q.push(std::make_tuple(0, -1, start));
         while (visited_cc < s && !q.empty()) {
             auto t = q.top();
             q.pop();
@@ -35,7 +35,7 @@ namespace TSPBaB {
                 } else {
                     m = mat[vi][vj];
                 }
-                if (m >= 0) q.push(std::make_tuple(m, vi, vj));
+                q.push(std::make_tuple(m, vi, vj));
             }
         }
         return ret;

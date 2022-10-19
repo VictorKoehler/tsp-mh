@@ -3,7 +3,7 @@
 #include <unordered_set>
 #include "tspsolution.h"
 
-namespace TSPBaB {
+namespace TSPLagrangian {
     class LagrangianTSP {
         typedef std::vector<std::tuple<int, int>> GraphEdges;
         private:
@@ -24,7 +24,7 @@ namespace TSPBaB {
         GraphEdges best_onetree;
         double best_lb;
 
-        std::optional<TSPMH::TSPSolution> extract_solution(const Data& dp, int start = 0) const;
+        std::optional<TSPMH::TSPSolution> extract_solution(const Data& dp, std::vector< std::vector<int> >& adj_list, int start) const;
 
         static void swap_data_vertices(Data& data, int i, int j);
 
@@ -34,17 +34,17 @@ namespace TSPBaB {
 
         void disable_arc(int i, int j);
         void disable_edge(int i, int j);
-        bool is_arc_disabled(int i, int j);
+        bool is_arc_disabled(int i, int j) const;
+        std::size_t getAmountOfDisabledArcs() const { return disabled_arcs.size(); }
 
         double optimize(double ub, double epsilon_k, int max_iter=-1, int max_iter_without_improv=-1);
 
         std::optional<TSPMH::TSPSolution> extract_solution() const;
+        std::optional<TSPMH::TSPSolution> extract_solution(std::vector< std::vector<int> >& adj_list) const;
 
         const std::vector<double>& getSolutionLambda() const { return best_u; }
         const GraphEdges& getSolutionOneTree() const { return best_onetree; }
         double getSolutionLB() const { return best_lb; }
-
-        static std::optional<TSPMH::TSPSolution> optimize_and_extract_solution(Data& data, double ub, double epsilon_k,
-            int max_iter=-1, int max_iter_without_improv=-1, int v0 = 0);
+        const Data& getData() const { return data; }
     };
 }
