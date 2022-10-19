@@ -85,7 +85,7 @@ namespace TSPBaB {
 
     void TSPNode::solve(HungarianBaBTree* tree) {
         #ifndef NDEBUG
-        printf("TSPNode::solve - Lower_bound=%d;  Height=%lu;  Subtour Arcs=%lu;", this->lower_bound, arcs.size(), subtour.size());
+        printf("TSPNode::solve - Lower_bound=%lf;  Height=%lu;  Subtour Arcs=%lu;", this->lower_bound, arcs.size(), subtour.size());
         int cc_branches = 0, cc_leafs = 0;
         #endif
 

@@ -23,12 +23,14 @@ namespace TSPBaB {
     struct TSPNode : BranchAndBound::Node {
         std::vector< std::pair<int, int> > arcs;
         std::vector<int> subtour;
+        double lower_bound;
 
         TSPNode(int lb) {
             lower_bound = lb;
         }
 
-        void solve(BranchAndBound::Tree* tree) override { solve(dynamic_cast<HungarianBaBTree*>(tree)); };
+        virtual double getLowerBound() const override { return lower_bound; };
+        bool solve(BranchAndBound::Tree* tree) override { solve(dynamic_cast<HungarianBaBTree*>(tree)); return false; };
         void solve(HungarianBaBTree* tree);
         ~TSPNode() override {}
 

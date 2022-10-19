@@ -1,3 +1,6 @@
+#ifndef __TSPBAB_CLASS__
+#define __TSPBAB_CLASS__
+
 #include <vector>
 #include <queue>
 #include <iostream>
@@ -10,14 +13,13 @@ namespace BranchAndBound {
     class Tree;
 
     struct Node {
-        public:
         Node(const Node&) = delete;
         void operator=(const Node&) = delete;
         Node() {}
-        Node(int lb) : lower_bound(lb) {}
 
-        int lower_bound;
-        virtual void solve(Tree* tree) = 0; 
+        virtual double getLowerBound() const = 0;
+        inline double lb() const { return getLowerBound(); }
+        virtual bool solve(Tree* tree) = 0; 
         virtual ~Node() {}
     };
     
@@ -25,9 +27,8 @@ namespace BranchAndBound {
 
     class NodeComparator {
         public:
-        bool operator()(const NodePtr a, const NodePtr b)
-        {
-            return (a->lower_bound > b->lower_bound);
+        bool operator()(const NodePtr a, const NodePtr b) {
+            return a->lb() > b->lb();
         }
     };
 
@@ -35,12 +36,12 @@ namespace BranchAndBound {
 
     class Tree {
         protected:
-        int upper_bound;
+        double upper_bound;
         std::priority_queue< NodePtr, std::vector<NodePtr>, NodeComparator > nodes;
         NodePtr best_node;
 
         public:
-        Tree(int upper=std::numeric_limits<int>::max()) : upper_bound(upper) { }
+        Tree(double upper=std::numeric_limits<double>::max()) : upper_bound(upper) { }
         virtual ~Tree() {}
 
         void solve(NodePtr root) {
@@ -50,8 +51,15 @@ namespace BranchAndBound {
             while (!nodes.empty()) {
                 NodePtr n = std::move(nodes.top());
                 nodes.pop();
-                if (n->lower_bound <= upper_bound) {
-                    n->solve(this);
+                // if (nodes.size() % 1000 == 0) std::cout << "B&B Tree: " << nodes.size() << " nodes, lb=" << n->lb() << ", ub=" << upper_bound << "\n";
+                if (n->lb() <= upper_bound + 0.1) {
+                    if (n->solve(this)) {
+                        std::cout << "Found feasible solution of value " << n->lb() << ", best UB so far was " << upper_bound;
+                        if (n->lb() < upper_bound) {
+                            std::cout << ". Updating it.\n";
+                            setBest(n, true);
+                        } else std::cout << ".\n";
+                    }
                 }
             }
         }
@@ -67,7 +75,7 @@ namespace BranchAndBound {
         inline void setBest(NodePtr node, bool setUB) {
             best_node = node;
             if (setUB) {
-                upper_bound = best_node->lower_bound;
+                upper_bound = best_node->lb();
             }
         }
 
@@ -78,5 +86,14 @@ namespace BranchAndBound {
         const NodePtr& getBest() const {
             return best_node;
         }
+
+        double getUpperBound() const {
+            return upper_bound;
+        }
+
+        double getLowerBound() const {
+            return getBest() ? getBest()->lb() : -std::numeric_limits<double>::infinity();
+        }
     };
 }
+#endif

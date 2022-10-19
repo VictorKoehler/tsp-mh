@@ -3,7 +3,7 @@
 #include "data.h"
 #include "tests.h"
 #include "tspbab.h"
-#include "lagrangian.h"
+#include "lagrbab.h"
 
 using namespace std;
 
@@ -51,7 +51,6 @@ int main(int argc, char** argv) {
     // std::cout << "\n";
     // exit(1);
 
-
     if (upper_bound == TSPBaB::INT_HIGH) {
         auto a = TSPMH::gils_rvnd(data, 1, 10);
         upper_bound = int(a.cost); // safety margin
@@ -67,7 +66,13 @@ int main(int argc, char** argv) {
     } else {
         std::cout << "LAGRANGIAN DID NOT YIELD A VALID SOLUTION!\n";
     }
-    // exit(1);
+
+    TSPBaB::TSPLagrangianBaBTree lagrbab(data, upper_bound+1.1);
+    lagrbab.solve();
+    if (lagrbab.getBest()) {
+        std::cout << "LAGRANGIAN SOLUTION: lb=" << lagrbab.getLowerBound() << ", up=" << lagrbab.getUpperBound() << "\n";
+        dynamic_cast<TSPBaB::TSPLagrNode*>(lagrbab.getBest().get())->getSolution().extract_solution().value().printSolution();
+    }
 
     auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
     cout << "Prohibited arcs:";
