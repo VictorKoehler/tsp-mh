@@ -123,9 +123,20 @@ namespace TSPLagrangian {
                 best_onetree.swap(onetree);
                 if (sg_norm == 0) return nz;
                 iter_wo_improv = 0;
-            } else if (sg_norm == 0) {
-                throw std::runtime_error("OLA!");
             } else {
+                if (unlikely(sg_norm == 0)) {
+                    std::cout << "LAGRANGIAN OPTIMIZATION SPECIAL CASE: " << iter << "/" << max_iter << " iterations, " << iter_wo_improv << "/"
+                              << max_iter_without_improv << " without improvements, ub=" << ub << ", z'=" << nz << ", mi=" << mi << ", e_k="
+                              << epsilon_k << ", |sg'|=" << sg_norm << ", sg'=[";
+                    std::copy(sg.begin(), sg.end(), std::ostream_iterator<int>(std::cout, " "));
+                    std::cout << "], u'=[";
+                    std::copy(u.begin(), u.end(), std::ostream_iterator<double>(std::cout, " "));
+                    std::cout << "]\n\nBest Solution: z=" << best_lb << ", u=[";
+                    std::copy(best_u.begin(), best_u.end(), std::ostream_iterator<double>(std::cout, " "));
+                    std::cout << "], Tree=[";
+                    for (const auto [v0, v1] : best_onetree) std::cout << " " << v0 << ":" << v1;
+                    std::cout << " ]\n\n=========\n";
+                }
                 iter_wo_improv++;
             }
 

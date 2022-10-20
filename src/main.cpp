@@ -64,14 +64,16 @@ int main(int argc, char** argv) {
         lags.value().printSolution();
         std::cout << "\n\n";
     } else {
-        std::cout << "LAGRANGIAN DID NOT YIELD A VALID SOLUTION!\n";
+        std::cout << "LAGRANGIAN DID NOT YIELD A VALID SOLUTION! lb=" << lag.getSolutionLB() << "\n";
     }
 
     TSPBaB::TSPLagrangianBaBTree lagrbab(data, upper_bound+1.1);
     lagrbab.solve();
     if (lagrbab.getBest()) {
-        std::cout << "LAGRANGIAN SOLUTION: lb=" << lagrbab.getLowerBound() << ", up=" << lagrbab.getUpperBound() << "\n";
+        std::cout << "LAGRANGIAN SOLUTION: lb=" << lagrbab.getLowerBound() << ", ub=" << lagrbab.getUpperBound() << "\n";
         dynamic_cast<TSPBaB::TSPLagrNode*>(lagrbab.getBest().get())->getSolution().extract_solution().value().printSolution();
+    } else {
+        std::cout << "LAGRANGIAN B&B DID NOT YIELD A VALID SOLUTION! lb=" << lag.getSolutionLB() << "\n";
     }
 
     auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
