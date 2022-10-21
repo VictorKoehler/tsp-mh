@@ -3,10 +3,6 @@
 
 #include <vector>
 #include <queue>
-#include <iostream>
-#include <sstream>
-#include <ctime>
-#include <iomanip>
 #include <memory>
 
 namespace BranchAndBound {

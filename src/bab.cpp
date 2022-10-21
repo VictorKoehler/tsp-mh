@@ -1,3 +1,8 @@
+#include <chrono>
+#include <iostream>
+#include <sstream>
+#include <ctime>
+#include <iomanip>
 #include "bab.h"
 
 namespace BranchAndBound {
@@ -17,11 +22,12 @@ namespace BranchAndBound {
             using std::setw;
             const auto dp{std::cout.precision()};
             const auto gap = (upper_bound - n->lb()) / upper_bound * 100.0;
-            std::cout << setw(6) << iter_cc << setw(13) << nodes.size() << setw(11) << n->lb() << setw(11) << upper_bound << setw(9)
+            std::cout << setw(6) << iter_cc << setw(13) << nodes.size() << setw(11) << n->lb() << setw(11) << upper_bound << " " << setw(8)
                       << std::setprecision(4) << gap << "% " << setw(5) << solutions << "   " << timeStamp() << "\n" << std::setprecision(dp);
         };
 
-        std::cout << "B&B Tree:\n  iter | Nodes Left |       lb |       ub |     gap | sol | time\n";
+        auto st = std::chrono::steady_clock::now();
+        std::cout << "B&B Tree started at " << timeStamp() << ":\n  iter | Nodes Left |       lb |       ub |     gap | sol | time\n";
         while (!nodes.empty()) {
             NodePtr n = std::move(nodes.top());
             nodes.pop();
@@ -37,6 +43,10 @@ namespace BranchAndBound {
             }
             iter_cc++;
         }
+
+        std::cout << "B&B Tree finished at " << timeStamp() << "; Elapsed "
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - st).count() << " ms\n";
+        log(getBest());
     }
 
     void Tree::branch(NodePtr node) {
