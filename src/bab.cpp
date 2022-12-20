@@ -29,6 +29,10 @@ namespace BranchAndBound {
         auto st = std::chrono::steady_clock::now();
         std::cout << "B&B Tree started at " << timeStamp() << ":\n  iter | Nodes Left |       lb |       ub |     gap | sol | time\n";
         while (!nodes.empty()) {
+            if (unlikely(int(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - st).count()) > time_limit)) {
+                std::cout << "B&B Tree stoping due to time limit:\n";
+                break;
+            }
             NodePtr n = std::move(nodes.top());
             nodes.pop();
             if (iter_cc % 250 == 0) log(n);

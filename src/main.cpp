@@ -4,6 +4,7 @@
 #include "tests.h"
 #include "tspbab.h"
 #include "lagrbab.h"
+#include "TimePoint.hpp"
 
 using namespace std;
 
@@ -17,6 +18,7 @@ void realignData();
 int main(int argc, char** argv) {
     srand(RSEED);
 
+    TimePoint tp;
     int upper_bound = TSPBaB::INT_HIGH;
     if (argc == 3) {
         argc--;
@@ -60,6 +62,7 @@ int main(int argc, char** argv) {
     auto lag = TSPLagrangian::LagrangianTSP(data);
     lag.optimize(upper_bound, 1, 100, 5);
     auto lags = lag.extract_solution();
+    std::cout << "LagrangianTSP finished. Total elapsed time: " << tp.diff_seconds() << "\n";
     if (lags.has_value()) {
         lags.value().printSolution();
         std::cout << "\n\n";
@@ -69,6 +72,7 @@ int main(int argc, char** argv) {
 
     TSPBaB::TSPLagrangianBaBTree lagrbab(data, upper_bound+1.1);
     lagrbab.solve();
+    std::cout << "TSPLagrangianBaBTree finished. Total elapsed time: " << tp.diff_seconds() << "\n";
     if (lagrbab.getBest()) {
         std::cout << "LAGRANGIAN SOLUTION: lb=" << lagrbab.getLowerBound() << ", ub=" << lagrbab.getUpperBound() << "\n";
         dynamic_cast<TSPBaB::TSPLagrNode*>(lagrbab.getBest().get())->getSolution().extract_solution().value().printSolution();
@@ -76,16 +80,16 @@ int main(int argc, char** argv) {
         std::cout << "LAGRANGIAN B&B DID NOT YIELD A VALID SOLUTION! lb=" << lag.getSolutionLB() << "\n";
     }
 
-    auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
-    cout << "Prohibited arcs:";
-    for (auto a : bab->arcs) {
-        cout << " " << a.first << "," << a.second;
-    }
-    cout << endl << "Tour:";
-    for (auto t : bab->subtour) {
-        cout << " " << t;
-    }
-    cout << endl << "Cost: " << bab->lower_bound << endl;
+    // auto bab = TSPBaB::solveTSPBab(data.getDimension(), data.getMatrixCost(), upper_bound);
+    // cout << "Prohibited arcs:";
+    // for (auto a : bab->arcs) {
+    //     cout << " " << a.first << "," << a.second;
+    // }
+    // cout << endl << "Tour:";
+    // for (auto t : bab->subtour) {
+    //     cout << " " << t;
+    // }
+    // cout << endl << "Cost: " << bab->lower_bound << endl;
 
     return 0;
 }

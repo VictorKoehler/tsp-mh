@@ -4,6 +4,8 @@
 #include <vector>
 #include <queue>
 #include <memory>
+#include <limits>
+#include "global.h"
 
 namespace BranchAndBound {
     
@@ -37,9 +39,10 @@ namespace BranchAndBound {
         double upper_bound;
         pqueue nodes;
         NodePtr best_node;
+        int time_limit;
 
         public:
-        Tree(double upper=std::numeric_limits<double>::max()) : upper_bound(upper) { }
+        Tree(double upper=std::numeric_limits<double>::max(), int time_limit=5) : upper_bound(upper), time_limit(time_limit) { }
         virtual ~Tree() {}
         void solve(NodePtr root);
         void branch(NodePtr node);
