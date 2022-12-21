@@ -1,0 +1,13 @@
+NAME: cidp
+TYPE: TSP
+COMMENT: Example taken from Cid/relaxlag-2p.pdf by prof Cid de Souza, with vertices 1 and 5 swapped.
+DIMENSION: 5
+EDGE_WEIGHT_TYPE: EXPLICIT
+EDGE_WEIGHT_FORMAT: FULL_MATRIX 
+EDGE_WEIGHT_SECTION
+ 0 50 26 30 40
+50  0 24 40 30
+26 24  0 24 26
+30 40 24  0 50
+40 30 26 50  0
+EOF
